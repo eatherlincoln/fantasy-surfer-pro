@@ -1,7 +1,8 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Surfer, Tier } from '../types';
-import { MOCK_SURFERS, TOTAL_BUDGET, TIER_LIMITS } from '../constants';
+import { TOTAL_BUDGET, TIER_LIMITS } from '../constants';
+import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
 
 interface TeamBuilderProps {
@@ -12,6 +13,7 @@ interface TeamBuilderProps {
 
 const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave }) => {
   const [selectedSurfers, setSelectedSurfers] = useState<Surfer[]>(initialTeam);
+  const [allSurfers, setAllSurfers] = useState<Surfer[]>([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
   const [expandedTiers, setExpandedTiers] = useState<Record<Tier, boolean>>({
@@ -19,10 +21,22 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     [Tier.B]: false,
     [Tier.C]: false,
   });
-  
-  const totalSpent = useMemo(() => 
+
+  useEffect(() => {
+    const fetchSurfers = async () => {
+      const { data, error } = await supabase.from('surfers').select('*');
+      if (error) {
+        console.error('Error fetching surfers:', error);
+      } else if (data) {
+        setAllSurfers(data as Surfer[]);
+      }
+    };
+    fetchSurfers();
+  }, []);
+
+  const totalSpent = useMemo(() =>
     selectedSurfers.reduce((acc, s) => acc + s.value, 0)
-  , [selectedSurfers]);
+    , [selectedSurfers]);
 
   const counts = useMemo(() => ({
     [Tier.A]: selectedSurfers.filter(s => s.tier === Tier.A).length,
@@ -37,7 +51,9 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
       const prompt = `You are an expert World Surf League fantasy analyst. 
       Current Event: Pipeline Pro, Hawaii. 
       Conditions: 8-10ft, clean west swell. 
-      Available Tier A Surfers: ${MOCK_SURFERS.filter(s => s.tier === Tier.A).map(s => s.name).join(', ')}.
+      Current Event: Pipeline Pro, Hawaii. 
+      Conditions: 8-10ft, clean west swell. 
+      Available Tier A Surfers: ${allSurfers.filter(s => s.tier === Tier.A).map(s => s.name).join(', ')}.
       Suggest 2 surfers from Tier A and 1 from Tier C that are "must-haves" for these specific conditions.
       Keep the response concise (max 3 sentences) and highly strategic.`;
 
@@ -73,9 +89,9 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
   const getTierColor = (tier: Tier) => {
     switch (tier) {
-      case Tier.A: return 'border-amber-400';
+      case Tier.A: return 'border-pop'; // Yellow/Gold highlight
       case Tier.B: return 'border-primary-dark';
-      case Tier.C: return 'border-slate-300';
+      case Tier.C: return 'border-gray-300';
       default: return 'border-gray-200';
     }
   };
@@ -91,14 +107,14 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
         key={surfer.id}
         onClick={() => toggleSurfer(surfer)}
         disabled={isFull || isEliminated || isLocked}
-        className={`${inGrid ? 'w-full' : 'min-w-[155px] md:min-w-[190px] flex-shrink-0'} bg-white rounded-[40px] p-6 text-center border-2 transition-all transform active:scale-95 snap-start ${isSelected ? `${tierColor} shadow-xl scale-105 z-10` : 'border-transparent apple-shadow'} ${isFull || isEliminated || isLocked ? 'opacity-40 grayscale pointer-events-none shadow-none' : ''} hover:border-gray-100`}
+        className={`${inGrid ? 'w-full' : 'min-w-[155px] md:min-w-[190px] flex-shrink-0'} bg-white rounded-[40px] p-6 text-center border-2 transition-all duration-300 active:scale-95 snap-start ${isSelected ? `${tierColor} shadow-[0_20px_40px_-10px_rgba(0,0,0,0.2)] scale-105 z-10 ring-4 ring-offset-2 ring-pop/20` : 'border-transparent apple-shadow hover:border-gray-100'} ${isFull || isEliminated || isLocked ? 'opacity-40 grayscale pointer-events-none shadow-none' : ''}`}
       >
         <div className="relative mb-5">
           <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto bg-gray-50 overflow-hidden border-2 ${isSelected ? tierColor : 'border-background'} shadow-sm`}>
             <img src={surfer.image} alt={surfer.name} className="w-full h-full object-cover object-top" />
           </div>
           {isSelected && (
-            <div className={`absolute top-0 right-1 md:right-4 w-8 h-8 ${tierColor.replace('border-', 'bg-')} rounded-full flex items-center justify-center text-white border-4 border-white shadow-md`}>
+            <div className={`absolute top-0 right-1 md:right-4 w-8 h-8 ${tierColor.replace('border-', 'bg-')} rounded-full flex items-center justify-center text-white border-4 border-white shadow-md animate-in zoom-in`}>
               <span className="material-icons-round text-lg font-black">check</span>
             </div>
           )}
@@ -116,28 +132,28 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   };
 
   const renderTier = (tier: Tier, label: string) => {
-    const surfers = MOCK_SURFERS.filter(s => s.tier === tier).sort((a, b) => {
+    const surfers = allSurfers.filter(s => s.tier === tier).sort((a, b) => {
       const aSelected = selectedSurfers.some(s => s.id === a.id);
       const bSelected = selectedSurfers.some(s => s.id === b.id);
       if (aSelected && !bSelected) return -1;
       if (!aSelected && bSelected) return 1;
       return 0;
     });
-    
+
     const isExpanded = expandedTiers[tier];
 
     return (
       <div key={tier} className="mb-20 last:mb-0">
         <div className="flex justify-between items-center mb-8 px-1">
           <div className="flex items-center gap-5">
-             <div className={`w-2 h-10 md:h-14 rounded-full ${getTierColor(tier).replace('border-', 'bg-')}`}></div>
-             <div>
-               <h3 className="text-3xl md:text-4xl font-black tracking-tight text-gray-900">Tier {tier}</h3>
-               <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</p>
-             </div>
+            <div className={`w-2 h-10 md:h-14 rounded-full ${getTierColor(tier).replace('border-', 'bg-')}`}></div>
+            <div>
+              <h3 className="text-3xl md:text-4xl font-black tracking-tight text-gray-900">Tier {tier}</h3>
+              <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</p>
+            </div>
           </div>
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => toggleTierExpand(tier)}
               className="text-xs font-black text-primary-dark underline uppercase px-3 py-2 hover:bg-white rounded-xl transition"
             >
@@ -148,10 +164,10 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             </span>
           </div>
         </div>
-        
+
         {isExpanded ? (
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 animate-in fade-in zoom-in-95 duration-300">
-             {surfers.map(surfer => renderSurferCard(surfer, true))}
+            {surfers.map(surfer => renderSurferCard(surfer, true))}
           </div>
         ) : (
           <div className="relative overflow-visible">
@@ -173,8 +189,8 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
           {surfer ? (
             <>
               {!isLocked && (
-                <button 
-                  className="absolute -top-1 -right-1 w-6 h-6 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center cursor-pointer shadow-md active:scale-90 border border-gray-100 hover:text-red-500 transition-colors z-30" 
+                <button
+                  className="absolute -top-1 -right-1 w-6 h-6 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center cursor-pointer shadow-md active:scale-90 border border-gray-100 hover:text-red-500 transition-colors z-30"
                   onClick={(e) => { e.stopPropagation(); toggleSurfer(surfer); }}
                 >
                   <span className="material-icons-round text-sm md:text-lg">close</span>
@@ -188,7 +204,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             <span className="text-lg md:text-xl text-gray-200 font-black uppercase tracking-tighter opacity-50">{tier}</span>
           )}
         </div>
-        
+
         {/* Name underneath the circle */}
         <div className="mt-4 text-center min-h-[40px] flex flex-col items-center">
           {surfer ? (
@@ -223,9 +239,9 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
       {aiAdvice && (
         <div className="mb-14 bg-primary/10 border-2 border-primary/20 rounded-[48px] p-10 relative overflow-hidden animate-in fade-in slide-in-from-top duration-500 shadow-sm">
           <div className="absolute top-0 right-0 p-6">
-             <button onClick={() => setAiAdvice(null)} className="text-primary-dark opacity-40 hover:opacity-100 transition">
-               <span className="material-icons-round">close</span>
-             </button>
+            <button onClick={() => setAiAdvice(null)} className="text-primary-dark opacity-40 hover:opacity-100 transition">
+              <span className="material-icons-round">close</span>
+            </button>
           </div>
           <div className="flex items-start gap-8">
             <div className="w-16 h-16 rounded-[24px] bg-primary text-white flex items-center justify-center flex-shrink-0 shadow-lg">
@@ -251,9 +267,9 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
         <div className="lg:col-span-5 lg:sticky lg:top-24 order-1 lg:order-2 z-40">
           {/* Main Summary Panel */}
           <div className="bg-white rounded-[64px] p-10 md:p-14 apple-shadow border border-white/80 backdrop-blur-sm">
-            
+
             {!aiAdvice && (
-              <button 
+              <button
                 onClick={fetchAiAdvice}
                 disabled={isAiLoading || isLocked}
                 className="w-full mb-12 py-4 rounded-3xl bg-accent/20 text-primary-dark font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-accent/40 transition active:scale-95 border border-white shadow-sm"
@@ -270,40 +286,39 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             )}
 
             <div className="flex justify-between items-center mb-14 px-2">
-               <div className="flex flex-col">
-                 <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2">Budget</span>
-                 <span className={`text-5xl md:text-6xl font-black tracking-tighter ${totalSpent > TOTAL_BUDGET ? 'text-red-500' : 'text-primary'}`}>
-                   ${(TOTAL_BUDGET - totalSpent).toFixed(1)}<span className="text-2xl font-bold ml-1">M</span>
-                 </span>
-               </div>
-               <div className="text-right">
-                 <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2">Draft</span>
-                 <p className="text-5xl md:text-6xl font-black tracking-tighter">
-                   {selectedSurfers.length}<span className="text-2xl text-gray-200 font-bold ml-1">/8</span>
-                 </p>
-               </div>
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2">Budget</span>
+                <span className={`text-5xl md:text-6xl font-black tracking-tighter ${totalSpent > TOTAL_BUDGET ? 'text-red-500' : 'text-primary'}`}>
+                  ${(TOTAL_BUDGET - totalSpent).toFixed(1)}<span className="text-2xl font-bold ml-1">M</span>
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2">Draft</span>
+                <p className="text-5xl md:text-6xl font-black tracking-tighter">
+                  {selectedSurfers.length}<span className="text-2xl text-gray-200 font-bold ml-1">/8</span>
+                </p>
+              </div>
             </div>
 
             {/* Circular Slot 4x2 Grid */}
             <div className="grid grid-cols-4 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-12">
-               <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.A)[0]} tier={Tier.A} />
-               <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.A)[1]} tier={Tier.A} />
-               <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.C)[0]} tier={Tier.C} />
-               <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.C)[1]} tier={Tier.C} />
+              <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.A)[0]} tier={Tier.A} />
+              <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.A)[1]} tier={Tier.A} />
+              <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.C)[0]} tier={Tier.C} />
+              <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.C)[1]} tier={Tier.C} />
 
-               {[0, 1, 2, 3].map(i => (
-                 <RosterSlot key={`b-slot-${i}`} surfer={selectedSurfers.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} />
-               ))}
+              {[0, 1, 2, 3].map(i => (
+                <RosterSlot key={`b-slot-${i}`} surfer={selectedSurfers.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} />
+              ))}
             </div>
 
             <button
               disabled={!isComplete || isLocked}
               onClick={() => onSave(selectedSurfers)}
-              className={`w-full mt-16 py-6 rounded-[40px] font-black text-xl apple-shadow transform transition-all active:scale-95 ${
-                isComplete && !isLocked 
-                ? 'bg-primary-dark text-white hover:bg-primary-dark/90 hover:-translate-y-1 shadow-2xl shadow-primary/30' 
+              className={`w-full mt-16 py-6 rounded-[40px] font-black text-xl apple-shadow transform transition-all active:scale-95 ${isComplete && !isLocked
+                ? 'bg-primary-dark text-white hover:bg-primary-dark/90 hover:-translate-y-1 shadow-2xl shadow-primary/30'
                 : 'bg-accent/40 text-gray-400 cursor-not-allowed shadow-none'
-              }`}
+                }`}
             >
               {isLocked ? 'Roster Locked (Live)' : isComplete ? 'Lock In Roster' : `Select ${8 - selectedSurfers.length} Athletes`}
             </button>
