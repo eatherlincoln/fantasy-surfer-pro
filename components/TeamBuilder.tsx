@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Surfer, Tier } from '../types';
-import { TOTAL_BUDGET, TIER_LIMITS } from '../constants';
+import { TOTAL_BUDGET, TIER_LIMITS, MOCK_SURFERS } from '../constants';
 import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
 
@@ -46,9 +46,10 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   useEffect(() => {
     const fetchSurfers = async () => {
       const { data, error } = await supabase.from('surfers').select('*');
-      if (error) {
-        console.error('Error fetching surfers:', error);
-      } else if (data) {
+      if (error || !data) {
+        console.warn('Using Mock Data (Supabase offline/empty)', error);
+        setAllSurfers(MOCK_SURFERS);
+      } else {
         setAllSurfers(data as Surfer[]);
       }
     };
