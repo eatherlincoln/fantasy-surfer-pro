@@ -57,14 +57,17 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
           let validImage = mockSurfer.image;
 
           // Image Selection Logic:
-          // 1. If DB has an image and it's NOT a placeholder/avatar, prefer DB (User might have updated it)
-          // 2. Else if Mock has a "real" image (Men's photos), use Mock
-          // 3. Else fallback to whatever we have (Avatar)
-          if (dbSurfer?.image && !dbSurfer.image.includes('ui-avatars')) {
-            validImage = dbSurfer.image;
-          } else if (mockSurfer.image && !mockSurfer.image.includes('ui-avatars')) {
+          // 1. **HIGHEST PRIORITY**: Local Assets (we manually downloaded these to public/images/surfers/)
+          //    If the mock data has a local path (starts with '/'), USE IT. It is guaranteed to be fast and working.
+          if (mockSurfer.image && mockSurfer.image.startsWith('/')) {
             validImage = mockSurfer.image;
-          } else {
+          }
+          // 2. If DB has a "real" image (user uploaded or valid URL) and we don't have a local one, use DB.
+          else if (dbSurfer?.image && !dbSurfer.image.includes('ui-avatars')) {
+            validImage = dbSurfer.image;
+          }
+          // 3. Fallback to whatever mock has (likely avatar) or standard DB fallback
+          else {
             validImage = dbSurfer?.image || mockSurfer.image;
           }
 
