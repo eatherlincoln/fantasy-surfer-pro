@@ -48,28 +48,41 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     const fetchSurfers = async () => {
       try {
         const { data, error } = await supabase.from('surfers').select('*');
-        if (data && data.length > 0) {
-          // Sanitize and Repair data
-          const repairedData = data.map((s: any) => {
-            // Try to find matching mock data to repair holes (images, gender, etc)
-            const mockMatch = FULL_MOCK_SURFERS.find(m => m.name === s.name || m.id === s.id);
 
-            return {
-              ...s,
-              gender: s.gender || mockMatch?.gender || 'Male', // Fallback chain
-              status: s.status || 'Waiting',
-              tier: s.tier || mockMatch?.tier || 'A',
-              // FORCE use of Mock Image if available, effectively ignoring DB image for now to solve broken links
-              image: mockMatch?.image || s.image,
-              country: s.country || mockMatch?.country || 'Unknown',
-              flag: s.flag || mockMatch?.flag || '🏳️'
-            };
-          });
-          setAllSurfers(repairedData as Surfer[]);
-        } else {
-          console.log("Using Mock Data (No DB data found)");
-          setAllSurfers(FULL_MOCK_SURFERS);
-        }
+        // Always use FULL_MOCK_SURFERS as the canonical list to ensure no one is missing
+        // Merge DB data (status, points, etc.) into the mock data
+        const mergedData = FULL_MOCK_SURFERS.map(mockSurfer => {
+          const dbSurfer = data?.find((s: any) => s.id === mockSurfer.id || s.name === mockSurfer.name);
+
+          let validImage = mockSurfer.image;
+
+          // Image Selection Logic:
+          // 1. If DB has an image and it's NOT a placeholder/avatar, prefer DB (User might have updated it)
+          // 2. Else if Mock has a "real" image (Men's photos), use Mock
+          // 3. Else fallback to whatever we have (Avatar)
+          if (dbSurfer?.image && !dbSurfer.image.includes('ui-avatars')) {
+            validImage = dbSurfer.image;
+          } else if (mockSurfer.image && !mockSurfer.image.includes('ui-avatars')) {
+            validImage = mockSurfer.image;
+          } else {
+            validImage = dbSurfer?.image || mockSurfer.image;
+          }
+
+          return {
+            ...mockSurfer,
+            ...dbSurfer, // Overwrite with live data (points, status)
+            // Ensure essential fields are preserved from Mock if missing in DB
+            id: mockSurfer.id,
+            name: mockSurfer.name,
+            country: mockSurfer.country,
+            tier: mockSurfer.tier,
+            gender: mockSurfer.gender,
+            image: validImage
+          };
+        });
+
+        setAllSurfers(mergedData as Surfer[]);
+
       } catch (err) {
         console.error("Supabase fetch failed, keeping Mocks", err);
         setAllSurfers(FULL_MOCK_SURFERS);
