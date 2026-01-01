@@ -52,7 +52,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
       <div className="mb-10 bg-white rounded-[40px] p-8 border border-white apple-shadow relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-primary/10 transition-colors"></div>
         <div className="w-full h-32 md:h-40 rounded-3xl overflow-hidden mb-6 relative">
-          <img src="/pipe-banner-2026.png" alt="Pipeline Pro 2026 Banner" className="w-full h-full object-cover" />
+          <img src="pipe-banner-2026.png" onError={(e) => e.currentTarget.style.display = 'none'} alt="Pipeline Pro 2026 Banner" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-6">
             <h2 className="text-white text-2xl font-black uppercase tracking-tighter">Official Event</h2>
           </div>

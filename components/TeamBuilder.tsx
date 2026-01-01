@@ -32,7 +32,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   const [teamWomen, setTeamWomen] = useState<Surfer[]>(initialWomen);
 
   const [activeTab, setActiveTab] = useState<'Male' | 'Female'>('Male');
-  const [allSurfers, setAllSurfers] = useState<Surfer[]>([]);
+  const [allSurfers, setAllSurfers] = useState<Surfer[]>(MOCK_SURFERS);
 
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
@@ -45,12 +45,15 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
   useEffect(() => {
     const fetchSurfers = async () => {
-      const { data, error } = await supabase.from('surfers').select('*');
-      if (error || !data || data.length === 0) {
-        console.warn('Using Mock Data (Supabase offline/empty)', error);
-        setAllSurfers(MOCK_SURFERS);
-      } else {
-        setAllSurfers(data as Surfer[]);
+      try {
+        const { data, error } = await supabase.from('surfers').select('*');
+        if (data && data.length > 0) {
+          setAllSurfers(data as Surfer[]);
+        } else {
+          console.log("Using Mock Data (No DB data found)");
+        }
+      } catch (err) {
+        console.error("Supabase fetch failed, keeping Mocks", err);
       }
     };
     fetchSurfers();
