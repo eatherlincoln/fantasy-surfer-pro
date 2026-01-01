@@ -59,7 +59,8 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
               gender: s.gender || mockMatch?.gender || 'Male', // Fallback chain
               status: s.status || 'Waiting',
               tier: s.tier || mockMatch?.tier || 'A',
-              image: (s.image && s.image.length > 10) ? s.image : (mockMatch?.image || s.image), // Use mock image if DB image is missing/short
+              // FORCE use of Mock Image if available, effectively ignoring DB image for now to solve broken links
+              image: mockMatch?.image || s.image,
               country: s.country || mockMatch?.country || 'Unknown',
               flag: s.flag || mockMatch?.flag || '🏳️'
             };
@@ -188,7 +189,6 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             <img
               src={surfer.image.startsWith('http') ? `${surfer.image}${surfer.image.includes('?') ? '&' : '?'}v=1` : surfer.image}
               alt={surfer.name}
-              crossOrigin="anonymous"
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover object-top"
               onError={(e) => {
