@@ -1,7 +1,8 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Surfer, Tier } from '../types';
-import { TOTAL_BUDGET, TIER_LIMITS, MOCK_SURFERS } from '../constants';
+import { TOTAL_BUDGET, TIER_LIMITS } from '../constants';
+import { FULL_MOCK_SURFERS } from '../fullMockData';
 import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
 
@@ -32,7 +33,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   const [teamWomen, setTeamWomen] = useState<Surfer[]>(initialWomen);
 
   const [activeTab, setActiveTab] = useState<'Male' | 'Female'>('Male');
-  const [allSurfers, setAllSurfers] = useState<Surfer[]>(MOCK_SURFERS);
+  const [allSurfers, setAllSurfers] = useState<Surfer[]>(FULL_MOCK_SURFERS);
 
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
@@ -48,19 +49,29 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
       try {
         const { data, error } = await supabase.from('surfers').select('*');
         if (data && data.length > 0) {
-          // Sanitize data: Ensure gender exists (Default to Male if missing)
-          const sanitizedData = data.map((s: any) => ({
-            ...s,
-            gender: s.gender || 'Male',
-            status: s.status || 'Waiting',
-            tier: s.tier || 'A' // Fallback to avoid crashes
-          }));
-          setAllSurfers(sanitizedData as Surfer[]);
+          // Sanitize and Repair data
+          const repairedData = data.map((s: any) => {
+            // Try to find matching mock data to repair holes (images, gender, etc)
+            const mockMatch = FULL_MOCK_SURFERS.find(m => m.name === s.name || m.id === s.id);
+
+            return {
+              ...s,
+              gender: s.gender || mockMatch?.gender || 'Male', // Fallback chain
+              status: s.status || 'Waiting',
+              tier: s.tier || mockMatch?.tier || 'A',
+              image: (s.image && s.image.length > 10) ? s.image : (mockMatch?.image || s.image), // Use mock image if DB image is missing/short
+              country: s.country || mockMatch?.country || 'Unknown',
+              flag: s.flag || mockMatch?.flag || '🏳️'
+            };
+          });
+          setAllSurfers(repairedData as Surfer[]);
         } else {
           console.log("Using Mock Data (No DB data found)");
+          setAllSurfers(FULL_MOCK_SURFERS);
         }
       } catch (err) {
         console.error("Supabase fetch failed, keeping Mocks", err);
+        setAllSurfers(FULL_MOCK_SURFERS);
       }
     };
     fetchSurfers();
