@@ -46,7 +46,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   useEffect(() => {
     const fetchSurfers = async () => {
       const { data, error } = await supabase.from('surfers').select('*');
-      if (error || !data) {
+      if (error || !data || data.length === 0) {
         console.warn('Using Mock Data (Supabase offline/empty)', error);
         setAllSurfers(MOCK_SURFERS);
       } else {
