@@ -1,7 +1,7 @@
 import { Surfer, Tier } from './types';
 
 export const FULL_MOCK_SURFERS: Surfer[] = [
-    // --- MEN ---
+    // --- MEN (Based on Spreadsheet) ---
     // Tier A
     { id: 'yago-dora', name: 'Yago Dora', country: 'Brazil', flag: '🇧🇷', stance: 'Goofy', age: 27, value: 11.0, tier: Tier.A, image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/c97a7e74e_Yago-Dora.png', points: 0, gender: 'Male', status: 'Waiting' },
     { id: 'ethan-ewing', name: 'Ethan Ewing', country: 'Australia', flag: '🇦🇺', stance: 'Regular', age: 25, value: 10.0, tier: Tier.A, image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/53aa937f5_Ethan-Ewing.png', points: 0, gender: 'Male', status: 'Waiting' },
@@ -12,11 +12,9 @@ export const FULL_MOCK_SURFERS: Surfer[] = [
     { id: 'filipe-toledo', name: 'Filipe Toledo', country: 'Brazil', flag: '🇧🇷', stance: 'Regular', age: 29, value: 9.0, tier: Tier.A, image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/efc922ebc_Filipe-Toledo.png', points: 0, gender: 'Male', status: 'Waiting' },
     { id: 'kanoa-igarashi', name: 'Kanoa Igarashi', country: 'Japan', flag: '🇯🇵', stance: 'Regular', age: 26, value: 9.0, tier: Tier.A, image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/552a8cfc5_kanoa-Igarashi.png', points: 0, gender: 'Male', status: 'Waiting' },
     { id: 'connor-oleary', name: "Connor O'Leary", country: 'Japan', flag: '🇯🇵', stance: 'Goofy', age: 30, value: 8.0, tier: Tier.A, image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/8bc34ac4c_Connor-Oleary.png', points: 0, gender: 'Male', status: 'Waiting' },
-    // Missing JJF in constants.ts but present in seed.sql - Adding him manually
-    { id: 'john-john-florence', name: 'John John Florence', country: 'Hawaii', flag: '🇺🇸', stance: 'Regular', age: 31, value: 10.0, tier: Tier.A, image: 'https://ui-avatars.com/api/?name=John+John+Florence&background=random&size=200', points: 0, gender: 'Male', status: 'Waiting' },
 
     // Tier B
-    { id: 'gabriel-medina', name: 'Gabriel Medina', country: 'Brazil', flag: '🇧🇷', stance: 'Goofy', age: 30, value: 8.5, tier: Tier.B, image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/aebc31dff_Gabby-Medina.png', points: 0, gender: 'Male', status: 'Waiting' },
+    { id: 'gabriel-medina', name: 'Gabriel Medina', country: 'Brazil', flag: '🇧🇷', stance: 'Goofy', age: 30, value: 8.0, tier: Tier.B, image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/aebc31dff_Gabby-Medina.png', points: 0, gender: 'Male', status: 'Waiting' },
     { id: 'barron-mamiya', name: 'Barron Mamiya', country: 'USA', flag: '🇺🇸', stance: 'Regular', age: 24, value: 7.0, tier: Tier.B, image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/649ca6fb4_Barron-Mamiya.png', points: 0, gender: 'Male', status: 'Waiting' },
     { id: 'leo-fioravanti', name: 'Leonardo Fioravanti', country: 'Italy', flag: '🇮🇹', stance: 'Regular', age: 26, value: 7.0, tier: Tier.B, image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/b4e9a0f31_Leo-Fivo.png', points: 0, gender: 'Male', status: 'Waiting' },
     { id: 'joao-chianca', name: 'Joao Chianca', country: 'Brazil', flag: '🇧🇷', stance: 'Regular', age: 23, value: 6.0, tier: Tier.B, image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/e5a59113a_Jaoa-Chianca.png', points: 0, gender: 'Male', status: 'Waiting' },
