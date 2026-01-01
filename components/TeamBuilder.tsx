@@ -48,7 +48,14 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
       try {
         const { data, error } = await supabase.from('surfers').select('*');
         if (data && data.length > 0) {
-          setAllSurfers(data as Surfer[]);
+          // Sanitize data: Ensure gender exists (Default to Male if missing)
+          const sanitizedData = data.map((s: any) => ({
+            ...s,
+            gender: s.gender || 'Male',
+            status: s.status || 'Waiting',
+            tier: s.tier || 'A' // Fallback to avoid crashes
+          }));
+          setAllSurfers(sanitizedData as Surfer[]);
         } else {
           console.log("Using Mock Data (No DB data found)");
         }
@@ -297,21 +304,6 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   return (
     <div className="pb-44 animate-in slide-in-from-bottom duration-700">
       <header className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-        {/* DEBUG PANEL - REMOVE LATER */}
-        <div className="fixed bottom-4 left-4 z-50 bg-black/90 text-green-400 p-4 rounded-xl text-xs font-mono border border-green-500 shadow-2xl max-w-sm overflow-auto">
-          <p className="font-bold border-b border-green-500/50 mb-2 pb-1">DEBUG DIAGNOSTICS</p>
-          <p>Surfers Loaded: <span className="text-white">{allSurfers.length}</span></p>
-          <p>Active Tab: <span className="text-white">{activeTab}</span></p>
-          <p>First Surfer: <span className="text-white">{allSurfers[0]?.name || 'None'}</span></p>
-          <p>First Gender: <span className="text-white">{allSurfers[0]?.gender || 'N/A'}</span></p>
-          <p>First Tier: <span className="text-white">{allSurfers[0]?.tier || 'N/A'}</span></p>
-          <button
-            onClick={() => setAllSurfers(MOCK_SURFERS)}
-            className="mt-2 w-full bg-green-900/50 hover:bg-green-900 text-green-400 border border-green-700 rounded px-2 py-1 transition-colors uppercase tracking-wider text-[10px]"
-          >
-            Force Reload Mocks
-          </button>
-        </div>
         <div>
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-gray-900">Draft Team</h2>
           <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-3">Pipeline Pro • Season 2026</p>
