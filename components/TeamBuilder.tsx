@@ -186,11 +186,14 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
           <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto bg-gray-50 overflow-hidden border-2 ${isSelected ? tierColor : 'border-background'} shadow-sm`}>
             {/* Added fallback for broken images if any */}
             <img
-              src={surfer.image}
+              src={surfer.image.startsWith('http') ? `${surfer.image}${surfer.image.includes('?') ? '&' : '?'}v=1` : surfer.image}
               alt={surfer.name}
+              crossOrigin="anonymous"
+              referrerPolicy="no-referrer"
               className="w-full h-full object-cover object-top"
               onError={(e) => {
                 // Fallback to initial if image fails
+                console.warn(`Failed to load image for ${surfer.name}: ${surfer.image}`);
                 (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${surfer.name}&background=random`;
               }}
             />
