@@ -6,16 +6,37 @@ import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
 
 interface TeamBuilderProps {
-  initialTeam: Surfer[];
+  initialTeam: Surfer[]; // Legacy prop - likely empty or mix
   isLocked: boolean;
   onSave: (team: Surfer[]) => void;
 }
 
+const TIER_LIMITS_MEN = {
+  [Tier.A]: 2,
+  [Tier.B]: 4,
+  [Tier.C]: 2,
+};
+
+const TIER_LIMITS_WOMEN = {
+  [Tier.A]: 1,
+  [Tier.B]: 2,
+  [Tier.C]: 1,
+};
+
 const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave }) => {
-  const [selectedSurfers, setSelectedSurfers] = useState<Surfer[]>(initialTeam);
+  // Split initial team if it exists (legacy support)
+  const initialMen = initialTeam.filter(s => s.gender === 'Male');
+  const initialWomen = initialTeam.filter(s => s.gender === 'Female');
+
+  const [teamMen, setTeamMen] = useState<Surfer[]>(initialMen);
+  const [teamWomen, setTeamWomen] = useState<Surfer[]>(initialWomen);
+
+  const [activeTab, setActiveTab] = useState<'Male' | 'Female'>('Male');
   const [allSurfers, setAllSurfers] = useState<Surfer[]>([]);
+
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
+
   const [expandedTiers, setExpandedTiers] = useState<Record<Tier, boolean>>({
     [Tier.A]: false,
     [Tier.B]: false,
@@ -34,31 +55,49 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     fetchSurfers();
   }, []);
 
-  const totalSpent = useMemo(() =>
-    selectedSurfers.reduce((acc, s) => acc + s.value, 0)
-    , [selectedSurfers]);
+  const totalSpent = useMemo(() => {
+    const menCost = teamMen.reduce((acc, s) => acc + s.value, 0);
+    const womenCost = teamWomen.reduce((acc, s) => acc + s.value, 0);
+    return menCost + womenCost;
+  }, [teamMen, teamWomen]);
+
+  const currentTeam = activeTab === 'Male' ? teamMen : teamWomen;
+  const currentLimits = activeTab === 'Male' ? TIER_LIMITS_MEN : TIER_LIMITS_WOMEN;
+  const requiredCount = activeTab === 'Male' ? 8 : 4;
 
   const counts = useMemo(() => ({
-    [Tier.A]: selectedSurfers.filter(s => s.tier === Tier.A).length,
-    [Tier.B]: selectedSurfers.filter(s => s.tier === Tier.B).length,
-    [Tier.C]: selectedSurfers.filter(s => s.tier === Tier.C).length,
-  }), [selectedSurfers]);
+    [Tier.A]: currentTeam.filter(s => s.tier === Tier.A).length,
+    [Tier.B]: currentTeam.filter(s => s.tier === Tier.B).length,
+    [Tier.C]: currentTeam.filter(s => s.tier === Tier.C).length,
+  }), [currentTeam]);
+
+  // Global validation state
+  const isMenComplete =
+    teamMen.filter(s => s.tier === Tier.A).length === TIER_LIMITS_MEN[Tier.A] &&
+    teamMen.filter(s => s.tier === Tier.B).length === TIER_LIMITS_MEN[Tier.B] &&
+    teamMen.filter(s => s.tier === Tier.C).length === TIER_LIMITS_MEN[Tier.C];
+
+  const isWomenComplete =
+    teamWomen.filter(s => s.tier === Tier.A).length === TIER_LIMITS_WOMEN[Tier.A] &&
+    teamWomen.filter(s => s.tier === Tier.B).length === TIER_LIMITS_WOMEN[Tier.B] &&
+    teamWomen.filter(s => s.tier === Tier.C).length === TIER_LIMITS_WOMEN[Tier.C];
+
+  const isGlobalComplete = isMenComplete && isWomenComplete;
 
   const fetchAiAdvice = async () => {
+    if (!process.env.API_KEY) return; // Guard
     setIsAiLoading(true);
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const prompt = `You are an expert World Surf League fantasy analyst. 
       Current Event: Pipeline Pro, Hawaii. 
-      Conditions: 8-10ft, clean west swell. 
-      Current Event: Pipeline Pro, Hawaii. 
-      Conditions: 8-10ft, clean west swell. 
-      Available Tier A Surfers: ${allSurfers.filter(s => s.tier === Tier.A).map(s => s.name).join(', ')}.
-      Suggest 2 surfers from Tier A and 1 from Tier C that are "must-haves" for these specific conditions.
+      Looking at the ${activeTab} division.
+      Available Tier A Surfers: ${allSurfers.filter(s => s.tier === Tier.A && s.gender === activeTab).map(s => s.name).join(', ')}.
+      Suggest a strategy for selecting a team for Pipeline with a budget constraint.
       Keep the response concise (max 3 sentences) and highly strategic.`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.0-flash-exp',
         contents: prompt,
       });
       setAiAdvice(response.text);
@@ -71,21 +110,33 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
   const toggleSurfer = (surfer: Surfer) => {
     if (isLocked) return;
-    const isSelected = selectedSurfers.find(s => s.id === surfer.id);
+
+    // Determine which roster to update based on surfer gender (safety check)
+    // or use activeTab if we trust the UI context
+    const isMale = surfer.gender === 'Male';
+    const targetTeam = isMale ? teamMen : teamWomen;
+    const setTargetTeam = isMale ? setTeamMen : setTeamWomen;
+    const limits = isMale ? TIER_LIMITS_MEN : TIER_LIMITS_WOMEN;
+
+    const isSelected = targetTeam.find(s => s.id === surfer.id);
+
     if (isSelected) {
-      setSelectedSurfers(selectedSurfers.filter(s => s.id !== surfer.id));
+      setTargetTeam(targetTeam.filter(s => s.id !== surfer.id));
     } else {
-      if (counts[surfer.tier] >= TIER_LIMITS[surfer.tier]) return;
+      // Check limits
+      const currentTierCount = targetTeam.filter(s => s.tier === surfer.tier).length;
+      if (currentTierCount >= limits[surfer.tier]) return;
+
+      // Check global budget
       if (totalSpent + surfer.value > TOTAL_BUDGET) return;
-      setSelectedSurfers([...selectedSurfers, surfer]);
+
+      setTargetTeam([...targetTeam, surfer]);
     }
   };
 
   const toggleTierExpand = (tier: Tier) => {
     setExpandedTiers(prev => ({ ...prev, [tier]: !prev[tier] }));
   };
-
-  const isComplete = counts[Tier.A] === 2 && counts[Tier.B] === 4 && counts[Tier.C] === 2;
 
   const getTierColor = (tier: Tier) => {
     switch (tier) {
@@ -97,8 +148,8 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   };
 
   const renderSurferCard = (surfer: Surfer, inGrid: boolean = false) => {
-    const isSelected = selectedSurfers.some(s => s.id === surfer.id);
-    const isFull = !isSelected && counts[surfer.tier] >= TIER_LIMITS[surfer.tier];
+    const isSelected = currentTeam.some(s => s.id === surfer.id);
+    const isFull = !isSelected && counts[surfer.tier] >= currentLimits[surfer.tier];
     const isEliminated = surfer.status === 'Eliminated';
     const tierColor = getTierColor(surfer.tier);
 
@@ -106,12 +157,21 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
       <button
         key={surfer.id}
         onClick={() => toggleSurfer(surfer)}
-        disabled={isFull || isEliminated || isLocked}
-        className={`${inGrid ? 'w-full' : 'min-w-[155px] md:min-w-[190px] flex-shrink-0'} bg-white rounded-[40px] p-6 text-center border-2 transition-all duration-300 active:scale-95 snap-start ${isSelected ? `${tierColor} shadow-[0_20px_40px_-10px_rgba(0,0,0,0.2)] scale-105 z-10 ring-4 ring-offset-2 ring-pop/20` : 'border-transparent apple-shadow hover:border-gray-100'} ${isFull || isEliminated || isLocked ? 'opacity-40 grayscale pointer-events-none shadow-none' : ''}`}
+        disabled={(isFull || isEliminated || isLocked) && !isSelected}
+        className={`${inGrid ? 'w-full h-full' : 'min-w-[155px] md:min-w-[190px] flex-shrink-0'} bg-white rounded-[40px] p-6 text-center border-2 transition-all duration-300 active:scale-95 snap-start flex flex-col ${isSelected ? `${tierColor} shadow-[0_20px_40px_-10px_rgba(0,0,0,0.2)] scale-105 z-10 ring-4 ring-offset-2 ring-pop/20` : 'border-transparent apple-shadow hover:border-gray-100'} ${isFull || isEliminated || isLocked ? 'opacity-40 grayscale pointer-events-none shadow-none' : ''}`}
       >
         <div className="relative mb-5">
           <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto bg-gray-50 overflow-hidden border-2 ${isSelected ? tierColor : 'border-background'} shadow-sm`}>
-            <img src={surfer.image} alt={surfer.name} className="w-full h-full object-cover object-top" />
+            {/* Added fallback for broken images if any */}
+            <img
+              src={surfer.image}
+              alt={surfer.name}
+              className="w-full h-full object-cover object-top"
+              onError={(e) => {
+                // Fallback to initial if image fails
+                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${surfer.name}&background=random`;
+              }}
+            />
           </div>
           {isSelected && (
             <div className={`absolute top-0 right-1 md:right-4 w-8 h-8 ${tierColor.replace('border-', 'bg-')} rounded-full flex items-center justify-center text-white border-4 border-white shadow-md animate-in zoom-in`}>
@@ -132,13 +192,16 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   };
 
   const renderTier = (tier: Tier, label: string) => {
-    const surfers = allSurfers.filter(s => s.tier === tier).sort((a, b) => {
-      const aSelected = selectedSurfers.some(s => s.id === a.id);
-      const bSelected = selectedSurfers.some(s => s.id === b.id);
-      if (aSelected && !bSelected) return -1;
-      if (!aSelected && bSelected) return 1;
-      return 0;
-    });
+    // Filter by active Gender
+    const surfers = allSurfers
+      .filter(s => s.tier === tier && s.gender === activeTab)
+      .sort((a, b) => {
+        const aSelected = currentTeam.some(s => s.id === a.id);
+        const bSelected = currentTeam.some(s => s.id === b.id);
+        if (aSelected && !bSelected) return -1;
+        if (!aSelected && bSelected) return 1;
+        return 0;
+      });
 
     const isExpanded = expandedTiers[tier];
 
@@ -159,14 +222,14 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             >
               {isExpanded ? 'Collapse' : `View All (${surfers.length})`}
             </button>
-            <span className={`px-5 py-2.5 rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-tight ${counts[tier] === TIER_LIMITS[tier] ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-accent text-gray-500'}`}>
-              {counts[tier]} / {TIER_LIMITS[tier]} Selected
+            <span className={`px-5 py-2.5 rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-tight ${counts[tier] === currentLimits[tier] ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-accent text-gray-500'}`}>
+              {counts[tier]} / {currentLimits[tier]} Selected
             </span>
           </div>
         </div>
 
         {isExpanded ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 animate-in fade-in zoom-in-95 duration-300">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 p-4 animate-in fade-in zoom-in-95 duration-300">
             {surfers.map(surfer => renderSurferCard(surfer, true))}
           </div>
         ) : (
@@ -181,28 +244,30 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     );
   };
 
-  const RosterSlot = ({ surfer, tier }: { surfer?: Surfer; tier: Tier; key?: React.Key }) => {
+  const RosterSlot = ({ surfer, tier }: { surfer?: Surfer; tier: Tier }) => {
     const tierColor = getTierColor(tier);
     return (
       <div className="flex flex-col items-center">
-        <div className={`w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full border-4 flex items-center justify-center relative transition-all duration-300 ${surfer ? `bg-white ${tierColor} shadow-lg scale-105` : 'border-dashed border-gray-200 bg-gray-50/50'}`}>
-          {surfer ? (
-            <>
-              {!isLocked && (
-                <button
-                  className="absolute -top-1 -right-1 w-6 h-6 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center cursor-pointer shadow-md active:scale-90 border border-gray-100 hover:text-red-500 transition-colors z-30"
-                  onClick={(e) => { e.stopPropagation(); toggleSurfer(surfer); }}
-                >
-                  <span className="material-icons-round text-sm md:text-lg">close</span>
-                </button>
-              )}
-              <div className="w-full h-full rounded-full overflow-hidden shadow-inner border border-gray-50">
+        <div className="relative">
+          <div className={`w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${surfer ? `bg-white ${tierColor} shadow-lg scale-105` : 'border-dashed border-gray-200 bg-gray-50/50'}`}>
+            {surfer ? (
+              <div className="w-full h-full rounded-full overflow-hidden shadow-inner border border-gray-50 group relative">
                 <img src={surfer.image} className="w-full h-full object-cover object-top" alt={surfer.name} />
+                {!isLocked && (
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      className="w-8 h-8 bg-white rounded-full flex items-center justify-center cursor-pointer shadow-md active:scale-90 text-red-500"
+                      onClick={(e) => { e.stopPropagation(); toggleSurfer(surfer); }}
+                    >
+                      <span className="material-icons-round text-lg">close</span>
+                    </button>
+                  </div>
+                )}
               </div>
-            </>
-          ) : (
-            <span className="text-lg md:text-xl text-gray-200 font-black uppercase tracking-tighter opacity-50">{tier}</span>
-          )}
+            ) : (
+              <span className="text-lg md:text-xl text-gray-200 font-black uppercase tracking-tighter opacity-50">{tier}</span>
+            )}
+          </div>
         </div>
 
         {/* Name underneath the circle */}
@@ -227,12 +292,29 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
   return (
     <div className="pb-44 animate-in slide-in-from-bottom duration-700">
-      <header className="flex justify-between items-end mb-16">
+      <header className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
         <div>
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-gray-900">Draft Team</h2>
-          <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-3">Pipeline Pro • Season 2024</p>
+          <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-3">Pipeline Pro • Season 2026</p>
         </div>
-        <button onClick={() => onSave(selectedSurfers)} className="text-sm md:text-base font-black text-primary-dark underline p-4 hover:opacity-70 transition decoration-2 underline-offset-4">Cancel Draft</button>
+
+        {/* Gender Toggle */}
+        <div className="flex bg-gray-100 p-1 rounded-2xl">
+          {(['Male', 'Female'] as const).map(gender => (
+            <button
+              key={gender}
+              onClick={() => setActiveTab(gender)}
+              className={`px-8 py-3 rounded-xl text-sm font-black uppercase tracking-wide transition-all ${activeTab === gender
+                ? 'bg-white text-primary-dark shadow-sm'
+                : 'text-gray-400 hover:text-gray-600'
+                }`}
+            >
+              {gender === 'Male' ? "Men's" : "Women's"}
+            </button>
+          ))}
+        </div>
+
+        <button onClick={() => onSave([...teamMen, ...teamWomen])} className="text-sm md:text-base font-black text-primary-dark underline p-4 hover:opacity-70 transition decoration-2 underline-offset-4">Cancel Draft</button>
       </header>
 
       {/* AI Advice Banner */}
@@ -268,59 +350,66 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
           {/* Main Summary Panel */}
           <div className="bg-white rounded-[64px] p-10 md:p-14 apple-shadow border border-white/80 backdrop-blur-sm">
 
-            {!aiAdvice && (
-              <button
-                onClick={fetchAiAdvice}
-                disabled={isAiLoading || isLocked}
-                className="w-full mb-12 py-4 rounded-3xl bg-accent/20 text-primary-dark font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-accent/40 transition active:scale-95 border border-white shadow-sm"
-              >
-                {isAiLoading ? (
-                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    <span className="material-icons-round text-base">auto_awesome</span>
-                    {isLocked ? 'AI ANALYSIS COMPLETE' : 'GET AI SCOUT ADVICE'}
-                  </>
-                )}
-              </button>
-            )}
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-2xl font-black text-gray-900">{activeTab} Roster</h3>
+              {!aiAdvice && (
+                <button onClick={fetchAiAdvice} disabled={isAiLoading || isLocked} className="text-xs font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
+                  {isAiLoading ? "Analyzing..." : "Ask AI"} <span className="material-icons-round text-sm">auto_awesome</span>
+                </button>
+              )}
+            </div>
 
             <div className="flex justify-between items-center mb-14 px-2">
               <div className="flex flex-col">
-                <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2">Budget</span>
+                <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2">Total Budget</span>
                 <span className={`text-5xl md:text-6xl font-black tracking-tighter ${totalSpent > TOTAL_BUDGET ? 'text-red-500' : 'text-primary'}`}>
                   ${(TOTAL_BUDGET - totalSpent).toFixed(1)}<span className="text-2xl font-bold ml-1">M</span>
                 </span>
+                <span className="text-xs text-gray-400 font-bold mt-1">Remaining / $70.0M Cap</span>
               </div>
               <div className="text-right">
                 <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2">Draft</span>
                 <p className="text-5xl md:text-6xl font-black tracking-tighter">
-                  {selectedSurfers.length}<span className="text-2xl text-gray-200 font-bold ml-1">/8</span>
+                  {currentTeam.length}<span className="text-2xl text-gray-200 font-bold ml-1">/{requiredCount}</span>
                 </p>
               </div>
             </div>
 
-            {/* Circular Slot 4x2 Grid */}
-            <div className="grid grid-cols-4 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-12">
-              <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.A)[0]} tier={Tier.A} />
-              <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.A)[1]} tier={Tier.A} />
-              <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.C)[0]} tier={Tier.C} />
-              <RosterSlot surfer={selectedSurfers.filter(s => s.tier === Tier.C)[1]} tier={Tier.C} />
+            {/* Dynamic Grid based on Gender */}
+            {activeTab === 'Male' ? (
+              <div className="grid grid-cols-4 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-12">
+                <RosterSlot surfer={teamMen.filter(s => s.tier === Tier.A)[0]} tier={Tier.A} />
+                <RosterSlot surfer={teamMen.filter(s => s.tier === Tier.A)[1]} tier={Tier.A} />
+                <RosterSlot surfer={teamMen.filter(s => s.tier === Tier.C)[0]} tier={Tier.C} />
+                <RosterSlot surfer={teamMen.filter(s => s.tier === Tier.C)[1]} tier={Tier.C} />
+                {[0, 1, 2, 3].map(i => (
+                  <RosterSlot key={`b-slot-${i}`} surfer={teamMen.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-4 gap-4 md:gap-8">
+                <RosterSlot surfer={teamWomen.filter(s => s.tier === Tier.A)[0]} tier={Tier.A} />
+                <RosterSlot surfer={teamWomen.filter(s => s.tier === Tier.C)[0]} tier={Tier.C} />
+                <RosterSlot surfer={teamWomen.filter(s => s.tier === Tier.B)[0]} tier={Tier.B} />
+                <RosterSlot surfer={teamWomen.filter(s => s.tier === Tier.B)[1]} tier={Tier.B} />
+              </div>
+            )}
 
-              {[0, 1, 2, 3].map(i => (
-                <RosterSlot key={`b-slot-${i}`} surfer={selectedSurfers.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} />
-              ))}
+            {/* Global Status Indicator if other team is incomplete */}
+            <div className="mt-8 flex gap-2 justify-center">
+              <div className={`h-2 flex-1 rounded-full ${isMenComplete ? 'bg-green-400' : 'bg-gray-100'} transition-colors duration-500`} title="Men's Team Complete" />
+              <div className={`h-2 flex-1 rounded-full ${isWomenComplete ? 'bg-green-400' : 'bg-gray-100'} transition-colors duration-500`} title="Women's Team Complete" />
             </div>
 
             <button
-              disabled={!isComplete || isLocked}
-              onClick={() => onSave(selectedSurfers)}
-              className={`w-full mt-16 py-6 rounded-[40px] font-black text-xl apple-shadow transform transition-all active:scale-95 ${isComplete && !isLocked
+              disabled={!isGlobalComplete || isLocked}
+              onClick={() => onSave([...teamMen, ...teamWomen])}
+              className={`w-full mt-8 py-6 rounded-[40px] font-black text-xl apple-shadow transform transition-all active:scale-95 ${isGlobalComplete && !isLocked
                 ? 'bg-primary-dark text-white hover:bg-primary-dark/90 hover:-translate-y-1 shadow-2xl shadow-primary/30'
                 : 'bg-accent/40 text-gray-400 cursor-not-allowed shadow-none'
                 }`}
             >
-              {isLocked ? 'Roster Locked (Live)' : isComplete ? 'Lock In Roster' : `Select ${8 - selectedSurfers.length} Athletes`}
+              {isLocked ? 'Roster Locked (Live)' : isGlobalComplete ? 'Lock In Full Roster' : `Complete Both Teams`}
             </button>
           </div>
         </div>

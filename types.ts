@@ -13,6 +13,7 @@ export interface Surfer {
   country: string;
   flag: string;
   stance: 'Regular' | 'Goofy';
+  gender: 'Male' | 'Female';
   age: number;
   value: number; // in millions
   tier: Tier;

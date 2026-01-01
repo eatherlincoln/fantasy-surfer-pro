@@ -40,7 +40,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
       <header className="flex justify-between items-center mb-10">
         <div>
           <p className="text-[10px] md:text-xs font-bold text-primary-dark uppercase tracking-widest mb-1">Current Event</p>
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight">Pipeline Pro 2024</h1>
+          <h1 className="text-3xl md:text-5xl font-bold tracking-tight">Pipeline Pro 2026</h1>
         </div>
         <button onClick={onSimulate} className="h-12 px-6 rounded-2xl bg-white border border-accent apple-shadow flex items-center gap-2 hover:bg-gray-50 transition active:scale-95">
           <span className="material-icons-round text-primary-dark">bolt</span>

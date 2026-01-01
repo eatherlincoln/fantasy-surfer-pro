@@ -1,7 +1,7 @@
 
 import { Surfer, Tier, Heat } from './types';
 
-export const TOTAL_BUDGET = 50.0;
+export const TOTAL_BUDGET = 70.0;
 export const TIER_LIMITS = {
   [Tier.A]: 2,
   [Tier.B]: 4,
