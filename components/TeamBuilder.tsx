@@ -197,7 +197,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
         key={surfer.id}
         onClick={() => toggleSurfer(surfer)}
         disabled={(isFull || isEliminated || isLocked) && !isSelected}
-        className={`${inGrid ? 'w-full h-full' : 'min-w-[155px] md:min-w-[190px] flex-shrink-0'} bg-white rounded-[40px] p-6 text-center border-2 transition-all duration-300 active:scale-95 snap-start flex flex-col ${isSelected ? `${tierColor} shadow-[0_20px_40px_-10px_rgba(0,0,0,0.2)] scale-105 z-10 ring-4 ring-offset-2 ring-pop/20` : 'border-transparent apple-shadow hover:border-gray-100'} ${isFull || isEliminated || isLocked ? 'opacity-40 grayscale pointer-events-none shadow-none' : ''}`}
+        className={`${inGrid ? 'w-full h-full' : 'min-w-[155px] md:min-w-[190px] flex-shrink-0'} bg-white rounded-[40px] p-6 text-center border-2 transition-all duration-300 active:scale-95 snap-start flex flex-col ${isSelected ? `${tierColor} scale-105 z-10 ring-4 ring-offset-2 ring-pop/20` : 'border-transparent apple-shadow hover:border-gray-100'} ${isFull || isEliminated || isLocked ? 'opacity-40 grayscale pointer-events-none shadow-none' : ''}`}
       >
         <div className="relative mb-5">
           <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto bg-gray-50 overflow-hidden border-2 ${isSelected ? tierColor : 'border-background'} shadow-sm`}>
@@ -275,9 +275,10 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
           </div>
         ) : (
           <div className="relative overflow-visible">
-            <div className="flex gap-8 overflow-x-auto hide-scrollbar snap-x snap-mandatory flex-nowrap touch-pan-x py-4 scroll-pl-1">
+            {/* Added px-4 to prevent first card clipping and updated scroll-pl */}
+            <div className="flex gap-8 overflow-x-auto hide-scrollbar snap-x snap-mandatory flex-nowrap touch-pan-x py-4 px-4 scroll-pl-4">
               {surfers.map((surfer) => renderSurferCard(surfer, false))}
-              <div className="min-w-[100px] h-full flex-shrink-0 invisible"></div>
+              <div className="min-w-[40px] h-full flex-shrink-0 invisible"></div>
             </div>
           </div>
         )}
