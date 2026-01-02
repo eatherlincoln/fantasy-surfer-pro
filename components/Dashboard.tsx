@@ -131,7 +131,29 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
           <span className="text-xs font-bold text-primary-mid uppercase tracking-tighter opacity-70 cursor-pointer hover:text-primary transition-colors">Live Tracker</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        {/* Mobile View: Single Card (All 10 Surfers) */}
+        <div className="md:hidden mb-6">
+          {(() => {
+            const sortedTeam = [...displayTeam]
+              .sort((a, b) => (b.value || 0) - (a.value || 0))
+              .slice(0, 10);
+
+            return (
+              <div className="bg-white rounded-[32px] p-2 apple-shadow border border-accent overflow-hidden flex flex-col h-full">
+                {sortedTeam.length > 0 ? (
+                  sortedTeam.map((surfer) => (
+                    <SurferRow key={surfer.id} surfer={surfer} />
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-gray-400 text-sm font-medium italic">Empty Slot</div>
+                )}
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Desktop View: Split Columns (5 Left / 5 Right) */}
+        <div className="hidden md:grid grid-cols-2 gap-6 mb-6">
           {(() => {
             // Sort by Value (High to Low) and limit to Top 10
             const sortedTeam = [...displayTeam]
