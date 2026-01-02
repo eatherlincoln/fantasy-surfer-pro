@@ -132,27 +132,36 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Men's Roster */}
-          <div className="bg-white rounded-[32px] p-2 apple-shadow border border-accent overflow-hidden flex flex-col h-full">
-            {displayTeam.filter(s => s.gender === 'Male').length > 0 ? (
-              displayTeam.filter(s => s.gender === 'Male').map((surfer) => (
-                <SurferRow key={surfer.id} surfer={surfer} />
-              ))
-            ) : (
-              <div className="p-8 text-center text-gray-400 text-sm font-medium italic">No Men Selected</div>
-            )}
-          </div>
+          {(() => {
+            // Sort by Value (High to Low) and limit to Top 10
+            const sortedTeam = [...displayTeam]
+              .sort((a, b) => (b.value || 0) - (a.value || 0))
+              .slice(0, 10);
 
-          {/* Women's Roster */}
-          <div className="bg-white rounded-[32px] p-2 apple-shadow border border-accent overflow-hidden flex flex-col h-full">
-            {displayTeam.filter(s => s.gender === 'Female').length > 0 ? (
-              displayTeam.filter(s => s.gender === 'Female').map((surfer) => (
-                <SurferRow key={surfer.id} surfer={surfer} />
-              ))
-            ) : (
-              <div className="p-8 text-center text-gray-400 text-sm font-medium italic">No Women Selected</div>
-            )}
-          </div>
+            // Split exactly at 5 for a 5/5 layout
+            const midPoint = 5;
+            const col1 = sortedTeam.slice(0, midPoint);
+            const col2 = sortedTeam.slice(midPoint);
+
+            const renderSurferList = (surfers: Surfer[]) => (
+              <div className="bg-white rounded-[32px] p-2 apple-shadow border border-accent overflow-hidden flex flex-col h-full">
+                {surfers.length > 0 ? (
+                  surfers.map((surfer) => (
+                    <SurferRow key={surfer.id} surfer={surfer} />
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-gray-400 text-sm font-medium italic">Empty Slot</div>
+                )}
+              </div>
+            );
+
+            return (
+              <>
+                {renderSurferList(col1)}
+                {renderSurferList(col2)}
+              </>
+            );
+          })()}
         </div>
 
         <button
