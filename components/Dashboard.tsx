@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MOCK_SURFERS, MOCK_HEATS } from '../constants';
 import { Surfer, EventStatus } from '../types';
@@ -36,95 +35,92 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
   }, [userTeam, totalPoints]);
 
   return (
-    {/* Custom Replaceable Banner Area */ }
-    < div className = "w-full rounded-[40px] overflow-hidden shadow-2xl mb-10 relative group" >
-      <img
-        src="/images/banners/pipeline_banner.jpg"
-        alt="Event Banner"
-        className="w-full h-auto object-cover min-h-[300px]"
-        onError={(e) => {
-          // Fallback if the user hasn't refreshed or cache issue
-          e.currentTarget.src = '/pipe-banner-2026.png';
-        }}
-      />
-  {/* Overlay Controls (Sim Wave moved here to match design if purely visual, but user might want it separate. 
-            Looking at the screenshot, the "Sim Wave" button is actually INSIDE the black banner area on the left. 
-            I will position it absolutely.) */}
-  <div className="absolute bottom-8 left-8 z-20">
-    <button onClick={onSimulate} className="h-12 px-8 rounded-full bg-white text-primary-dark font-black uppercase tracking-widest shadow-lg hover:bg-gray-50 active:scale-95 transition flex items-center gap-2">
-      <span className="material-icons-round">bolt</span>
-      Sim Wave
-    </button>
-  </div>
-      </div >
-
-  {/* AI Daily Briefing */ }
-  < div className = "mb-8 px-2" >
-    <div className="flex items-center gap-3 mb-2">
-      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-        <span className="material-icons-round text-primary text-xs">auto_awesome</span>
+    <div className="pb-12 animate-in fade-in duration-500">
+      {/* Custom Replaceable Banner Area */}
+      <div className="w-full rounded-[40px] overflow-hidden shadow-2xl mb-10 relative group">
+        <img
+          src="/images/banners/pipeline_banner.jpg"
+          alt="Event Banner"
+          className="w-full h-auto object-cover min-h-[300px]"
+          onError={(e) => {
+            // Fallback if the user hasn't refreshed or cache issue
+            e.currentTarget.src = '/pipe-banner-2026.png';
+          }}
+        />
+        {/* Overlay Controls */}
+        <div className="absolute bottom-8 left-8 z-20">
+          <button onClick={onSimulate} className="h-12 px-8 rounded-full bg-white text-primary-dark font-black uppercase tracking-widest shadow-lg hover:bg-gray-50 active:scale-95 transition flex items-center gap-2">
+            <span className="material-icons-round">bolt</span>
+            Sim Wave
+          </button>
+        </div>
       </div>
-      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">AI Morning Briefing</span>
-    </div>
-{
-  isBriefingLoading ? (
-    <div className="h-6 w-full bg-gray-100 animate-pulse rounded-full"></div>
-  ) : (
-    <p className="text-xl md:text-2xl font-serif italic text-gray-800 leading-snug">
-      "{aiBriefing || "Swell's looking good. Your roster is ready for the incoming set."}"
-    </p>
-  )
-}
-      </div >
+
+      {/* AI Daily Briefing */}
+      <div className="mb-8 px-2">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+            <span className="material-icons-round text-primary text-xs">auto_awesome</span>
+          </div>
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">AI Morning Briefing</span>
+        </div>
+        {isBriefingLoading ? (
+          <div className="h-6 w-full bg-gray-100 animate-pulse rounded-full"></div>
+        ) : (
+          <p className="text-xl md:text-2xl font-serif italic text-gray-800 leading-snug">
+            "{aiBriefing || "Swell's looking good. Your roster is ready for the incoming set."}"
+          </p>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
         {/* Event Status Card */}
         <div className="bg-white rounded-[32px] p-8 apple-shadow border border-gray-100 relative overflow-hidden flex flex-col justify-between h-[220px]">
-           <div className="flex justify-between items-start">
-              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${eventStatus === 'LIVE' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
-                {eventStatus === 'LIVE' ? 'Drafting' : 'Waiting'}
-              </span>
-              <div className="text-right">
-                  <div className="text-xs font-bold text-gray-400 uppercase tracking-wide">Total Points</div>
-                  <div className="text-3xl font-black text-primary-dark tracking-tight">{totalPoints.toFixed(2)}</div>
-                  <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Ranked #132 Global</div>
-              </div>
-           </div>
-           
-           <div>
-               <div className="flex items-baseline gap-1">
-                 <span className="text-6xl font-black text-gray-900 tracking-tighter">1st</span>
-                 <span className="text-xl font-bold text-gray-300">/ 12</span>
-               </div>
-               <div className="text-xs font-bold text-primary-dark uppercase tracking-widest mt-1">Friends League</div>
-           </div>
+          <div className="flex justify-between items-start">
+            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${eventStatus === 'LIVE' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
+              {eventStatus === 'LIVE' ? 'Drafting' : 'Waiting'}
+            </span>
+            <div className="text-right">
+              <div className="text-xs font-bold text-gray-400 uppercase tracking-wide">Total Points</div>
+              <div className="text-3xl font-black text-primary-dark tracking-tight">{totalPoints.toFixed(2)}</div>
+              <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Ranked #132 Global</div>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-6xl font-black text-gray-900 tracking-tighter">1st</span>
+              <span className="text-xl font-bold text-gray-300">/ 12</span>
+            </div>
+            <div className="text-xs font-bold text-primary-dark uppercase tracking-widest mt-1">Friends League</div>
+          </div>
         </div>
 
         {/* Conditions/Watching Card (Teal) */}
         <div className="bg-[#14746f] rounded-[32px] p-8 text-white shadow-xl relative overflow-hidden flex flex-col justify-between h-[220px]">
-            {/* Background Texture/Gradient */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none"></div>
-            
-            <div className="flex justify-between items-start relative z-10">
-                <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur text-[10px] font-bold uppercase tracking-wide">
-                    {eventStatus === 'LIVE' ? 'Live Conditions' : 'Waiting for Swell'}
-                </span>
-                <div className="text-right">
-                    <div className="text-6xl font-black tracking-tighter leading-none">6-8<span className="text-2xl font-bold opacity-60">ft</span></div>
-                    <div className="text-[10px] font-bold opacity-60 uppercase tracking-widest mt-1">Swell Height</div>
-                </div>
-            </div>
+          {/* Background Texture/Gradient */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none"></div>
 
-            <div className="flex items-end justify-between relative z-10">
-                <div>
-                    <h3 className="text-xl font-bold">Conditions</h3>
-                    <p className="text-xs font-medium opacity-80 mt-1">Clean • Light Offshore</p>
-                </div>
-                <button className="px-6 py-2 bg-white text-[#14746f] rounded-full text-xs font-black uppercase tracking-widest shadow hover:bg-gray-50 active:scale-95 transition flex items-center gap-2">
-                    <span className="material-icons-round text-base">play_arrow</span>
-                    Watch
-                </button>
+          <div className="flex justify-between items-start relative z-10">
+            <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur text-[10px] font-bold uppercase tracking-wide">
+              {eventStatus === 'LIVE' ? 'Live Conditions' : 'Waiting for Swell'}
+            </span>
+            <div className="text-right">
+              <div className="text-6xl font-black tracking-tighter leading-none">6-8<span className="text-2xl font-bold opacity-60">ft</span></div>
+              <div className="text-[10px] font-bold opacity-60 uppercase tracking-widest mt-1">Swell Height</div>
             </div>
+          </div>
+
+          <div className="flex items-end justify-between relative z-10">
+            <div>
+              <h3 className="text-xl font-bold">Conditions</h3>
+              <p className="text-xs font-medium opacity-80 mt-1">Clean • Light Offshore</p>
+            </div>
+            <button className="px-6 py-2 bg-white text-[#14746f] rounded-full text-xs font-black uppercase tracking-widest shadow hover:bg-gray-50 active:scale-95 transition flex items-center gap-2">
+              <span className="material-icons-round text-base">play_arrow</span>
+              Watch
+            </button>
+          </div>
         </div>
       </div>
 
@@ -212,7 +208,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
           </div>
         </section>
       </div>
-    </div >
+    </div>
   );
 };
 
