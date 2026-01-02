@@ -124,89 +124,115 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <section>
-          <div className="flex justify-between items-end mb-6 px-1">
-            <h3 className="text-2xl font-bold text-gray-900 tracking-tight">My Team</h3>
-            <span className="text-xs font-bold text-primary-mid uppercase tracking-tighter opacity-70">Live Tracker</span>
-          </div>
-          <div className="bg-white rounded-3xl p-2 apple-shadow border border-accent overflow-hidden">
-            {displayTeam.map((surfer) => {
-              const isEliminated = surfer.status === 'Eliminated';
-              const isInWater = surfer.status === 'In Water Now';
-              return (
-                <div key={surfer.id} className={`flex items-center p-5 border-b border-gray-50 last:border-0 transition-all ${isInWater ? 'bg-primary/5' : 'hover:bg-gray-50/50'}`}>
-                  <div className="relative">
-                    <img src={surfer.image} alt={surfer.name} className={`h-16 w-16 rounded-2xl object-cover object-top ${isEliminated ? 'grayscale opacity-60' : ''} ${isInWater ? 'ring-2 ring-primary ring-offset-2' : ''}`} />
-                    {!isEliminated && (
-                      <div className="absolute -bottom-1.5 -right-1.5 bg-primary text-white text-[10px] font-black px-2 py-1 rounded-full border-4 border-white shadow-sm">{surfer.tier}</div>
-                    )}
-                  </div>
-                  <div className={`ml-5 flex-1 ${isEliminated ? 'opacity-50' : ''}`}>
-                    <h4 className="font-bold text-lg leading-tight">{surfer.name}</h4>
-                    <p className={`text-[10px] font-black mt-1 uppercase tracking-widest ${isInWater ? 'text-primary animate-pulse' : 'text-gray-400'}`}>
-                      {surfer.status === 'In Water Now' ? 'Scoring Heat...' : surfer.status}
-                    </p>
-                    {surfer.commentary && isInWater && (
-                      <p className="text-xs text-primary-dark mt-1 italic font-medium animate-in fade-in slide-in-from-left-2 duration-500">"{surfer.commentary}"</p>
-                    )}
-                  </div>
-                  <div className={`text-right ${isEliminated ? 'opacity-40' : ''}`}>
-                    <div className={`font-black text-2xl tracking-tighter transition-all ${surfer.lastWaveScore ? 'text-primary scale-110' : 'text-primary-dark'}`}>
-                      {surfer.points?.toFixed(2) || '0.00'}
-                    </div>
-                    {surfer.lastWaveScore && isInWater && (
-                      <p className="text-[10px] font-black text-primary uppercase animate-bounce mt-1">+{surfer.lastWaveScore}</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <button
-            disabled={eventStatus === 'LIVE'}
-            onClick={onManageTeam}
-            className={`w-full mt-6 py-5 rounded-3xl border-2 border-dashed font-black text-sm flex items-center justify-center gap-3 transition active:scale-95 ${eventStatus === 'LIVE'
-              ? 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
-              : 'border-primary/40 text-primary-dark hover:bg-white hover:border-primary/60'
-              }`}
-          >
-            <span className="material-icons-round text-xl">{eventStatus === 'LIVE' ? 'lock' : 'swap_horiz'}</span>
-            {eventStatus === 'LIVE' ? 'Roster Locked' : 'Manage My Team'}
-          </button>
-        </section>
+      {/* Team Section - Split into Men and Women columns */}
+      <section className="mb-10">
+        <div className="flex justify-between items-end mb-6 px-1">
+          <h3 className="text-2xl font-bold text-gray-900 tracking-tight">My Team</h3>
+          <span className="text-xs font-bold text-primary-mid uppercase tracking-tighter opacity-70 cursor-pointer hover:text-primary transition-colors">Live Tracker</span>
+        </div>
 
-        <section>
-          <div className="flex justify-between items-center mb-6 px-1">
-            <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Heat Center</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Men's Roster */}
+          <div className="bg-white rounded-[32px] p-2 apple-shadow border border-accent overflow-hidden flex flex-col h-full">
+            {displayTeam.filter(s => s.gender === 'Male').length > 0 ? (
+              displayTeam.filter(s => s.gender === 'Male').map((surfer) => (
+                <SurferRow key={surfer.id} surfer={surfer} />
+              ))
+            ) : (
+              <div className="p-8 text-center text-gray-400 text-sm font-medium italic">No Men Selected</div>
+            )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {MOCK_HEATS.map((heat) => (
-              <div key={heat.id} className="bg-white p-8 rounded-[40px] apple-shadow border border-accent relative overflow-hidden group hover:border-primary/20 transition-all">
-                <div className="flex justify-between items-center mb-8 relative z-10">
-                  <span className="bg-accent/40 px-3 py-1.5 rounded-full text-xs font-black text-primary-dark uppercase tracking-tight">Heat {heat.number}</span>
-                  <span className="text-xs font-bold text-gray-400 flex items-center gap-1.5">
-                    <span className="material-icons-round text-base">schedule</span>
-                    {heat.time}
-                  </span>
-                </div>
-                <div className="space-y-4 relative z-10">
-                  {heat.surfers.map((s, idx) => (
-                    <div key={idx} className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-2 h-10 rounded-full shadow-sm ${s.color === 'red' ? 'bg-red-500' : 'bg-blue-600'}`}></div>
-                        <div className="flex flex-col">
-                          <span className="font-black text-base text-gray-800 tracking-tight">{s.name}</span>
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{s.country}</span>
-                        </div>
+
+          {/* Women's Roster */}
+          <div className="bg-white rounded-[32px] p-2 apple-shadow border border-accent overflow-hidden flex flex-col h-full">
+            {displayTeam.filter(s => s.gender === 'Female').length > 0 ? (
+              displayTeam.filter(s => s.gender === 'Female').map((surfer) => (
+                <SurferRow key={surfer.id} surfer={surfer} />
+              ))
+            ) : (
+              <div className="p-8 text-center text-gray-400 text-sm font-medium italic">No Women Selected</div>
+            )}
+          </div>
+        </div>
+
+        <button
+          disabled={eventStatus === 'LIVE'}
+          onClick={onManageTeam}
+          className={`w-full py-5 rounded-[32px] border-2 border-dashed font-black text-sm flex items-center justify-center gap-3 transition active:scale-95 ${eventStatus === 'LIVE'
+            ? 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
+            : 'border-primary/40 text-primary-dark hover:bg-white hover:border-primary/60'
+            }`}
+        >
+          <span className="material-icons-round text-xl">{eventStatus === 'LIVE' ? 'lock' : 'swap_horiz'}</span>
+          {eventStatus === 'LIVE' ? 'Roster Locked' : 'Manage My Team'}
+        </button>
+      </section>
+
+      {/* Heat Center Section */}
+      <section>
+        <div className="flex justify-between items-center mb-6 px-1">
+          <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Heat Center</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {MOCK_HEATS.map((heat) => (
+            <div key={heat.id} className="bg-white p-8 rounded-[40px] apple-shadow border border-accent relative overflow-hidden group hover:border-primary/20 transition-all">
+              <div className="flex justify-between items-center mb-8 relative z-10">
+                <span className="bg-accent/40 px-3 py-1.5 rounded-full text-xs font-black text-primary-dark uppercase tracking-tight">Heat {heat.number}</span>
+                <span className="text-xs font-bold text-gray-400 flex items-center gap-1.5">
+                  <span className="material-icons-round text-base">schedule</span>
+                  {heat.time}
+                </span>
+              </div>
+              <div className="space-y-4 relative z-10">
+                {heat.surfers.map((s, idx) => (
+                  <div key={idx} className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-2 h-10 rounded-full shadow-sm ${s.color === 'red' ? 'bg-red-500' : 'bg-blue-600'}`}></div>
+                      <div className="flex flex-col">
+                        <span className="font-black text-base text-gray-800 tracking-tight">{s.name}</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{s.country}</span>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// Sub-component for rendering a single surfer row (to avoid code duplication)
+const SurferRow: React.FC<{ surfer: Surfer }> = ({ surfer }) => {
+  const isEliminated = surfer.status === 'Eliminated';
+  const isInWater = surfer.status === 'In Water Now';
+
+  return (
+    <div className={`flex items-center p-5 border-b border-gray-50 last:border-0 transition-all ${isInWater ? 'bg-primary/5' : 'hover:bg-gray-50/50'}`}>
+      <div className="relative">
+        <img src={surfer.image} alt={surfer.name} className={`h-16 w-16 rounded-2xl object-cover object-top ${isEliminated ? 'grayscale opacity-60' : ''} ${isInWater ? 'ring-2 ring-primary ring-offset-2' : ''}`} />
+        {!isEliminated && (
+          <div className="absolute -bottom-1.5 -right-1.5 bg-primary text-white text-[10px] font-black px-2 py-1 rounded-full border-4 border-white shadow-sm">{surfer.tier}</div>
+        )}
+      </div>
+      <div className={`ml-5 flex-1 ${isEliminated ? 'opacity-50' : ''}`}>
+        <h4 className="font-bold text-lg leading-tight">{surfer.name}</h4>
+        <p className={`text-[10px] font-black mt-1 uppercase tracking-widest ${isInWater ? 'text-primary animate-pulse' : 'text-gray-400'}`}>
+          {surfer.status === 'In Water Now' ? 'Scoring Heat...' : surfer.status}
+        </p>
+        {surfer.commentary && isInWater && (
+          <p className="text-xs text-primary-dark mt-1 italic font-medium animate-in fade-in slide-in-from-left-2 duration-500">"{surfer.commentary}"</p>
+        )}
+      </div>
+      <div className={`text-right ${isEliminated ? 'opacity-40' : ''}`}>
+        <div className={`font-black text-2xl tracking-tighter transition-all ${surfer.lastWaveScore ? 'text-primary scale-110' : 'text-primary-dark'}`}>
+          {surfer.points?.toFixed(2) || '0.00'}
+        </div>
+        {surfer.lastWaveScore && isInWater && (
+          <p className="text-[10px] font-black text-primary uppercase animate-bounce mt-1">+{surfer.lastWaveScore}</p>
+        )}
       </div>
     </div>
   );
