@@ -36,103 +36,100 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
   }, [userTeam, totalPoints]);
 
   return (
-    <div className="pb-12 animate-in fade-in duration-500">
-      <header className="flex justify-between items-center mb-10">
-        <div>
-          <p className="text-[10px] md:text-xs font-bold text-primary-dark uppercase tracking-widest mb-1">Current Event</p>
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight">Pipeline Pro 2026</h1>
-        </div>
-        <button onClick={onSimulate} className="h-12 px-6 rounded-2xl bg-white border border-accent apple-shadow flex items-center gap-2 hover:bg-gray-50 transition active:scale-95">
-          <span className="material-icons-round text-primary-dark">bolt</span>
-          <span className="text-xs font-black uppercase tracking-widest">Sim Wave</span>
-        </button>
-      </header>
+    {/* Custom Replaceable Banner Area */ }
+    < div className = "w-full rounded-[40px] overflow-hidden shadow-2xl mb-10 relative group" >
+      <img
+        src="/images/banners/pipeline_banner.jpg"
+        alt="Event Banner"
+        className="w-full h-auto object-cover min-h-[300px]"
+        onError={(e) => {
+          // Fallback if the user hasn't refreshed or cache issue
+          e.currentTarget.src = '/pipe-banner-2026.png';
+        }}
+      />
+  {/* Overlay Controls (Sim Wave moved here to match design if purely visual, but user might want it separate. 
+            Looking at the screenshot, the "Sim Wave" button is actually INSIDE the black banner area on the left. 
+            I will position it absolutely.) */}
+  <div className="absolute bottom-8 left-8 z-20">
+    <button onClick={onSimulate} className="h-12 px-8 rounded-full bg-white text-primary-dark font-black uppercase tracking-widest shadow-lg hover:bg-gray-50 active:scale-95 transition flex items-center gap-2">
+      <span className="material-icons-round">bolt</span>
+      Sim Wave
+    </button>
+  </div>
+      </div >
 
-      {/* AI Daily Briefing */}
-      <div className="mb-10 bg-white rounded-[40px] p-8 border border-white apple-shadow relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-primary/10 transition-colors"></div>
-        <div className="w-full h-32 md:h-40 rounded-3xl overflow-hidden mb-6 relative">
-          <img src="pipe-banner-2026.png" onError={(e) => e.currentTarget.style.display = 'none'} alt="Pipeline Pro 2026 Banner" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-6">
-            <h2 className="text-white text-2xl font-black uppercase tracking-tighter">Official Event</h2>
-          </div>
-        </div>
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-            <span className="material-icons-round">auto_awesome</span>
-          </div>
-          <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">AI Morning Briefing</h4>
-        </div>
-        {isBriefingLoading ? (
-          <div className="flex gap-2">
-            <div className="h-4 w-3/4 bg-gray-100 animate-pulse rounded"></div>
-            <div className="h-4 w-1/4 bg-gray-100 animate-pulse rounded"></div>
-          </div>
-        ) : (
-          <p className="text-lg font-medium text-gray-700 leading-relaxed italic">
-            "{aiBriefing || "Draft your team to get your personalized AI scouting report."}"
-          </p>
-        )}
+  {/* AI Daily Briefing */ }
+  < div className = "mb-8 px-2" >
+    <div className="flex items-center gap-3 mb-2">
+      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+        <span className="material-icons-round text-primary text-xs">auto_awesome</span>
       </div>
+      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">AI Morning Briefing</span>
+    </div>
+{
+  isBriefingLoading ? (
+    <div className="h-6 w-full bg-gray-100 animate-pulse rounded-full"></div>
+  ) : (
+    <p className="text-xl md:text-2xl font-serif italic text-gray-800 leading-snug">
+      "{aiBriefing || "Swell's looking good. Your roster is ready for the incoming set."}"
+    </p>
+  )
+}
+      </div >
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        <div className="bg-white rounded-3xl p-8 shadow-sm border border-accent flex justify-between items-center relative overflow-hidden">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Event Status</span>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${eventStatus === 'LIVE' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
-                {eventStatus}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+        {/* Event Status Card */}
+        <div className="bg-white rounded-[32px] p-8 apple-shadow border border-gray-100 relative overflow-hidden flex flex-col justify-between h-[220px]">
+           <div className="flex justify-between items-start">
+              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${eventStatus === 'LIVE' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
+                {eventStatus === 'LIVE' ? 'Drafting' : 'Waiting'}
               </span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-5xl font-black text-gray-900 tracking-tighter">1st</span>
-              <span className="text-lg font-medium text-gray-400">/ 12</span>
-            </div>
-            <span className="text-xs font-bold text-primary-dark uppercase mt-2 tracking-wide">Friends League</span>
-          </div>
-          <div className="text-right">
-            <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Total Points</span>
-            <div className="text-4xl font-black text-primary-dark mt-1 animate-in zoom-in duration-300" key={totalPoints}>
-              {totalPoints.toFixed(2)}
-            </div>
-            <div className="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-tight">Ranked #132 Global</div>
-          </div>
+              <div className="text-right">
+                  <div className="text-xs font-bold text-gray-400 uppercase tracking-wide">Total Points</div>
+                  <div className="text-3xl font-black text-primary-dark tracking-tight">{totalPoints.toFixed(2)}</div>
+                  <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Ranked #132 Global</div>
+              </div>
+           </div>
+           
+           <div>
+               <div className="flex items-baseline gap-1">
+                 <span className="text-6xl font-black text-gray-900 tracking-tighter">1st</span>
+                 <span className="text-xl font-bold text-gray-300">/ 12</span>
+               </div>
+               <div className="text-xs font-bold text-primary-dark uppercase tracking-widest mt-1">Friends League</div>
+           </div>
         </div>
 
-        <div className="bg-primary rounded-3xl p-8 text-white shadow-lg relative overflow-hidden">
-          <div className="flex justify-between items-start mb-10 relative z-10">
-            <div className="flex flex-col">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold mb-3 w-fit">
-                <span className={`w-2 h-2 rounded-full ${eventStatus === 'LIVE' ? 'bg-red-500 animate-pulse' : 'bg-gray-400'}`}></span>
-                {eventStatus === 'LIVE' ? 'HEATS IN PROGRESS' : 'WAITING FOR SWELL'}
-              </span>
-              <h3 className="text-2xl font-black tracking-tight">Opening Round</h3>
+        {/* Conditions/Watching Card (Teal) */}
+        <div className="bg-[#14746f] rounded-[32px] p-8 text-white shadow-xl relative overflow-hidden flex flex-col justify-between h-[220px]">
+            {/* Background Texture/Gradient */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none"></div>
+            
+            <div className="flex justify-between items-start relative z-10">
+                <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur text-[10px] font-bold uppercase tracking-wide">
+                    {eventStatus === 'LIVE' ? 'Live Conditions' : 'Waiting for Swell'}
+                </span>
+                <div className="text-right">
+                    <div className="text-6xl font-black tracking-tighter leading-none">6-8<span className="text-2xl font-bold opacity-60">ft</span></div>
+                    <div className="text-[10px] font-bold opacity-60 uppercase tracking-widest mt-1">Swell Height</div>
+                </div>
             </div>
-            <div className="text-right">
-              <div className="text-5xl font-black tracking-tighter">6-8<span className="text-xl font-medium opacity-70">ft</span></div>
-              <div className="text-[10px] uppercase font-bold opacity-75 mt-1">Swell Height</div>
+
+            <div className="flex items-end justify-between relative z-10">
+                <div>
+                    <h3 className="text-xl font-bold">Conditions</h3>
+                    <p className="text-xs font-medium opacity-80 mt-1">Clean • Light Offshore</p>
+                </div>
+                <button className="px-6 py-2 bg-white text-[#14746f] rounded-full text-xs font-black uppercase tracking-widest shadow hover:bg-gray-50 active:scale-95 transition flex items-center gap-2">
+                    <span className="material-icons-round text-base">play_arrow</span>
+                    Watch
+                </button>
             </div>
-          </div>
-          <div className="flex items-center justify-between relative z-10">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-2xl bg-white/20 flex items-center justify-center">
-                <span className="material-icons-round text-2xl">waves</span>
-              </div>
-              <div>
-                <div className="text-base font-bold">Conditions</div>
-                <div className="text-xs opacity-90">Clean • Light Offshore</div>
-              </div>
-            </div>
-            <button className="px-6 py-3 bg-white text-primary-dark rounded-2xl text-sm font-bold shadow-md active:scale-95 hover:bg-gray-50 transition flex items-center gap-2">
-              <span className="material-icons-round text-xl">play_arrow</span>
-              Watch
-            </button>
-          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <section className="lg:col-span-1">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section>
           <div className="flex justify-between items-end mb-6 px-1">
             <h3 className="text-2xl font-bold text-gray-900 tracking-tight">My Team</h3>
             <span className="text-xs font-bold text-primary-mid uppercase tracking-tighter opacity-70">Live Tracker</span>
@@ -183,7 +180,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
           </button>
         </section>
 
-        <section className="lg:col-span-2">
+        <section>
           <div className="flex justify-between items-center mb-6 px-1">
             <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Heat Center</h3>
           </div>
@@ -215,7 +212,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
           </div>
         </section>
       </div>
-    </div>
+    </div >
   );
 };
 
