@@ -379,18 +379,12 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start relative">
-        <div className="lg:col-span-7 order-2 lg:order-1">
-          <div className="space-y-24">
-            {renderTier(Tier.A, "Top Seed Powerhouses")}
-            {renderTier(Tier.B, "The Competitive Core")}
-            {renderTier(Tier.C, "Value Picks & Underdogs")}
-          </div>
-        </div>
+      {/* Main Layout - Stacked Vertical (Desktop & Mobile) */}
+      <div className="flex flex-col gap-10">
 
-        <div className="lg:col-span-5 lg:sticky lg:top-24 order-1 lg:order-2 z-40">
-          {/* Main Summary Panel */}
-          <div className="bg-white rounded-[64px] p-10 md:p-14 apple-shadow border border-white/80 backdrop-blur-sm">
+        {/* 1. Roster Summary Panel (Top) */}
+        <div className="w-full">
+          <div className="bg-white rounded-[48px] md:rounded-[64px] p-8 md:p-14 apple-shadow border border-white/80 backdrop-blur-sm">
 
             <div className="flex justify-between items-center mb-8">
               <h3 className="text-2xl font-black text-gray-900">{activeTab} Roster</h3>
@@ -455,6 +449,14 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             </button>
           </div>
         </div>
+
+        {/* 2. Tier Selection (Bottom) */}
+        <div className="w-full space-y-20 mt-10">
+          {renderTier(Tier.A, "Top Seed Powerhouses")}
+          {renderTier(Tier.B, "The Competitive Core")}
+          {renderTier(Tier.C, "Value Picks & Underdogs")}
+        </div>
+
       </div>
     </div>
   );
