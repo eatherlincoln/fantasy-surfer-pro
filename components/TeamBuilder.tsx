@@ -14,7 +14,7 @@ interface TeamBuilderProps {
 
 const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave }) => {
   // Single Team State
-  const [team, setTeam] = useState<Surfer[]>([]);
+  const [team, setTeam] = useState<Surfer[]>(initialTeam || []);
   const [allSurfers, setAllSurfers] = useState<Surfer[]>(FULL_MOCK_SURFERS);
 
   const [isAiLoading, setIsAiLoading] = useState(false);
