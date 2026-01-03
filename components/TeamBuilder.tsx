@@ -171,6 +171,8 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     // Show ALL surfers in this tier (No Gender Filter)
     const surfers = allSurfers
       .filter(s => s.tier === tier)
+      // Sort by Value (High -> Low), then Logic for Selected Selection
+      .sort((a, b) => b.value - a.value)
       .sort((a, b) => {
         const aSelected = team.some(s => s.id === a.id);
         const bSelected = team.some(s => s.id === b.id);
