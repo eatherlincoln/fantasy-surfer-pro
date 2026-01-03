@@ -32,45 +32,11 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     // For this simplified single-team context, we'll just use the mock data directly.
     // If dynamic data is still desired, the original useEffect logic should be adapted
     // to fetch all surfers and merge, then setAllSurfers.
-    const fetchSurfers = async () => {
-      try {
-        const { data, error } = await supabase.from('surfers').select('*');
-
-        const mergedData = FULL_MOCK_SURFERS.map(mockSurfer => {
-          const dbSurfer = data?.find((s: any) => s.id === mockSurfer.id || s.name === mockSurfer.name);
-
-          let validImage = mockSurfer.image;
-
-          if (mockSurfer.image && mockSurfer.image.startsWith('/')) {
-            validImage = mockSurfer.image;
-          }
-          else if (dbSurfer?.image && !dbSurfer.image.includes('ui-avatars')) {
-            validImage = dbSurfer.image;
-          }
-          else {
-            validImage = dbSurfer?.image || mockSurfer.image;
-          }
-
-          return {
-            ...mockSurfer,
-            ...dbSurfer,
-            id: mockSurfer.id,
-            name: mockSurfer.name,
-            country: mockSurfer.country,
-            tier: mockSurfer.tier,
-            gender: mockSurfer.gender,
-            image: validImage
-          };
-        });
-
-        setAllSurfers(mergedData as Surfer[]);
-
-      } catch (err) {
-        console.error("Supabase fetch failed, keeping Mocks", err);
-        setAllSurfers(FULL_MOCK_SURFERS);
-      }
-    };
-    fetchSurfers();
+    useEffect(() => {
+      // FORCE USE OF LOCAL MOCK DATA (SPREADSHEET SOURCE OF TRUTH)
+      // Supabase fetch disabled to prevent stale data overriding new constants.
+      setAllSurfers(FULL_MOCK_SURFERS);
+    }, []);
   }, []);
 
   const totalSpent = useMemo(() => {
