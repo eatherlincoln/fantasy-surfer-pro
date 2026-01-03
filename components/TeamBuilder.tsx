@@ -345,17 +345,18 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
             {/* Single Grid for All 10 Slots */}
             <div className="grid grid-cols-4 md:grid-cols-5 gap-x-2 gap-y-8 md:gap-x-6 md:gap-y-10">
-              {/* Tier A (2 Slots) */}
-              <RosterSlot surfer={team.filter(s => s.tier === Tier.A)[0]} tier={Tier.A} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} />
-              <RosterSlot surfer={team.filter(s => s.tier === Tier.A)[1]} tier={Tier.A} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} />
+              {/* Tier A (3 Slots) */}
+              {[0, 1, 2].map(i => (
+                <RosterSlot key={`a-${i}`} surfer={team.filter(s => s.tier === Tier.A)[i]} tier={Tier.A} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} />
+              ))}
 
               {/* Tier B (4 Slots) */}
               {[0, 1, 2, 3].map(i => (
                 <RosterSlot key={`b-${i}`} surfer={team.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} />
               ))}
 
-              {/* Tier C (4 Slots) */}
-              {[0, 1, 2, 3].map(i => (
+              {/* Tier C (3 Slots) */}
+              {[0, 1, 2].map(i => (
                 <RosterSlot key={`c-${i}`} surfer={team.filter(s => s.tier === Tier.C)[i]} tier={Tier.C} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} />
               ))}
             </div>
