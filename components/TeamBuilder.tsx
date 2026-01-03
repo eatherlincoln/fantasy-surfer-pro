@@ -28,9 +28,24 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
   useEffect(() => {
     // FORCE USE OF LOCAL MOCK DATA (SPREADSHEET SOURCE OF TRUTH)
-    // Supabase fetch disabled to prevent stale data overriding new constants.
     setAllSurfers(FULL_MOCK_SURFERS);
   }, []);
+
+  // 1. Sync local team state with prop updates (e.g. Live Points from App.tsx)
+  useEffect(() => {
+    if (initialTeam) {
+      setTeam(initialTeam);
+    }
+  }, [initialTeam]);
+
+  // 2. Sync "All Surfers" list to reflect the points of selected team members
+  // This ensures the bottom list shows correct points for selected surfers too.
+  useEffect(() => {
+    setAllSurfers(prev => prev.map(s => {
+      const teamMember = team.find(t => t.id === s.id);
+      return teamMember ? { ...s, points: teamMember.points } : s;
+    }));
+  }, [team]);
 
   const totalSpent = useMemo(() => {
     return team.reduce((acc, s) => acc + s.value, 0);
