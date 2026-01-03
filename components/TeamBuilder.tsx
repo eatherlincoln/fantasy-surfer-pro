@@ -27,16 +27,9 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   });
 
   useEffect(() => {
-    // Just ensure we have the latest data/images
-    // The original useEffect fetched from Supabase and merged.
-    // For this simplified single-team context, we'll just use the mock data directly.
-    // If dynamic data is still desired, the original useEffect logic should be adapted
-    // to fetch all surfers and merge, then setAllSurfers.
-    useEffect(() => {
-      // FORCE USE OF LOCAL MOCK DATA (SPREADSHEET SOURCE OF TRUTH)
-      // Supabase fetch disabled to prevent stale data overriding new constants.
-      setAllSurfers(FULL_MOCK_SURFERS);
-    }, []);
+    // FORCE USE OF LOCAL MOCK DATA (SPREADSHEET SOURCE OF TRUTH)
+    // Supabase fetch disabled to prevent stale data overriding new constants.
+    setAllSurfers(FULL_MOCK_SURFERS);
   }, []);
 
   const totalSpent = useMemo(() => {
