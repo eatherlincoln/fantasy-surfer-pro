@@ -243,7 +243,7 @@ const SurferRow: React.FC<{ surfer: Surfer }> = ({ surfer }) => {
   const getTierBadgeColor = (tier: Tier) => {
     switch (tier) {
       case Tier.A: return 'bg-yellow-400 text-yellow-950'; // Gold/Yellow
-      case Tier.B: return 'bg-green-500 text-white';       // Green
+      case Tier.B: return 'bg-teal-600 text-white';       // Green/Teal
       case Tier.C: return 'bg-gray-400 text-white';        // Grey
       default: return 'bg-gray-200 text-gray-500';
     }
