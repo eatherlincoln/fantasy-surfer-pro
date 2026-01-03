@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { Surfer } from '../types';
+import { Surfer, Tier } from '../types';
 
 interface LeagueMember {
   id: string;
@@ -12,7 +12,7 @@ interface LeagueMember {
   trend: 'up' | 'down' | 'neutral';
   trendValue?: number;
   isUser?: boolean;
-  lineup?: { name: string; status: 'IN HEAT' | 'OUT' | 'NEXT'; image: string }[];
+  lineup?: { name: string; status: 'IN HEAT' | 'OUT' | 'NEXT'; image: string; value: number; tier: Tier }[];
 }
 
 interface LeaguesProps {
@@ -30,15 +30,26 @@ const MOCK_OTHER_MEMBERS: LeagueMember[] = [
 const Leagues: React.FC<LeaguesProps> = ({ userTeam }) => {
   const [expandedId, setExpandedId] = useState<string | null>('1');
 
+  const getTierColor = (tier: Tier) => {
+    switch (tier) {
+      case Tier.A: return 'border-purple-400';
+      case Tier.B: return 'border-blue-400';
+      case Tier.C: return 'border-green-400';
+      default: return 'border-gray-200';
+    }
+  };
+
   const userStats = useMemo(() => {
     const totalPoints = userTeam.reduce((acc, s) => acc + (s.points || 0), 0);
     const activeSurfers = userTeam.filter(s => s.status !== 'Eliminated').length;
-    
+
     // Map surfer status to league UI status
     const lineup = userTeam.map(s => ({
       name: s.name.split(' ').pop() || '',
       image: s.image,
-      status: s.status === 'In Water Now' ? 'IN HEAT' : s.status === 'Eliminated' ? 'OUT' : 'NEXT' as any
+      status: s.status === 'In Water Now' ? 'IN HEAT' : s.status === 'Eliminated' ? 'OUT' : 'NEXT' as any,
+      value: s.value,
+      tier: s.tier
     }));
 
     return {
@@ -138,7 +149,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam }) => {
       <div className="bg-white rounded-2xl apple-shadow border border-accent/50 overflow-hidden divide-y divide-gray-50">
         {allMembers.map((member) => (
           <div key={member.id} className="flex flex-col">
-            <button 
+            <button
               onClick={() => setExpandedId(expandedId === member.id ? null : member.id)}
               className="flex items-center p-4 hover:bg-gray-50 transition-colors w-full text-left"
             >
@@ -178,7 +189,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam }) => {
                   <div className="flex space-x-4 overflow-x-auto hide-scrollbar pb-2">
                     {member.lineup.map((surfer, idx) => (
                       <div key={idx} className="flex-shrink-0 w-16 text-center">
-                        <div className={`w-14 h-14 mx-auto rounded-full bg-gray-200 relative overflow-hidden border-2 ${surfer.status === 'OUT' ? 'grayscale opacity-60 border-gray-300' : 'border-primary'}`}>
+                        <div className={`w-14 h-14 mx-auto rounded-full bg-gray-200 relative overflow-hidden border-2 transition-all ${surfer.status === 'OUT' ? 'grayscale opacity-60 border-gray-300' : getTierColor(surfer.tier)}`}>
                           <img alt={surfer.name} className="w-full h-full object-cover" src={surfer.image} />
                           {surfer.status === 'OUT' && (
                             <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -187,7 +198,11 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam }) => {
                           )}
                         </div>
                         <p className="text-[9px] font-bold mt-1 truncate text-gray-700">{surfer.name}</p>
-                        <p className={`text-[8px] font-extrabold ${surfer.status === 'IN HEAT' ? 'text-green-500' : surfer.status === 'NEXT' ? 'text-blue-500' : 'text-gray-400'}`}>
+
+                        {/* New Value Display */}
+                        <p className="text-[9px] font-extrabold text-gray-500 -mt-0.5">${surfer.value}M</p>
+
+                        <p className={`text-[8px] font-extrabold mt-0.5 ${surfer.status === 'IN HEAT' ? 'text-green-500' : surfer.status === 'NEXT' ? 'text-blue-500' : 'text-gray-400'}`}>
                           {surfer.status}
                         </p>
                       </div>
