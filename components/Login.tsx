@@ -121,7 +121,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       ) : (
         <div className="w-full max-w-sm space-y-4">
           <button
-            onClick={onLogin}
+            onClick={() => alert("Apple Sign In coming soon! Please use 'Sign up with email' below.")}
             className="w-full bg-black text-white flex items-center justify-center gap-3 py-4 rounded-2xl font-bold transform transition-transform active:scale-95"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 16 16">
@@ -139,7 +139,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           </button>
 
           <button
-            onClick={onLogin}
+            onClick={() => alert("Facebook Sign In coming soon! Please use 'Sign up with email' below.")}
             className="w-full bg-[#1877F2] text-white flex items-center justify-center gap-3 py-4 rounded-2xl font-bold transform transition-transform active:scale-95"
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
