@@ -13,6 +13,8 @@ interface TeamBuilderProps {
 }
 
 const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave, userProfile }) => {
+  console.log("TeamBuilder Rendered. initialTeam points:", initialTeam?.reduce((sum, s) => sum + (s.points || 0), 0));
+
   // Single Team State
   const [team, setTeam] = useState<Surfer[]>(initialTeam || []);
   const [allSurfers, setAllSurfers] = useState<Surfer[]>(FULL_MOCK_SURFERS);
@@ -49,6 +51,10 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
   const totalSpent = useMemo(() => {
     return team.reduce((acc, s) => acc + s.value, 0);
+  }, [team]);
+
+  const totalPoints = useMemo(() => {
+    return team.reduce((acc, s) => acc + (s.points || 0), 0);
   }, [team]);
 
   const counts = useMemo(() => ({
@@ -283,7 +289,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
                 <div>
                   <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2 block">Team Points</span>
                   <p className="text-5xl md:text-6xl font-black tracking-tighter text-gray-900">
-                    0.00
+                    {totalPoints.toFixed(2)}
                   </p>
                 </div>
 
