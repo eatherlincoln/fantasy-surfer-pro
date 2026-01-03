@@ -121,13 +121,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       ) : (
         <div className="w-full max-w-sm space-y-4">
           <button
-            onClick={() => alert("Apple Sign In coming soon! Please use 'Sign up with email' below.")}
+            onClick={onLogin}
             className="w-full bg-black text-white flex items-center justify-center gap-3 py-4 rounded-2xl font-bold transform transition-transform active:scale-95"
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M7.99 0C3.58 0 0 3.58 0 7.99c0 4.41 3.58 7.99 7.99 7.99 4.41 0 7.99-3.58 7.99-7.99C15.98 3.58 12.4 0 7.99 0z" />
-            </svg>
-            Sign in with Apple
+            <span className="material-icons-round">person_outline</span>
+            Continue as Guest
           </button>
 
           <button

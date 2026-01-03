@@ -56,7 +56,11 @@ const Profile: React.FC = () => {
   const updateProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user');
+
+      if (!user) {
+        alert("🔒 Guest Mode\n\nPlease sign up to create a profile and save your team!");
+        return;
+      }
 
       const updates = {
         id: user.id,
