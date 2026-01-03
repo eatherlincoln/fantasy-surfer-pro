@@ -15,6 +15,7 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeModal, setActiveModal] = useState<'PRIVACY' | 'TERMS' | 'REFUND' | 'COOKIE' | null>(null);
+  const [session, setSession] = useState<any>(null);
 
 
   const [isEditing, setIsEditing] = useState(false);
@@ -30,6 +31,7 @@ const Profile: React.FC = () => {
   const getProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      setSession(user);
 
       if (user) {
         // Fetch all profile fields including new stats/payment
@@ -226,6 +228,9 @@ const Profile: React.FC = () => {
                 <p>Privacy questions: <a href="mailto:hellomate@empireave.com" className="text-primary font-bold underline">hellomate@empireave.com</a></p>
               </div>
             </div>
+            <div className="p-4 border-t border-gray-100 bg-gray-50/50">
+              <button onClick={() => setActiveModal(null)} className="w-full py-3 bg-gray-900 text-white font-bold rounded-xl active:scale-95 transition shadow-lg">Close</button>
+            </div>
           </>
         );
 
@@ -392,6 +397,9 @@ const Profile: React.FC = () => {
                 <h3 className="text-lg font-bold text-gray-900 mb-2">18. Contact</h3>
                 <p>Questions: <a href="mailto:hellomate@empireave.com" className="text-primary font-bold underline">hellomate@empireave.com</a></p>
               </div>
+            </div>
+            <div className="p-4 border-t border-gray-100 bg-gray-50/50">
+              <button onClick={() => setActiveModal(null)} className="w-full py-3 bg-gray-900 text-white font-bold rounded-xl active:scale-95 transition shadow-lg">Close</button>
             </div>
           </>
         );
