@@ -240,12 +240,21 @@ const SurferRow: React.FC<{ surfer: Surfer }> = ({ surfer }) => {
   const isEliminated = surfer.status === 'Eliminated';
   const isInWater = surfer.status === 'In Water Now';
 
+  const getTierBadgeColor = (tier: Tier) => {
+    switch (tier) {
+      case Tier.A: return 'bg-yellow-400 text-yellow-950'; // Gold/Yellow
+      case Tier.B: return 'bg-green-500 text-white';       // Green
+      case Tier.C: return 'bg-gray-400 text-white';        // Grey
+      default: return 'bg-gray-200 text-gray-500';
+    }
+  };
+
   return (
     <div className={`flex items-center p-5 border-b border-gray-50 last:border-0 transition-all ${isInWater ? 'bg-primary/5' : 'hover:bg-gray-50/50'}`}>
       <div className="relative">
         <img src={surfer.image} alt={surfer.name} className={`h-16 w-16 rounded-2xl object-cover object-top ${isEliminated ? 'grayscale opacity-60' : ''} ${isInWater ? 'ring-2 ring-primary ring-offset-2' : ''}`} />
         {!isEliminated && (
-          <div className="absolute -bottom-1.5 -right-1.5 bg-primary text-white text-[10px] font-black px-2 py-1 rounded-full border-4 border-white shadow-sm">{surfer.tier}</div>
+          <div className={`absolute -bottom-1.5 -right-1.5 ${getTierBadgeColor(surfer.tier)} text-[10px] font-black px-2 py-1 rounded-full border-4 border-white shadow-sm`}>{surfer.tier}</div>
         )}
       </div>
       <div className={`ml-5 flex-1 ${isEliminated ? 'opacity-50' : ''}`}>

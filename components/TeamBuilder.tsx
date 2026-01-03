@@ -114,8 +114,8 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
   const getTierColor = (tier: Tier) => {
     switch (tier) {
-      case Tier.A: return 'border-pop'; // Yellow/Gold highlight
-      case Tier.B: return 'border-primary-dark';
+      case Tier.A: return 'border-yellow-400';
+      case Tier.B: return 'border-green-500';
       case Tier.C: return 'border-gray-300';
       default: return 'border-gray-200';
     }
