@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MOCK_SURFERS, MOCK_HEATS } from '../constants';
-import { Surfer, EventStatus, Tier } from '../types';
+import { Surfer, EventStatus, Tier, UserProfile } from '../types';
 import { generateBriefing } from '../services/aiService';
 
 interface DashboardProps {
@@ -8,9 +8,10 @@ interface DashboardProps {
   eventStatus: EventStatus;
   onManageTeam: () => void;
   onSimulate: () => void;
+  userProfile: UserProfile | null;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTeam, onSimulate }) => {
+const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTeam, onSimulate, userProfile }) => {
   const [aiBriefing, setAiBriefing] = useState<string | null>(null);
   const [isBriefingLoading, setIsBriefingLoading] = useState(false);
   const displayTeam = userTeam.length > 0 ? userTeam : MOCK_SURFERS.slice(0, 3);
@@ -127,7 +128,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
       {/* Team Section - Split into Men and Women columns */}
       <section className="mb-10">
         <div className="flex justify-between items-end mb-6 px-1">
-          <h3 className="text-2xl font-bold text-gray-900 tracking-tight">My Team</h3>
+          <h3 className="text-2xl font-bold text-gray-900 tracking-tight">{userProfile?.team_name || "My Team"}</h3>
           <span className="text-xs font-bold text-primary-mid uppercase tracking-tighter opacity-70 cursor-pointer hover:text-primary transition-colors">Live Tracker</span>
         </div>
 

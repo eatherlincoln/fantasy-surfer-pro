@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Surfer, Tier } from '../types';
+import { Surfer, Tier, UserProfile } from '../types';
 import { TOTAL_BUDGET, TIER_LIMITS } from '../constants';
 import { FULL_MOCK_SURFERS } from '../fullMockData';
 import { supabase } from '../services/supabase';
@@ -10,9 +10,10 @@ interface TeamBuilderProps {
   initialTeam: Surfer[]; // Legacy prop - likely empty or mix
   isLocked: boolean;
   onSave: (team: Surfer[]) => void;
+  userProfile: UserProfile | null;
 }
 
-const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave }) => {
+const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave, userProfile }) => {
   // Single Team State
   const [team, setTeam] = useState<Surfer[]>(initialTeam || []);
   const [allSurfers, setAllSurfers] = useState<Surfer[]>(FULL_MOCK_SURFERS);
@@ -229,7 +230,9 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     <div className="pb-44 animate-in slide-in-from-bottom duration-700">
       <header className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
         <div>
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-gray-900">Draft Team</h2>
+          <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-gray-900">
+            {userProfile?.team_name ? `Drafting: ${userProfile.team_name}` : 'Draft Team'}
+          </h2>
           <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-3">Pipeline Pro • Season 2026</p>
         </div>
 

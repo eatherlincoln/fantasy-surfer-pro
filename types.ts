@@ -43,3 +43,14 @@ export interface Heat {
     color: string;
   }[];
 }
+
+export interface UserProfile {
+  id?: string;
+  username: string | null;
+  avatar_url: string | null;
+  full_name?: string;
+  team_name?: string;
+  is_paid?: boolean;
+  events_won?: number;
+  events_lost?: number;
+}

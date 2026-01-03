@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Surfer, Tier } from '../types';
+import { Surfer, Tier, UserProfile } from '../types';
 
 interface LeagueMember {
   id: string;
@@ -17,6 +17,7 @@ interface LeagueMember {
 
 interface LeaguesProps {
   userTeam: Surfer[];
+  userProfile: UserProfile | null;
 }
 
 const MOCK_OTHER_MEMBERS: LeagueMember[] = [
@@ -27,10 +28,15 @@ const MOCK_OTHER_MEMBERS: LeagueMember[] = [
   { id: '6', rank: 6, name: 'Chris', initial: 'C', points: 104.1, surfersLeft: 1, trend: 'up', trendValue: 1 },
 ];
 
-const Leagues: React.FC<LeaguesProps> = ({ userTeam }) => {
+const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
   const [expandedId, setExpandedId] = useState<string | null>('1');
-  const [teamName, setTeamName] = useState("Lincoln's Team");
+  const [teamName, setTeamName] = useState(userProfile?.team_name || "Lincoln's Team");
   const [isEditingName, setIsEditingName] = useState(false);
+
+  // Sync state with prop if it loads late
+  useMemo(() => {
+    if (userProfile?.team_name) setTeamName(userProfile.team_name);
+  }, [userProfile]);
 
   const getTierColor = (tier: Tier) => {
     switch (tier) {
@@ -73,11 +79,11 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam }) => {
       trendValue: 3,
       isUser: true,
       lineup: userStats.lineup,
-      // No avatar for user by default, usually
+      avatar: userProfile?.avatar_url || undefined,
     };
 
     return [userMember, ...MOCK_OTHER_MEMBERS];
-  }, [userStats, teamName]);
+  }, [userStats, teamName, userProfile]);
 
   const renderMemberRow = (member: LeagueMember, isPinned = false) => (
     <div key={member.id} className={`flex flex-col ${isPinned ? 'bg-primary/5 border-b-2 border-primary/10' : ''}`}>

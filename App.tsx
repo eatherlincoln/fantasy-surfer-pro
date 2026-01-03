@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Surfer, EventStatus } from './types';
+import { View, Surfer, EventStatus, UserProfile } from './types';
 import { generateSurfCommentary } from './services/aiService';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
@@ -18,24 +18,49 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('fantasy_surfer_team');
     return saved ? JSON.parse(saved) : [];
   });
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      if (session) handleLogin(); // Auto-login if session exists
+      if (session) {
+        handleLogin(); // Auto-login if session exists
+        fetchProfile(session.user.id);
+      }
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      if (session && currentView === 'LOGIN') handleLogin();
+      if (session) {
+        if (currentView === 'LOGIN') handleLogin();
+        fetchProfile(session.user.id);
+      } else {
+        setUserProfile(null);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (data) {
+        setUserProfile(data);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1200);
@@ -115,6 +140,7 @@ const App: React.FC = () => {
               eventStatus={eventStatus}
               onManageTeam={() => setCurrentView('TEAM_BUILDER')}
               onSimulate={simulateWave}
+              userProfile={userProfile}
             />
           )}
 
@@ -123,6 +149,7 @@ const App: React.FC = () => {
               initialTeam={userTeam}
               isLocked={eventStatus === 'LIVE'}
               onSave={handleSaveTeam}
+              userProfile={userProfile}
             />
           )}
 
@@ -132,7 +159,7 @@ const App: React.FC = () => {
 
           {currentView === 'LEAGUES' && (
             <div className="max-w-4xl mx-auto">
-              <Leagues userTeam={userTeam} />
+              <Leagues userTeam={userTeam} userProfile={userProfile} />
             </div>
           )}
         </div>

@@ -6,6 +6,9 @@ interface UserProfile {
   avatar_url: string | null;
   full_name?: string;
   team_name?: string;
+  is_paid?: boolean;
+  events_won?: number;
+  events_lost?: number;
 }
 
 const Profile: React.FC = () => {
@@ -26,6 +29,7 @@ const Profile: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user) {
+        // Fetch all profile fields including new stats/payment
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -160,33 +164,41 @@ const Profile: React.FC = () => {
         )}
       </div>
 
-      {/* Payment Section */}
+      {/* Payment Section - Connected to DB */}
       <section className="mb-8">
         <h3 className="text-lg font-bold mb-4 text-gray-800">League Entry</h3>
         <div className="bg-white p-6 rounded-2xl apple-shadow border border-accent relative overflow-hidden">
-          <div className="absolute top-0 right-0 bg-red-100 text-red-600 px-3 py-1 rounded-bl-xl text-[10px] font-black uppercase tracking-widest">
-            Unpaid
+          <div className={`absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-[10px] font-black uppercase tracking-widest ${profile?.is_paid ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+            {profile?.is_paid ? 'PAID' : 'UNPAID'}
           </div>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-              <span className="material-icons-round text-green-600 text-xl">payments</span>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${profile?.is_paid ? 'bg-green-100' : 'bg-red-50'}`}>
+              <span className={`material-icons-round text-xl ${profile?.is_paid ? 'text-green-600' : 'text-red-500'}`}>
+                {profile?.is_paid ? 'check_circle' : 'payments'}
+              </span>
             </div>
             <div>
               <h4 className="font-bold text-gray-900 leading-tight">Entry Fee</h4>
               <p className="text-xs text-gray-400 font-medium">Season 2024 Access</p>
             </div>
           </div>
-          <button
-            onClick={handlePayment}
-            className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold shadow-lg hover:bg-black transition flex items-center justify-center gap-2 active:scale-95"
-          >
-            Pay $200
-            <span className="material-icons-round text-sm text-gray-400">arrow_forward</span>
-          </button>
+          {profile?.is_paid ? (
+            <div className="w-full py-3 bg-gray-100 text-gray-400 rounded-xl font-bold flex items-center justify-center gap-2 cursor-default">
+              Entry Confirmed
+            </div>
+          ) : (
+            <button
+              onClick={handlePayment}
+              className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold shadow-lg hover:bg-black transition flex items-center justify-center gap-2 active:scale-95"
+            >
+              Pay $200
+              <span className="material-icons-round text-sm text-gray-400">arrow_forward</span>
+            </button>
+          )}
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Stats Section - Connected to DB */}
       <section className="mb-8">
         <h3 className="text-lg font-bold mb-4 text-gray-800">Season Stats</h3>
         <div className="grid grid-cols-2 gap-4 mb-4">
@@ -204,18 +216,18 @@ const Profile: React.FC = () => {
               <p className="text-[10px] font-bold text-gray-400 uppercase">Waves Scored</p>
             </div>
           </div>
-          {/* New Stats */}
+          {/* Real Data Stats */}
           <div className="bg-white p-5 rounded-2xl apple-shadow border border-gray-100 flex flex-col h-32">
             <span className="material-icons-round text-yellow-500 mb-2 text-2xl">military_tech</span>
             <div className="mt-auto">
-              <p className="text-2xl font-black tracking-tighter text-gray-900">0</p>
+              <p className="text-2xl font-black tracking-tighter text-gray-900">{profile?.events_won || 0}</p>
               <p className="text-[10px] font-bold text-gray-400 uppercase">Events Won</p>
             </div>
           </div>
           <div className="bg-white p-5 rounded-2xl apple-shadow border border-gray-100 flex flex-col h-32">
             <span className="material-icons-round text-red-400 mb-2 text-2xl">sentiment_very_dissatisfied</span>
             <div className="mt-auto">
-              <p className="text-2xl font-black tracking-tighter text-gray-900">0</p>
+              <p className="text-2xl font-black tracking-tighter text-gray-900">{profile?.events_lost || 0}</p>
               <p className="text-[10px] font-bold text-gray-400 uppercase">Events Lost</p>
             </div>
           </div>
