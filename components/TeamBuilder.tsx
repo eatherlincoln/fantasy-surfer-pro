@@ -9,10 +9,11 @@ interface TeamBuilderProps {
   initialTeam: Surfer[]; // Legacy prop - likely empty or mix
   isLocked: boolean;
   onSave: (team: Surfer[]) => void;
+  onBack: () => void;
   userProfile: UserProfile | null;
 }
 
-const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave, userProfile }) => {
+const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave, onBack, userProfile }) => {
   console.log("TeamBuilder Rendered. initialTeam points:", initialTeam?.reduce((sum, s) => sum + (s.points || 0), 0));
 
   // Single Team State
@@ -236,7 +237,9 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
           <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-3">Pipeline Pro • Season 2026</p>
         </div>
 
-        <button onClick={() => onSave(team)} className="text-sm md:text-base font-black text-primary-dark underline p-4 hover:opacity-70 transition decoration-2 underline-offset-4">Cancel Draft</button>
+        <button onClick={onBack} className="text-sm md:text-base font-black text-primary-dark underline p-4 hover:opacity-70 transition decoration-2 underline-offset-4">
+          {isLocked ? 'Back to Dashboard' : 'Cancel Draft'}
+        </button>
       </header>
 
       {/* AI Advice Banner */}

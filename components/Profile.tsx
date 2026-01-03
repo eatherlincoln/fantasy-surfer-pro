@@ -244,6 +244,7 @@ const Profile: React.FC = () => {
           {[
             { icon: 'policy', label: 'Privacy Policy' },
             { icon: 'help', label: 'Help & Support' },
+            { icon: 'info', label: 'About' },
           ].map((item, idx) => (
             <button key={idx} className="w-full flex justify-between items-center p-5 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition group">
               <div className="flex items-center gap-4">

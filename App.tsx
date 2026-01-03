@@ -130,6 +130,11 @@ const App: React.FC = () => {
     return <Login onLogin={handleLogin} />;
   }
 
+  const handleBackFromTeamBuilder = () => {
+    // Just switch view, do NOT reset points
+    setCurrentView('DASHBOARD');
+  };
+
   return (
     <div className="min-h-screen bg-background text-gray-800 flex flex-col items-center">
       <main className="flex-1 w-full max-w-screen-xl px-4 md:px-8 lg:px-12 pt-8 md:pt-16 pb-32">
@@ -149,6 +154,7 @@ const App: React.FC = () => {
               initialTeam={userTeam}
               isLocked={eventStatus === 'LIVE'}
               onSave={handleSaveTeam}
+              onBack={handleBackFromTeamBuilder}
               userProfile={userProfile}
             />
           )}
