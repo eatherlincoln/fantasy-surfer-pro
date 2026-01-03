@@ -14,60 +14,104 @@ interface UserProfile {
 const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+  const [activeModal, setActiveModal] = useState<'PRIVACY' | 'TERMS' | 'REFUND' | 'COOKIE' | null>(null);
 
-  // ... (previous code)
 
-  return (
-    <div className="animate-in fade-in duration-500 pt-6 px-4 pb-24">
-      {/* ... (previous code) */}
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({ username: '', full_name: '', team_name: '', avatar_url: '' });
 
-      <section className="space-y-4">
-        <h3 className="text-lg font-bold mb-4 text-gray-800">Support</h3>
-        <div className="bg-white rounded-2xl apple-shadow border border-gray-100 overflow-hidden">
-          <button
-            onClick={() => setShowPrivacyPolicy(true)}
-            className="w-full flex justify-between items-center p-5 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition group"
-          >
-            <div className="flex items-center gap-4">
-              <span className="material-icons-round text-gray-400 group-hover:text-primary transition-colors">policy</span>
-              <span className="font-bold text-sm text-gray-700">Privacy Policy</span>
-            </div>
-            <span className="material-icons-round text-gray-200">chevron_right</span>
-          </button>
+  // Mock Stripe Payment Link (Replace with actual link later)
+  const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_eVa...";
 
-          {[
-            { icon: 'help', label: 'Help & Support' },
-            { icon: 'info', label: 'About' },
-          ].map((item, idx) => (
-            <button key={idx} className="w-full flex justify-between items-center p-5 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition group">
-              <div className="flex items-center gap-4">
-                <span className="material-icons-round text-gray-400 group-hover:text-primary transition-colors">{item.icon}</span>
-                <span className="font-bold text-sm text-gray-700">{item.label}</span>
-              </div>
-              <span className="material-icons-round text-gray-200">chevron_right</span>
-            </button>
-          ))}
-        </div>
-      </section>
+  useEffect(() => {
+    getProfile();
+  }, []);
 
-      <button
-        onClick={handleSignOut}
-        className="w-full mt-10 py-5 rounded-2xl bg-white text-danger font-bold text-sm flex items-center justify-center gap-2 border border-danger/20 hover:bg-danger/5 transition active:scale-95 mb-10 shadow-sm"
-      >
-        <span className="material-icons-round text-lg">logout</span>
-        Log Out
-      </button>
+  const getProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
 
-      {/* Privacy Policy Modal */}
-      {showPrivacyPolicy && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowPrivacyPolicy(false)}></div>
-          <div className="bg-white rounded-[32px] w-full max-w-2xl max-h-[85vh] overflow-hidden shadow-2xl relative animate-in fade-in zoom-in-95 duration-300 flex flex-col">
+      if (user) {
+        // Fetch all profile fields including new stats/payment
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (data) {
+          setProfile(data);
+          setFormData({
+            username: data.username || '',
+            full_name: data.full_name || user.user_metadata.full_name || '',
+            team_name: data.team_name || "Lincoln's Team", // Default fallback
+            avatar_url: data.avatar_url || ''
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        alert("🔒 Guest Mode\n\nPlease sign up to create a profile and save your team!");
+        return;
+      }
+
+      const updates = {
+        id: user.id,
+        username: formData.username,
+        team_name: formData.team_name,
+        avatar_url: formData.avatar_url,
+        updated_at: new Date(),
+      };
+
+      const { error } = await supabase.from('profiles').upsert(updates);
+      if (error) throw error;
+
+      setProfile({
+        ...profile,
+        username: formData.username,
+        avatar_url: formData.avatar_url || null,
+        team_name: formData.team_name
+      });
+      setIsEditing(false);
+      alert("✅ Profile updated successfully!");
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      alert(`❌ Failed to update profile: ${error.message || error}`);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.reload(); // Simple reload to reset state/view
+  };
+
+  const handlePayment = () => {
+    window.open(STRIPE_PAYMENT_LINK, '_blank');
+  };
+
+  if (loading) {
+    return <div className="p-10 text-center text-primary animate-pulse">Loading Profile...</div>;
+  }
+
+  const renderModalContent = () => {
+    switch (activeModal) {
+      case 'PRIVACY':
+        return (
+          <>
             <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
               <h2 className="text-xl font-bold text-gray-900">Privacy Policy</h2>
               <button
-                onClick={() => setShowPrivacyPolicy(false)}
+                onClick={() => setActiveModal(null)}
                 className="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
               >
                 <span className="material-icons-round text-gray-500">close</span>
@@ -182,8 +226,402 @@ const Profile: React.FC = () => {
                 <p>Privacy questions: <a href="mailto:hellomate@empireave.com" className="text-primary font-bold underline">hellomate@empireave.com</a></p>
               </div>
             </div>
+          </>
+        );
+
+      case 'TERMS':
+        return (
+          <>
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h2 className="text-xl font-bold text-gray-900">Terms of Use</h2>
+              <button
+                onClick={() => setActiveModal(null)}
+                className="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
+              >
+                <span className="material-icons-round text-gray-500">close</span>
+              </button>
+            </div>
+            <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar text-sm md:text-base text-gray-600 space-y-6 leading-relaxed">
+              <p className="font-bold text-gray-900">Effective date: 03/01/2026</p>
+
+              <div className="bg-gray-50 p-4 rounded-xl text-xs sm:text-sm font-medium text-gray-500 space-y-1">
+                <p><span className="font-bold text-gray-700">Site:</span> Fantasy Pro Surfer (empireave.com)</p>
+                <p><span className="font-bold text-gray-700">Operator:</span> Lincoln Eather / Fantasy Pro Surfer (“we”, “us”)</p>
+                <p><span className="font-bold text-gray-700">Contact:</span> hellomate@empireave.com</p>
+                <p><span className="font-bold text-gray-700">Governing law:</span> Australia — Queensland</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">1. Agreement</h3>
+                <p>By accessing or using the Service, you agree to these Terms. If you don’t agree, don’t use the Service.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">2. What the Service is</h3>
+                <p>Fantasy Pro Surfer is a fantasy surfing competition and related tools (entries, picks, scoring, leaderboards, and communications).</p>
+                <p className="mt-2"><span className="font-bold">Not affiliated:</span> The Service is not endorsed by, sponsored by, or affiliated with the World Surf League (WSL) or any other league, brand, or athlete unless we say so clearly.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">3. Eligibility</h3>
+                <p>You must be at least 16 years old to use the Service. If you’re under 16, you must have permission from a parent/guardian.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">4. Accounts and user info</h3>
+                <p>You’re responsible for keeping your account details secure.</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>You must provide accurate information (at minimum, a working email).</li>
+                  <li>You’re responsible for all activity under your account.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">5. Competition rules and scoring</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Competition rules, deadlines, scoring logic, and prizes (if any) will be described on the site.</li>
+                  <li>Surf events can change (heats, results, schedules, athlete withdrawals). The Service may not always reflect changes instantly.</li>
+                  <li><span className="font-bold">Final call:</span> To the maximum extent allowed by law, our scoring and admin decisions are final.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">6. Payments</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Paid entries (if any) are processed via Stripe.</li>
+                  <li>You authorise Stripe and us to charge the fees shown at checkout.</li>
+                  <li>You are responsible for any bank/merchant fees, FX fees, or failed payment issues.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">7. Refunds</h3>
+                <p>Refund rules are in our Refund Policy (see below). That policy forms part of these Terms.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">8. Acceptable use</h3>
+                <p>You agree not to:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>break laws or violate anyone’s rights</li>
+                  <li>attempt to hack, scrape, overload, or disrupt the Service</li>
+                  <li>upload malware or run automated attacks</li>
+                  <li>impersonate others or use misleading identities</li>
+                  <li>harass, abuse, or post unlawful content</li>
+                  <li>exploit bugs or scoring loopholes (tell us instead)</li>
+                </ul>
+                <p className="mt-2">We can suspend or ban accounts that breach this section.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">9. Content and leaderboard names</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>If the Service shows public leaderboards, you may choose a username/display name.</li>
+                  <li>Don’t use a display name that is defamatory, hateful, or infringes someone’s trademark/identity.</li>
+                  <li>We can edit/remove display names or content that breaks these Terms.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">10. Intellectual property</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>We own the Service, branding, and site content (excluding third-party content).</li>
+                  <li>You may not copy, resell, or commercially exploit the Service without permission.</li>
+                  <li>Third-party names/logos (like WSL) belong to their respective owners.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">11. Third-party services and links</h3>
+                <p>We may rely on third-party providers (hosting, analytics, Stripe). Their services may have outages or issues outside our control.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">12. Service availability</h3>
+                <p>We aim to keep the Service running, but we don’t guarantee:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>uptime</li>
+                  <li>uninterrupted access</li>
+                  <li>that the Service will be error-free</li>
+                  <li>that scoring/data will always be perfectly accurate in real time</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">13. Disclaimer</h3>
+                <p>To the maximum extent allowed by law, the Service is provided “as is” and “as available.” You use it at your own risk.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">14. Limitation of liability</h3>
+                <p>To the maximum extent permitted by law:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>We are not liable for indirect or consequential loss (lost profits, lost data, loss of enjoyment, reputational loss).</li>
+                  <li>Our total liability for any claim relating to the Service is limited to the greater of:
+                    <ul className="list-disc pl-5 mt-1">
+                      <li>the amount you paid us in the 3 months before the event giving rise to the claim, or</li>
+                      <li>AUD $50 (if you paid nothing)</li>
+                    </ul>
+                  </li>
+                </ul>
+                <p className="mt-2 text-sm text-gray-500">Australian Consumer Law: Nothing in these Terms excludes non-excludable rights under the Australian Consumer Law. Where we’re permitted to limit remedies, we limit them to re-supplying the services or paying the cost of having them re-supplied.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">15. Indemnity</h3>
+                <p>You agree to indemnify us for reasonable losses or costs arising from your misuse of the Service or breach of these Terms (including claims by others).</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">16. Suspension and termination</h3>
+                <p>We can suspend or terminate access if:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>you breach these Terms</li>
+                  <li>we suspect fraud/abuse</li>
+                  <li>required by law</li>
+                  <li>the Service is being shut down</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">17. Changes to the Service or Terms</h3>
+                <p>We can change the Service and these Terms. If changes are material, we’ll post an update on the site.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">18. Contact</h3>
+                <p>Questions: <a href="mailto:hellomate@empireave.com" className="text-primary font-bold underline">hellomate@empireave.com</a></p>
+              </div>
+            </div>
+          </>
+        );
+
+      case 'REFUND':
+        return (
+          <>
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h2 className="text-xl font-bold text-gray-900">Refund Policy</h2>
+              <button
+                onClick={() => setActiveModal(null)}
+                className="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
+              >
+                <span className="material-icons-round text-gray-500">close</span>
+              </button>
+            </div>
+            <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar text-sm md:text-base text-gray-600 space-y-6 leading-relaxed">
+              <p className="font-bold text-gray-900">Effective date: 03/01/2026</p>
+
+              <div className="bg-gray-50 p-4 rounded-xl text-xs sm:text-sm font-medium text-gray-500 space-y-1">
+                <p><span className="font-bold text-gray-700">Site:</span> Fantasy Pro Surfer (empireave.com)</p>
+                <p><span className="font-bold text-gray-700">Contact:</span> hellomate@empireave.com</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">1. General position</h3>
+                <p>Fees paid are generally non-refundable because access is immediate and the Service is time-based (competition entry/access).</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">2. When we’ll refund</h3>
+                <p>We may provide a refund if:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>you were charged in error (duplicate charge)</li>
+                  <li>the Service is cancelled by us before the competition starts and we can’t reasonably provide a replacement</li>
+                  <li>required by law (including Australian Consumer Law)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">3. When we won’t refund (common cases)</h3>
+                <p>We typically won’t refund for:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>change of mind</li>
+                  <li>forgetting to play / missing deadlines</li>
+                  <li>poor performance / not liking the scoring outcome</li>
+                  <li>event schedule changes, athlete withdrawals, judging calls, or league decisions</li>
+                  <li>issues outside our control (your device, internet, email provider)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">4. Partial refunds / credits</h3>
+                <p>If the Service is disrupted after the competition begins, we may offer:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>a partial refund, or</li>
+                  <li>a credit toward a future comp</li>
+                </ul>
+                <p className="mt-2">…depending on what’s fair and practical.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">5. Chargebacks</h3>
+                <p>If you initiate a chargeback without contacting us first:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>we may suspend your account while we investigate</li>
+                  <li>we’ll provide Stripe with evidence (timestamps, access logs, and transaction info)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">6. How to request a refund</h3>
+                <p>Email <a href="mailto:hellomate@empireave.com" className="text-primary font-bold underline">hellomate@empireave.com</a> with:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>the email used on your account</li>
+                  <li>Stripe receipt/transaction reference (if available)</li>
+                  <li>what happened, and what outcome you’re seeking</li>
+                </ul>
+                <p className="mt-2">We’ll respond within a reasonable time.</p>
+              </div>
+            </div>
+          </>
+        );
+
+      case 'COOKIE':
+        return (
+          <>
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h2 className="text-xl font-bold text-gray-900">Cookie Policy</h2>
+              <button
+                onClick={() => setActiveModal(null)}
+                className="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
+              >
+                <span className="material-icons-round text-gray-500">close</span>
+              </button>
+            </div>
+            <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar text-sm md:text-base text-gray-600 space-y-6 leading-relaxed">
+              <p className="font-bold text-gray-900">Effective date: 03/01/2026</p>
+
+              <div className="bg-gray-50 p-4 rounded-xl text-xs sm:text-sm font-medium text-gray-500 space-y-1">
+                <p><span className="font-bold text-gray-700">Site:</span> Fantasy Pro Surfer (empireave.com)</p>
+                <p><span className="font-bold text-gray-700">Contact:</span> hellomate@empireave.com</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">1. What are cookies?</h3>
+                <p>Cookies are small files stored on your device that help websites function and remember things.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">2. What we use</h3>
+                <p>We may use:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>Essential cookies (login sessions, security, basic functionality)</li>
+                  <li>Preference cookies (remember settings)</li>
+                  <li>Analytics cookies (understand usage and improve performance)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">3. Managing cookies</h3>
+                <p>You can control cookies through:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>your browser settings (block/delete cookies)</li>
+                  <li>any cookie controls we provide on the site</li>
+                </ul>
+                <p className="mt-2">If you block cookies, some features may stop working.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">4. Third-party cookies</h3>
+                <p>Some third parties we use (e.g. analytics or embedded content) may set cookies. Those providers handle cookies under their own policies.</p>
+              </div>
+            </div>
+          </>
+        );
+
+      default: return null;
+    }
+  };
+
+  return (
+    <div className="animate-in fade-in duration-500 pt-6 px-4 pb-24">
+      {/* ... (previous code) */}
+
+      <section className="space-y-4">
+        <h3 className="text-lg font-bold mb-4 text-gray-800">Support</h3>
+        <div className="bg-white rounded-2xl apple-shadow border border-gray-100 overflow-hidden">
+          <button
+            onClick={() => setActiveModal('PRIVACY')}
+            className="w-full flex justify-between items-center p-5 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition group"
+          >
+            <div className="flex items-center gap-4">
+              <span className="material-icons-round text-gray-400 group-hover:text-primary transition-colors">policy</span>
+              <span className="font-bold text-sm text-gray-700">Privacy Policy</span>
+            </div>
+            <span className="material-icons-round text-gray-200">chevron_right</span>
+          </button>
+
+          <button
+            className="w-full flex justify-between items-center p-5 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition group"
+          >
+            <div className="flex items-center gap-4">
+              <span className="material-icons-round text-gray-400 group-hover:text-primary transition-colors">help</span>
+              <span className="font-bold text-sm text-gray-700">Help & Support</span>
+            </div>
+            <span className="material-icons-round text-gray-200">chevron_right</span>
+          </button>
+
+          <button
+            className="w-full flex justify-between items-center p-5 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition group"
+          >
+            <div className="flex items-center gap-4">
+              <span className="material-icons-round text-gray-400 group-hover:text-primary transition-colors">info</span>
+              <span className="font-bold text-sm text-gray-700">About</span>
+            </div>
+            <span className="material-icons-round text-gray-200">chevron_right</span>
+          </button>
+
+          <button
+            onClick={() => setActiveModal('TERMS')}
+            className="w-full flex justify-between items-center p-5 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition group"
+          >
+            <div className="flex items-center gap-4">
+              <span className="material-icons-round text-gray-400 group-hover:text-primary transition-colors">gavel</span>
+              <span className="font-bold text-sm text-gray-700">Terms of Use</span>
+            </div>
+            <span className="material-icons-round text-gray-200">chevron_right</span>
+          </button>
+
+          <button
+            onClick={() => setActiveModal('REFUND')}
+            className="w-full flex justify-between items-center p-5 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition group"
+          >
+            <div className="flex items-center gap-4">
+              <span className="material-icons-round text-gray-400 group-hover:text-primary transition-colors">receipt_long</span>
+              <span className="font-bold text-sm text-gray-700">Refund Policy</span>
+            </div>
+            <span className="material-icons-round text-gray-200">chevron_right</span>
+          </button>
+
+          <button
+            onClick={() => setActiveModal('COOKIE')}
+            className="w-full flex justify-between items-center p-5 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition group"
+          >
+            <div className="flex items-center gap-4">
+              <span className="material-icons-round text-gray-400 group-hover:text-primary transition-colors">cookie</span>
+              <span className="font-bold text-sm text-gray-700">Cookie Policy</span>
+            </div>
+            <span className="material-icons-round text-gray-200">chevron_right</span>
+          </button>
+        </div>
+      </section>
+
+      <button
+        onClick={handleSignOut}
+        className="w-full mt-10 py-5 rounded-2xl bg-white text-danger font-bold text-sm flex items-center justify-center gap-2 border border-danger/20 hover:bg-danger/5 transition active:scale-95 mb-10 shadow-sm"
+      >
+        <span className="material-icons-round text-lg">logout</span>
+        Log Out
+      </button>
+
+      {/* Generic Legal Modal */}
+      {activeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setActiveModal(null)}></div>
+          <div className="bg-white rounded-[32px] w-full max-w-2xl max-h-[85vh] overflow-hidden shadow-2xl relative animate-in fade-in zoom-in-95 duration-300 flex flex-col">
+            {renderModalContent()}
             <div className="p-4 border-t border-gray-100 bg-gray-50/50">
-              <button onClick={() => setShowPrivacyPolicy(false)} className="w-full py-3 bg-gray-900 text-white font-bold rounded-xl active:scale-95 transition shadow-lg">Close</button>
+              <button onClick={() => setActiveModal(null)} className="w-full py-3 bg-gray-900 text-white font-bold rounded-xl active:scale-95 transition shadow-lg">Close</button>
             </div>
           </div>
         </div>

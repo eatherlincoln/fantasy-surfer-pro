@@ -8,6 +8,7 @@ import TeamBuilder from './components/TeamBuilder';
 import Navigation from './components/Navigation';
 import Profile from './components/Profile';
 import Leagues from './components/Leagues';
+import CookieConsent from './components/CookieConsent';
 
 import { supabase } from './services/supabase';
 
@@ -170,6 +171,8 @@ const App: React.FC = () => {
           )}
         </div>
       </main>
+
+      <CookieConsent />
 
       <div className="fixed bottom-0 left-0 right-0 flex justify-center z-50 pointer-events-none">
         <div className="w-full max-w-screen-md pointer-events-auto px-4 md:px-0 mb-6">
