@@ -72,8 +72,10 @@ const Profile: React.FC = () => {
         team_name: formData.team_name
       });
       setIsEditing(false);
-    } catch (error) {
+      alert("✅ Profile updated successfully!");
+    } catch (error: any) {
       console.error('Error updating profile:', error);
+      alert(`❌ Failed to update profile: ${error.message || error}`);
     }
   };
 
