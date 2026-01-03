@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Surfer, Tier, UserProfile } from '../types';
 import { TOTAL_BUDGET, TIER_LIMITS } from '../constants';
@@ -37,29 +36,11 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     return team.reduce((acc, s) => acc + s.value, 0);
   }, [team]);
 
-  // Remove currentTeam, currentLimits, requiredCount as they were gender-specific
-  // const currentTeam = activeTab === 'Male' ? teamMen : teamWomen;
-  // const currentLimits = activeTab === 'Male' ? TIER_LIMITS_MEN : TIER_LIMITS_WOMEN;
-  // const requiredCount = activeTab === 'Male' ? 8 : 4; // This will now be a global 10
-
   const counts = useMemo(() => ({
     [Tier.A]: team.filter(s => s.tier === Tier.A).length,
     [Tier.B]: team.filter(s => s.tier === Tier.B).length,
     [Tier.C]: team.filter(s => s.tier === Tier.C).length,
   }), [team]);
-
-  // Global validation state
-  // const isMenComplete =
-  //   teamMen.filter(s => s.tier === Tier.A).length === TIER_LIMITS_MEN[Tier.A] &&
-  //   teamMen.filter(s => s.tier === Tier.B).length === TIER_LIMITS_MEN[Tier.B] &&
-  //   teamMen.filter(s => s.tier === Tier.C).length === TIER_LIMITS_MEN[Tier.C];
-
-  // const isWomenComplete =
-  //   teamWomen.filter(s => s.tier === Tier.A).length === TIER_LIMITS_WOMEN[Tier.A] &&
-  //   teamWomen.filter(s => s.tier === Tier.B).length === TIER_LIMITS_WOMEN[Tier.B] &&
-  //   teamWomen.filter(s => s.tier === Tier.C).length === TIER_LIMITS_WOMEN[Tier.C];
-
-  // const isGlobalComplete = isMenComplete && isWomenComplete;
 
   // New single team completion check
   const isComplete =
@@ -224,33 +205,15 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     );
   };
 
-
-
   return (
     <div className="pb-44 animate-in slide-in-from-bottom duration-700">
       <header className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
         <div>
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-gray-900">
-            {userProfile?.team_name ? `Drafting: ${userProfile.team_name}` : 'Draft Team'}
+            {userProfile?.team_name || 'Draft Team'}
           </h2>
           <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-3">Pipeline Pro • Season 2026</p>
         </div>
-
-        {/* Gender Toggle - REMOVED */}
-        {/* <div className="flex bg-gray-100 p-1 rounded-2xl">
-          {(['Male', 'Female'] as const).map(gender => (
-            <button
-              key={gender}
-              onClick={() => setActiveTab(gender)}
-              className={`px-8 py-3 rounded-xl text-sm font-black uppercase tracking-wide transition-all ${activeTab === gender
-                ? 'bg-white text-primary-dark shadow-sm'
-                : 'text-gray-400 hover:text-gray-600'
-                }`}
-            >
-              {gender === 'Male' ? "Men's" : "Women's"}
-            </button>
-          ))}
-        </div> */}
 
         <button onClick={() => onSave(team)} className="text-sm md:text-base font-black text-primary-dark underline p-4 hover:opacity-70 transition decoration-2 underline-offset-4">Cancel Draft</button>
       </header>
@@ -291,7 +254,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
               )}
             </div>
 
-            <div className="flex justify-between items-center mb-14 px-2">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-14 px-2 gap-8 md:gap-0">
               <div className="flex flex-col">
                 <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2">Total Budget</span>
                 <span className={`text-5xl md:text-6xl font-black tracking-tighter ${totalSpent > TOTAL_BUDGET ? 'text-red-500' : 'text-primary'}`}>
@@ -299,11 +262,22 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
                 </span>
                 <span className="text-xs text-gray-400 font-bold mt-1">Remaining / $60.0M Cap</span>
               </div>
-              <div className="text-right">
-                <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2">Draft</span>
-                <p className="text-5xl md:text-6xl font-black tracking-tighter">
-                  {team.length}<span className="text-2xl text-gray-200 font-bold ml-1">/10</span>
-                </p>
+
+              <div className="flex gap-12 md:text-right">
+                {/* Team Points Display */}
+                <div>
+                  <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2 block">Team Points</span>
+                  <p className="text-5xl md:text-6xl font-black tracking-tighter text-gray-900">
+                    0.00
+                  </p>
+                </div>
+
+                <div className="text-right">
+                  <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-2 block">Draft</span>
+                  <p className="text-5xl md:text-6xl font-black tracking-tighter">
+                    {team.length}<span className="text-2xl text-gray-200 font-bold ml-1">/10</span>
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -324,12 +298,6 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
                 <RosterSlot key={`c-${i}`} surfer={team.filter(s => s.tier === Tier.C)[i]} tier={Tier.C} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} />
               ))}
             </div>
-
-            {/* Global Status Indicator if other team is incomplete - REMOVED */}
-            {/* <div className="mt-8 flex gap-2 justify-center">
-              <div className={`h-2 flex-1 rounded-full ${isMenComplete ? 'bg-green-400' : 'bg-gray-100'} transition-colors duration-500`} title="Men's Team Complete" />
-              <div className={`h-2 flex-1 rounded-full ${isWomenComplete ? 'bg-green-400' : 'bg-gray-100'} transition-colors duration-500`} title="Women's Team Complete" />
-            </div> */}
 
             <button
               disabled={!isComplete || isLocked}
@@ -399,7 +367,12 @@ const RosterSlot: React.FC<RosterSlotProps> = ({ surfer, tier, isLocked, onToggl
             <p className="text-[11px] md:text-sm font-black text-gray-900 truncate max-w-[80px] md:max-w-[100px] tracking-tight">
               {surfer.name.split(' ').pop()}
             </p>
-            <div className="flex items-center gap-1 mt-1 opacity-70">
+            {/* Added Points Display */}
+            <div className="flex items-center gap-1 mt-1 justify-center">
+              <span className="text-xs font-black text-primary-dark">{(surfer.points || 0).toFixed(2)}</span>
+            </div>
+
+            <div className="flex items-center gap-1 mt-0.5 opacity-70">
               <span className="text-[10px] md:text-[11px]">{surfer.flag}</span>
               <span className="text-[8px] md:text-[9px] font-bold text-gray-500 uppercase tracking-widest">{surfer.stance[0]}</span>
             </div>
