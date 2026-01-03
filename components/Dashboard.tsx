@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MOCK_SURFERS, MOCK_HEATS } from '../constants';
-import { Surfer, EventStatus } from '../types';
+import { Surfer, EventStatus, Tier } from '../types';
 import { generateBriefing } from '../services/aiService';
 
 interface DashboardProps {
