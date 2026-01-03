@@ -40,12 +40,12 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
       {/* Custom Replaceable Banner Area */}
       <div className="w-full rounded-[40px] overflow-hidden shadow-2xl mb-10 relative group">
         <img
-          src="/images/banners/pipeline_banner.jpg"
-          alt="Event Banner"
+          src="/images/ripcurl-banner.jpg"
+          alt="Rip Curl Pro Bells Beach Banner"
           className="w-full h-auto object-cover min-h-[300px]"
           onError={(e) => {
             // Fallback if the user hasn't refreshed or cache issue
-            e.currentTarget.src = '/pipe-banner-2026.png';
+            e.currentTarget.src = '/images/ripcurl-banner.jpg';
           }}
         />
         {/* Overlay Controls */}

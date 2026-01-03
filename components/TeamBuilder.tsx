@@ -234,7 +234,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-gray-900">
             {userProfile?.team_name || 'Draft Team'}
           </h2>
-          <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-3">Pipeline Pro • Season 2026</p>
+          <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-3">Rip Curl Pro • Bells Beach</p>
         </div>
 
         <button onClick={onBack} className="text-sm md:text-base font-black text-primary-dark underline p-4 hover:opacity-70 transition decoration-2 underline-offset-4">
