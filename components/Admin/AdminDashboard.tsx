@@ -192,11 +192,32 @@ const AdminDashboard: React.FC = () => {
             header: false,
             skipEmptyLines: true,
             complete: async (results) => {
-                let currentRound = 1;
+                setLoading(true);
+                // 1. Pre-fetch existing heats to avoid duplicates
+                // We assume the state 'heats' is somewhat fresh, but better to fetch fresh or trust local optimization?
+                // For safety, let's trust the 'heats' state if we just loaded, or re-fetch.
+                // Let's build a map: "Round-HeatNum" -> HeatID
+                const heatMap = new Map<string, string>();
+
+                // We need to make sure we have the latest heats for this event
+                let currentHeats = heats;
+                if (currentHeats.length === 0) {
+                    currentHeats = await getHeats(selectedEvent.id);
+                }
+
+                currentHeats.forEach(h => {
+                    heatMap.set(`${h.round_number}-${h.heat_number}`, h.id);
+                });
+
+                let currentRound = targetRound > 0 ? targetRound : 1;
+                let processedCount = 0;
+                let assignedCount = 0;
+
+                // Helper to detect round from section headers
                 const getRoundFromLine = (line: any[]) => {
                     const text = line.join(' ').toUpperCase();
-                    if (text.includes('OPEN ROUND')) return 1;
-                    if (text.includes('ELIM ROUND')) return 2;
+                    if (text.includes('OPEN ROUND') || text.includes('OPENING ROUND')) return 1;
+                    if (text.includes('ELIM ROUND') || text.includes('ELIMINATION')) return 2;
                     if (text.includes('ROUND OF 16')) return 3;
                     if (text.includes('QUARTER') || text.includes('QF')) return 4;
                     if (text.includes('SEMI') || text.includes('SF')) return 5;
@@ -205,39 +226,81 @@ const AdminDashboard: React.FC = () => {
                 };
 
                 for (const row of results.data as any[]) {
+                    // Check for header row or explicit round switch
                     const newRound = getRoundFromLine(row);
-                    if (newRound) { currentRound = newRound; continue; }
-                    if (row.includes('Surfer') || row.includes('Total Score')) continue;
+                    if (newRound) {
+                        currentRound = newRound;
+                        continue;
+                    }
+
+                    // Robust Header Skip: Check if col 0 is 'Heat' or 'Round'
+                    const col0 = row[0]?.toString().trim().toUpperCase() || '';
+                    if (col0 === 'HEAT' || col0 === 'ROUND') continue;
+                    if (row.includes('Surfer') || row.includes('Total Score') || row.includes('Names')) continue;
 
                     const heatStr = row[0]?.toString() || '';
-                    const surferName = row[1]?.toString();
+                    const surferName = row[1]?.toString().trim();
+
                     if (!surferName) continue;
 
-                    if (!heatStr.toUpperCase().includes('HEAT') && !heatStr.toUpperCase().includes('QF') && !heatStr.toUpperCase().includes('SEMI') && !heatStr.toUpperCase().includes('FINAL')) continue;
+                    // Basic validation: does col 0 look like "HEAT X" or just a number?
+                    // User format: "HEAT 1"
+                    if (!heatStr.toUpperCase().includes('HEAT') && !heatStr.toUpperCase().includes('QF') && !heatStr.toUpperCase().includes('SF') && !heatStr.toUpperCase().includes('FINAL')) {
+                        // Some files might just have numbers "1", "2" etc? 
+                        // Check if it's a number
+                        if (isNaN(parseInt(heatStr))) continue;
+                    }
 
                     try {
                         const heatNumMatch = heatStr.match(/(\d+)/);
                         const heatNum = heatNumMatch ? parseInt(heatNumMatch[0]) : 1;
 
-                        // Use simple create (ignoring duplication handling for MVP)
-                        const heatRes = await createHeat(selectedEvent.id, currentRound, heatNum);
-                        if (heatRes?.id) {
-                            const surfer = await findSurferByName(surferName);
-                            if (surfer) {
-                                await createHeatAssignment(heatRes.id, surfer.id).catch(() => { });
-                                const w1 = parseFloat(row[3]);
-                                const w2 = parseFloat(row[4]);
-                                if (!isNaN(w1)) await submitWaveScore(heatRes.id, surfer.id, w1);
-                                if (!isNaN(w2)) await submitWaveScore(heatRes.id, surfer.id, w2);
+                        // 2. Get OR Create Heat
+                        const heatKey = `${currentRound}-${heatNum}`;
+                        let heatId = heatMap.get(heatKey);
 
-                                const status = row[5]?.toString().toUpperCase() || '';
-                                if (status.includes('ELIMINATED')) await eliminateSurfer(surfer.id);
-                                else if (status.includes('ADV')) await advanceSurfer(surfer.id);
+                        if (!heatId) {
+                            // Create it
+                            const newHeat = await createHeat(selectedEvent.id, currentRound, heatNum);
+                            if (newHeat) {
+                                heatId = newHeat.id;
+                                heatMap.set(heatKey, heatId); // Update map so next row (same heat) uses this ID
+                                processedCount++;
                             }
                         }
-                    } catch (e) { console.error(e); }
+
+                        if (heatId) {
+                            // 3. Find Surfer & Assign
+                            const surfer = await findSurferByName(surferName);
+                            if (surfer) {
+                                // Try assignment (ignore if exists)
+                                await createHeatAssignment(heatId, surfer.id).catch(() => { });
+                                assignedCount++;
+
+                                // Scores?
+                                // If user file has score cols (Col 3, 4 etc)
+                                // User file now: Heat | Name | Country. No scores.
+                                // Code checks row[3]... might be undefined.
+                                if (row[3]) {
+                                    const w1 = parseFloat(row[3]);
+                                    if (!isNaN(w1)) await submitWaveScore(heatId, surfer.id, w1);
+                                }
+                                if (row[4]) {
+                                    const w2 = parseFloat(row[4]);
+                                    if (!isNaN(w2)) await submitWaveScore(heatId, surfer.id, w2);
+                                }
+                            } else {
+                                console.warn('Surfer not found:', surferName);
+                            }
+                        }
+
+                    } catch (e) {
+                        console.error('Row process error', e);
+                    }
                 }
-                alert('Import Complete!');
+
+                setLoading(false);
+                alert(`Import Processed.\nHeats Created: ${processedCount}\nAssignments: ${assignedCount}`);
                 loadHeats(selectedEvent.id);
             }
         });
@@ -343,6 +406,21 @@ const AdminDashboard: React.FC = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col justify-center">
                                     <h3 className="font-bold text-blue-900 text-sm mb-2">📄 Import Heat Draw (CSV)</h3>
+                                    <div className="flex gap-2 items-center mb-2">
+                                        <select
+                                            value={targetRound}
+                                            onChange={e => setTargetRound(parseInt(e.target.value))}
+                                            className="text-xs border rounded p-1 text-blue-800 bg-white"
+                                        >
+                                            <option value={0}>Auto-Detect Round</option>
+                                            <option value={1}>Opening Round</option>
+                                            <option value={2}>Elimination Round</option>
+                                            <option value={3}>Round of 16</option>
+                                            <option value={4}>Quarterfinals</option>
+                                            <option value={5}>Semifinals</option>
+                                            <option value={6}>Final</option>
+                                        </select>
+                                    </div>
                                     <input type="file" accept=".csv" onChange={handleFileUpload} className="text-xs text-blue-600 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-200 file:text-blue-800 hover:file:bg-blue-300" />
                                 </div>
                                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
