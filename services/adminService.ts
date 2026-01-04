@@ -16,6 +16,21 @@ export interface Heat {
     round_number: number;
     heat_number: number;
     status: 'UPCOMING' | 'LIVE' | 'COMPLETED';
+    heat_assignments?: {
+        surfer_id: string;
+        surfers: {
+            id: string;
+            name: string;
+            country: string;
+            flag: string;
+            image: string;
+            stance: string;
+        };
+    }[];
+    scores?: {
+        surfer_id: string;
+        wave_score: number;
+    }[];
 }
 
 export interface Score {
@@ -76,7 +91,24 @@ export const createHeat = async (eventId: string, round: number, heatNum: number
 export const getHeats = async (eventId: string) => {
     const { data, error } = await supabase
         .from('heats')
-        .select('*')
+        .select(`
+            *,
+            heat_assignments (
+                surfer_id,
+                surfers (
+                    id,
+                    name,
+                    country,
+                    flag,
+                    image,
+                    stance
+                )
+            ),
+            scores (
+                surfer_id,
+                wave_score
+            )
+        `)
         .eq('event_id', eventId)
         .order('heat_number', { ascending: true });
 
@@ -180,8 +212,8 @@ export const createHeatAssignment = async (heatId: string, surferId: string) => 
         .select()
         .single();
 
-    if (error) throw error;
-    return data;
+    // Do not throw! Return error so UI can handle duplicates.
+    return { data, error };
 };
 
 // Helper to find a surfer by name (fuzzy match or exact)
