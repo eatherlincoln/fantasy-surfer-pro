@@ -156,7 +156,7 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <div className="p-8 pb-24 max-w-6xl mx-auto">
-            <h1 className="text-3xl font-black mb-8 text-gray-900 border-b pb-4">Admin Control Room 🎛️</h1>
+            <h1 className="text-3xl font-black mb-8 text-gray-900 border-b pb-4">Admin Control Room V2 🎛️</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* LEFT COLUMN: EVENTS */}
