@@ -108,6 +108,13 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
                                     <div className="font-bold text-sm text-gray-900 flex items-center gap-2">
                                         {surfer.name}
                                         <span className="text-xs font-normal opacity-50">{surfer.country} {surfer.flag}</span>
+                                        <button
+                                            onClick={() => deleteHeatAssignment(heat.id, surfer.id).then(onRefresh)}
+                                            className="text-gray-200 hover:text-red-500 material-icons-round text-[10px]"
+                                            title="Remove Surfer"
+                                        >
+                                            close
+                                        </button>
                                     </div>
                                     <div className="text-xs text-gray-400">
                                         Waves: <span className="font-mono text-gray-600">{getSurferLastWaves(surfer.id)}</span>

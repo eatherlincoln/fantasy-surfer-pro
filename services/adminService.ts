@@ -216,6 +216,15 @@ export const createHeatAssignment = async (heatId: string, surferId: string) => 
     return { data, error };
 };
 
+export const deleteHeatAssignment = async (heatId: string, surferId: string) => {
+    const { error } = await supabase
+        .from('heat_assignments')
+        .delete()
+        .match({ heat_id: heatId, surfer_id: surferId });
+
+    if (error) throw error;
+};
+
 // Helper to find a surfer by name (fuzzy match or exact)
 export const findSurferByName = async (name: string) => {
     const { data, error } = await supabase
