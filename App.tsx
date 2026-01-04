@@ -162,7 +162,7 @@ const App: React.FC = () => {
           )}
 
           {currentView === 'PROFILE' && (
-            <div className="max-w-2xl mx-auto"><Profile /></div>
+            <div className="max-w-2xl mx-auto"><Profile onNavigate={setCurrentView} /></div>
           )}
 
           {currentView === 'LEAGUES' && (

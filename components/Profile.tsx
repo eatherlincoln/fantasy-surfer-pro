@@ -11,7 +11,13 @@ interface UserProfile {
   events_lost?: number;
 }
 
-const Profile: React.FC = () => {
+import { View } from '../types';
+
+interface ProfileProps {
+  onNavigate?: (view: View) => void;
+}
+
+const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeModal, setActiveModal] = useState<'PRIVACY' | 'TERMS' | 'REFUND' | 'COOKIE' | null>(null);
@@ -744,6 +750,14 @@ const Profile: React.FC = () => {
           </button>
         </div>
       </section>
+
+      <button
+        onClick={() => onNavigate?.('ADMIN')}
+        className="w-full mt-10 py-5 rounded-2xl bg-gray-900 text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-black transition active:scale-95 mb-4 shadow-lg"
+      >
+        <span className="material-icons-round text-lg">admin_panel_settings</span>
+        Admin Dashboard
+      </button>
 
       <button
         onClick={handleSignOut}
