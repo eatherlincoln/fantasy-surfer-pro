@@ -73,7 +73,10 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
 
             <div className="divide-y divide-gray-50">
                 {heat.heat_assignments?.map(assignment => {
-                    const surfer = assignment.surfers;
+                    // Safe access in case of bad data/joins
+                    const surfer = Array.isArray(assignment.surfers) ? assignment.surfers[0] : assignment.surfers;
+                    if (!surfer) return null;
+
                     return (
                         <div key={surfer.id} className="p-3 flex items-center justify-between group">
                             <div className="flex items-center gap-3">
@@ -140,6 +143,9 @@ const AdminDashboard: React.FC = () => {
     const [newEventSlug, setNewEventSlug] = useState('');
     const [newHeatRound, setNewHeatRound] = useState(1);
     const [newHeatNum, setNewHeatNum] = useState(1);
+
+    // State for CSV Import
+    const [targetRound, setTargetRound] = useState<number>(0);
 
     useEffect(() => { checkAdmin(); }, []);
     useEffect(() => { if (isAdmin) loadEvents(); }, [isAdmin]);
