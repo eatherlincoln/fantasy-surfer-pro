@@ -2,7 +2,8 @@
 -- Use INSERT ON CONFLICT DO NOTHING to avoid duplicates if run multiple times
 
 INSERT INTO public.surfers (name, country, flag, stance, gender, tier, value, image)
-VALUES
+SELECT name, country, flag, stance, gender, tier, value, image
+FROM (VALUES
   ('Seth Moniz', 'HAW', '🇺🇸', 'Regular', 'Male', 'B', 6.0, 'https://ui-avatars.com/api/?name=Seth+Moniz&background=random'),
   ('Miguel Pupo', 'BRA', '🇧🇷', 'Goofy', 'Male', 'B', 6.5, 'https://ui-avatars.com/api/?name=Miguel+Pupo&background=random'),
   ('Kauli Vaast', 'FRA', '🇫🇷', 'Goofy', 'Male', 'B', 7.0, 'https://ui-avatars.com/api/?name=Kauli+Vaast&background=random'),
@@ -21,4 +22,7 @@ VALUES
   ('Filipe Toledo', 'BRA', '🇧🇷', 'Regular', 'Male', 'A', 9.5, 'https://ui-avatars.com/api/?name=Filipe+Toledo&background=random'),
   ('Barron Mamiya', 'HAW', '🇺🇸', 'Regular', 'Male', 'B', 7.0, 'https://ui-avatars.com/api/?name=Barron+Mamiya&background=random'),
   ('Marco Mignot', 'FRA', '🇫🇷', 'Regular', 'Male', 'C', 5.0, 'https://ui-avatars.com/api/?name=Marco+Mignot&background=random')
-ON CONFLICT (name) DO NOTHING;
+) AS s(name, country, flag, stance, gender, tier, value, image)
+WHERE NOT EXISTS (
+    SELECT 1 FROM public.surfers WHERE name = s.name
+);
