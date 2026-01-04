@@ -114,38 +114,96 @@ const AdminDashboard: React.FC = () => {
         if (!file || !selectedEvent) return;
 
         Papa.parse(file, {
-            header: true,
+            header: false, // We use false because header lines appear mid-file
+            skipEmptyLines: true,
             complete: async (results) => {
-                console.log('Parsed CSV:', results.data);
-                // Expected format: Round, Heat, Surfer1, Surfer2, Surfer3
+                console.log('Parsed Raw CSV:', results.data);
+
+                let currentRound = 1;
+                let processedCount = 0;
+                let assignedCount = 0;
+                let scoresCount = 0;
+
+                // Helper to detect round from section headers
+                const getRoundFromLine = (line: any[]) => {
+                    const text = line.join(' ').toUpperCase();
+                    if (text.includes('OPEN ROUND')) return 1;
+                    if (text.includes('ELIM ROUND')) return 2;
+                    if (text.includes('ROUND OF 16')) return 3; // Or 3
+                    if (text.includes('QUARTER') || text.includes('QF')) return 4;
+                    if (text.includes('SEMI') || text.includes('SF')) return 5;
+                    if (text.includes('FINAL')) return 6;
+                    return null;
+                };
 
                 for (const row of results.data as any[]) {
-                    if (!row.Round || !row.Heat) continue;
+                    // 1. Detect Round Change
+                    const newRound = getRoundFromLine(row);
+                    if (newRound) {
+                        currentRound = newRound;
+                        console.log(`Switched to Round ${currentRound}`);
+                        continue;
+                    }
+
+                    // 2. Skip Header Rows (rows containing "Surfer" or "Total Score")
+                    if (row.includes('Surfer') || row.includes('Total Score')) continue;
+
+                    // 3. Process Data Row
+                    const heatStr = row[0]?.toString() || '';
+                    const surferName = row[1]?.toString();
+
+                    if (!heatStr.toUpperCase().includes('HEAT') && !heatStr.toUpperCase().includes('QF') && !heatStr.toUpperCase().includes('SEMI') && !heatStr.toUpperCase().includes('FINAL')) {
+                        continue; // Skip lines that don't look like heat rows
+                    }
+
+                    if (!surferName) continue;
 
                     try {
-                        // 1. Create Heat (or find existing - simplistic for now, just creates)
-                        // Better: Try to find heat first? For MVP, we'll assume we are creating NEW heats from the draw.
-                        const heatRes = await createHeat(selectedEvent.id, parseInt(row.Round), parseInt(row.Heat));
+                        const heatNumMatch = heatStr.match(/(\d+)/);
+                        const heatNum = heatNumMatch ? parseInt(heatNumMatch[0]) : 1;
+
+                        const heatRes = await createHeat(selectedEvent.id, currentRound, heatNum);
                         const heatId = heatRes?.id;
 
                         if (heatId) {
-                            // 2. Find and Assign Surfers
-                            const surfers = [row.Surfer1, row.Surfer2, row.Surfer3, row.Surfer4].filter(s => s);
+                            processedCount++;
+                            const surfer = await findSurferByName(surferName);
+                            if (surfer) {
+                                await createHeatAssignment(heatId, surfer.id).catch(e =>
+                                    console.log('Assignment likely exists', e.message)
+                                );
+                                assignedCount++;
 
-                            for (const sName of surfers) {
-                                const surfer = await findSurferByName(sName);
-                                if (surfer) {
-                                    await createHeatAssignment(heatId, surfer.id);
-                                } else {
-                                    console.warn(`Surfer not found: ${sName}`);
+                                const w1 = parseFloat(row[3]);
+                                const w2 = parseFloat(row[4]);
+
+                                if (!isNaN(w1)) {
+                                    await submitWaveScore(heatId, surfer.id, w1);
+                                    scoresCount++;
                                 }
+                                if (!isNaN(w2)) {
+                                    await submitWaveScore(heatId, surfer.id, w2);
+                                    scoresCount++;
+                                }
+
+                                const status = row[5]?.toString().toUpperCase() || '';
+                                if (status.includes('ELIMINATED')) {
+                                    await eliminateSurfer(surfer.id);
+                                } else if (status.includes('ADV')) {
+                                    await advanceSurfer(surfer.id);
+                                }
+
+                            } else {
+                                console.warn(`Surfer NOT FOUND: ${surferName}`);
                             }
                         }
+
                     } catch (e) {
-                        console.error("Error processing row", row, e);
+                        console.error('Row Error:', row, e);
                     }
                 }
-                alert('Heat Draw Upload Processed! Refreshing...');
+
+                alert(`Import Complete!\nProcessed Heats: ${processedCount}\nAssignments: ${assignedCount}\nScored Waves: ${scoresCount}`);
                 loadHeats(selectedEvent.id);
             }
         });
