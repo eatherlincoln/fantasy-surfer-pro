@@ -1,5 +1,6 @@
 -- Consolidated Fix for Events Schema & RLS
--- Updated: Uses UUID for surfer_id to match existing DB schema
+-- Updated: Uses UUID for surfer_id
+-- Updated: Ensures 'gender' column exists
 
 -- 1. Ensure Tables Exist
 create table if not exists public.events (
@@ -34,7 +35,8 @@ create table if not exists public.scores (
 -- 2. Update Surfers Table (if not already done)
 alter table public.surfers 
 add column if not exists status text default 'ACTIVE',
-add column if not exists current_season_points numeric default 0;
+add column if not exists current_season_points numeric default 0,
+add column if not exists gender text check (gender in ('Male', 'Female'));
 
 -- 3. Reset RLS Policies (Drop first to avoid conflicts)
 alter table public.events enable row level security;
