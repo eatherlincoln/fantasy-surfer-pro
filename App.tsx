@@ -8,6 +8,7 @@ import TeamBuilder from './components/TeamBuilder';
 import Navigation from './components/Navigation';
 import Profile from './components/Profile';
 import Leagues from './components/Leagues';
+import AdminDashboard from './components/Admin/AdminDashboard';
 import CookieConsent from './components/CookieConsent';
 
 import { supabase } from './services/supabase';
@@ -168,6 +169,10 @@ const App: React.FC = () => {
             <div className="max-w-4xl mx-auto">
               <Leagues userTeam={userTeam} userProfile={userProfile} />
             </div>
+          )}
+
+          {currentView === 'ADMIN' && (
+            <AdminDashboard />
           )}
         </div>
       </main>

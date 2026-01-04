@@ -31,7 +31,7 @@ export interface Team {
   totalBudget: number;
 }
 
-export type View = 'LOGIN' | 'DASHBOARD' | 'TEAM_BUILDER' | 'LEAGUES' | 'PROFILE';
+export type View = 'LOGIN' | 'DASHBOARD' | 'TEAM_BUILDER' | 'LEAGUES' | 'PROFILE' | 'ADMIN';
 
 export interface Heat {
   id: string;
