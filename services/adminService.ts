@@ -307,6 +307,16 @@ export const findSurferByName = async (name: string) => {
     return data;
 };
 
+export const getAllSurfers = async () => {
+    const { data, error } = await supabase
+        .from('surfers')
+        .select('*')
+        .order('value', { ascending: false }); // Default sort by value
+
+    if (error) throw error;
+    return data;
+};
+
 // Flag Mapping
 export const COUNTRY_FLAGS: { [key: string]: string } = {
     'AUS': '🇦🇺', 'USA': '🇺🇸', 'BRA': '🇧🇷', 'HAW': '🇺🇸',

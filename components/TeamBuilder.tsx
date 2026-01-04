@@ -1,11 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Surfer, Tier, UserProfile } from '../types';
 import { TOTAL_BUDGET, TIER_LIMITS } from '../constants';
-import { FULL_MOCK_SURFERS } from '../fullMockData';
 import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
 
-import { Event } from '../services/adminService';
+import { Event, getAllSurfers } from '../services/adminService';
 
 interface TeamBuilderProps {
   initialTeam: Surfer[]; // Legacy prop - likely empty or mix
@@ -17,11 +16,10 @@ interface TeamBuilderProps {
 }
 
 const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave, onBack, userProfile, activeEvent }) => {
-  console.log("TeamBuilder Rendered. initialTeam points:", initialTeam?.reduce((sum, s) => sum + (s.points || 0), 0));
-
   // Single Team State
   const [team, setTeam] = useState<Surfer[]>(initialTeam || []);
-  const [allSurfers, setAllSurfers] = useState<Surfer[]>(FULL_MOCK_SURFERS);
+  const [allSurfers, setAllSurfers] = useState<Surfer[]>([]);
+  const [loadingSurfers, setLoadingSurfers] = useState(true);
 
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
@@ -33,8 +31,18 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   });
 
   useEffect(() => {
-    // FORCE USE OF LOCAL MOCK DATA (SPREADSHEET SOURCE OF TRUTH)
-    setAllSurfers(FULL_MOCK_SURFERS);
+    // FETCH REAL DATA
+    const loadSurfers = async () => {
+      try {
+        const data = await getAllSurfers();
+        if (data) setAllSurfers(data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoadingSurfers(false);
+      }
+    };
+    loadSurfers();
   }, []);
 
   // 1. Sync local team state with prop updates (e.g. Live Points from App.tsx)
