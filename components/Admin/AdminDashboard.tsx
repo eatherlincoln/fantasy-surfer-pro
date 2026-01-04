@@ -686,10 +686,10 @@ const AdminDashboard: React.FC = () => {
                         {/* LIST EVENTS */}
                         <div className="space-y-2">
                             {events.map(event => (
-                                <button
+                                <div
                                     key={event.id}
                                     onClick={() => { setSelectedEvent(event); loadHeats(event.id); }}
-                                    className={`relative group w-full text-left p-4 rounded-xl border transition-all ${selectedEvent?.id === event.id ? 'bg-blue-50 border-blue-500 shadow-md ring-1 ring-blue-500' : 'bg-white border-gray-200 hover:border-gray-300'}`}
+                                    className={`relative group w-full text-left p-4 rounded-xl border transition-all cursor-pointer ${selectedEvent?.id === event.id ? 'bg-blue-50 border-blue-500 shadow-md ring-1 ring-blue-500' : 'bg-white border-gray-200 hover:border-gray-300'}`}
                                 >
                                     <div className="font-bold text-gray-900">{event.name}</div>
                                     <div className="flex justify-between items-center mt-2">
@@ -712,7 +712,7 @@ const AdminDashboard: React.FC = () => {
                                             e.stopPropagation();
                                             setEventAsCurrent(event.id).then(loadEvents);
                                         }}
-                                        className={`absolute top-4 right-4 p-2 rounded-full transition-all ${event.is_current
+                                        className={`absolute top-4 right-4 p-2 rounded-full transition-all z-10 ${event.is_current
                                             ? 'text-yellow-400 hover:scale-110 drop-shadow-sm'
                                             : 'text-gray-200 hover:text-yellow-400'
                                             }`}
@@ -722,7 +722,7 @@ const AdminDashboard: React.FC = () => {
                                             {event.is_current ? 'star' : 'star_border'}
                                         </span>
                                     </button>
-                                </button>
+                                </div>
                             ))}
                         </div>
                     </div>
