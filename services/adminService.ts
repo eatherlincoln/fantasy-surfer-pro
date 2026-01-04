@@ -243,17 +243,48 @@ export const findSurferByName = async (name: string) => {
     return data;
 };
 
-export const getOrCreateSurfer = async (name: string) => {
+// Flag Mapping
+export const COUNTRY_FLAGS: { [key: string]: string } = {
+    'AUS': '🇦🇺', 'USA': '🇺🇸', 'BRA': '🇧🇷', 'HAW': '🇺🇸',
+    'FRA': '🇫🇷', 'ZAF': '🇿🇦', 'JPN': '🇯🇵', 'ITA': '🇮🇹',
+    'PRT': '🇵🇹', 'IDN': '🇮🇩', 'MEX': '🇲🇽', 'PYF': '🇵🇫',
+    'UNK': '🏳️'
+};
+
+export const getOrCreateSurfer = async (name: string, countryCode?: string) => {
+    // Resolve Flag
+    let flag = '🏳️';
+    let country = 'UNK';
+
+    if (countryCode) {
+        country = countryCode.toUpperCase();
+        flag = COUNTRY_FLAGS[country] || '🏳️';
+        if (country === 'HAW') flag = '🇺🇸'; // Special case override if needed
+    }
+
     // 1. Try to find
     const existing = await findSurferByName(name);
-    if (existing) return { data: existing, error: null };
+
+    if (existing) {
+        // UPDATE if country provided and different
+        if (countryCode && existing.country !== country) {
+            const { data: updated, error: updateErr } = await supabase
+                .from('surfers')
+                .update({ country, flag })
+                .eq('id', existing.id)
+                .select()
+                .single();
+
+            return { data: updated || existing, error: updateErr };
+        }
+        return { data: existing, error: null };
+    }
 
     // 2. Create if missing
-    // Defaults for new/wildcard surfers
     const newSurfer = {
         name: name,
-        country: 'UNK',
-        flag: '🏳️',
+        country: country,
+        flag: flag,
         stance: 'Regular',
         gender: 'Male',
         tier: 'C',

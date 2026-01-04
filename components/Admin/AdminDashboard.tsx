@@ -41,8 +41,13 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
     const handleAddSurfer = async () => {
         if (!searchName.trim()) return;
         try {
+            // Support "Name/Country" syntax (e.g. "Joel/AUS")
+            const parts = searchName.split('/');
+            const cleanName = parts[0].trim();
+            const countryCode = parts[1]?.trim(); // Optional
+
             // Use getOrCreate so we can add ANYONE manually if they are missing
-            const { data: surfer, error: surferErr } = await getOrCreateSurfer(searchName);
+            const { data: surfer, error: surferErr } = await getOrCreateSurfer(cleanName, countryCode);
 
             if (surfer) {
                 const { error } = await createHeatAssignment(heat.id, surfer.id);
@@ -62,7 +67,7 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
                 }
             } else {
                 // If we get here, creation failed
-                alert(`Failed to create surfer '${searchName}'.\n\nDB Error: ${surferErr?.message || 'Unknown'}\nCode: ${surferErr?.code}\n\nAsk Developer to check 'surfers' table permissions.`);
+                alert(`Failed to create surfer '${cleanName}'.\n\nDB Error: ${surferErr?.message || 'Unknown'}\nCode: ${surferErr?.code}\n\nAsk Developer to check 'surfers' table permissions.`);
             }
         } catch (e: any) {
             alert(`System Error: ${e.message}`);
@@ -299,6 +304,7 @@ const AdminDashboard: React.FC = () => {
 
                     const heatStr = row[0]?.toString() || '';
                     const surferName = row[1]?.toString().trim();
+                    const countryCode = row[2]?.toString().trim(); // New: Read Country from Col C
 
                     if (!surferName) continue;
 
@@ -330,8 +336,9 @@ const AdminDashboard: React.FC = () => {
                         if (heatId) {
                             processedCount++;
 
-                            // 3. Find Surfer & Assign
-                            const surfer = await findSurferByName(surferName);
+                            // 3. Find OR Create Surfer (Auto-Wildcard) WITH self-healing country
+                            const { data: surfer, error: surferErr } = await getOrCreateSurfer(surferName, countryCode);
+
                             if (surfer) {
                                 // Try assignment (ignore if exists)
                                 const { error: assignErr } = await createHeatAssignment(heatId, surfer.id);
@@ -356,7 +363,7 @@ const AdminDashboard: React.FC = () => {
                                 if (status.includes('ELIMINATED')) await eliminateSurfer(surfer.id);
                                 else if (status.includes('ADV')) await advanceSurfer(surfer.id);
                             } else {
-                                console.warn(`Surfer not found: ${surferName}`);
+                                console.warn(`Surfer Create Failed: ${surferName}`, surferErr);
                             }
                         }
 
