@@ -689,7 +689,7 @@ const AdminDashboard: React.FC = () => {
                                 <button
                                     key={event.id}
                                     onClick={() => { setSelectedEvent(event); loadHeats(event.id); }}
-                                    className={`w-full text-left p-4 rounded-xl border transition-all ${selectedEvent?.id === event.id ? 'bg-blue-50 border-blue-500 shadow-md ring-1 ring-blue-500' : 'bg-white border-gray-200 hover:border-gray-300'}`}
+                                    className={`relative group w-full text-left p-4 rounded-xl border transition-all ${selectedEvent?.id === event.id ? 'bg-blue-50 border-blue-500 shadow-md ring-1 ring-blue-500' : 'bg-white border-gray-200 hover:border-gray-300'}`}
                                 >
                                     <div className="font-bold text-gray-900">{event.name}</div>
                                     <div className="flex justify-between items-center mt-2">
