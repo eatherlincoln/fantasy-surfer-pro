@@ -25,23 +25,33 @@ const AdminRoundTabs: React.FC<{ rounds: string[], activeRound: string, onSelect
 };
 
 const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, onRefresh }) => {
-    // Local state for score inputs to avoid excessive re-renders/db calls while typing
     const [inputs, setInputs] = useState<{ [surferId: string]: string }>({});
+    const [isAdding, setIsAdding] = useState(false);
+    const [searchName, setSearchName] = useState('');
 
     const handleScoreSubmit = async (surferId: string, value: string) => {
         const score = parseFloat(value);
         if (!isNaN(score) && score >= 0 && score <= 10) {
             await submitWaveScore(heat.id, surferId, score);
-            // Clear input after submit or keep it? Usually keep to show last entered? 
-            // Better to just refresh data to show it "logged".
-            setInputs(prev => ({ ...prev, [surferId]: '' })); // Clear input
+            setInputs(prev => ({ ...prev, [surferId]: '' }));
             onRefresh();
         }
     };
 
+    const handleAddSurfer = async () => {
+        if (!searchName.trim()) return;
+        const surfer = await findSurferByName(searchName);
+        if (surfer) {
+            await createHeatAssignment(heat.id, surfer.id);
+            setSearchName('');
+            setIsAdding(false);
+            onRefresh();
+        } else {
+            alert(`Surfer '${searchName}' not found in database.`);
+        }
+    };
+
     const getSurferTotal = (surferId: string) => {
-        // Simple sum of top 2 waves? Or just sum all for now? 
-        // User requested top 2.
         const surferScores = heat.scores?.filter(s => s.surfer_id === surferId).map(s => s.wave_score) || [];
         surferScores.sort((a, b) => b - a);
         const top2 = surferScores.slice(0, 2);
@@ -50,16 +60,15 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
 
     const getSurferLastWaves = (surferId: string) => {
         const surferScores = heat.scores?.filter(s => s.surfer_id === surferId).map(s => s.wave_score) || [];
-        // Return last 2 distinct scores for display context (optional)
         return surferScores.slice(-2).join(', ');
     };
 
     return (
         <div className="bg-white border text-left border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
             <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-                <div className="font-bold text-gray-800">
-                    Heat {heat.heat_number}
-                    <button onClick={() => deleteHeat(heat.id).then(onRefresh)} className="ml-2 text-gray-300 hover:text-red-500 text-xs material-icons-round align-middle">
+                <div className="font-bold text-gray-800 flex items-center gap-2">
+                    <span>Heat {heat.heat_number}</span>
+                    <button onClick={() => deleteHeat(heat.id).then(onRefresh)} className="text-gray-300 hover:text-red-500 text-xs material-icons-round">
                         delete
                     </button>
                 </div>
@@ -73,7 +82,6 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
 
             <div className="divide-y divide-gray-50">
                 {heat.heat_assignments?.map(assignment => {
-                    // Safe access in case of bad data/joins
                     const surfer = Array.isArray(assignment.surfers) ? assignment.surfers[0] : assignment.surfers;
                     if (!surfer) return null;
 
@@ -97,7 +105,6 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
                                     <div className="text-xs text-gray-400 uppercase">Total</div>
                                     <div className="font-black text-lg font-mono">{getSurferTotal(surfer.id)}</div>
                                 </div>
-
                                 <div className="flex flex-col items-end gap-1">
                                     <input
                                         type="number"
@@ -115,9 +122,26 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
                         </div>
                     );
                 })}
-                {(!heat.heat_assignments || heat.heat_assignments.length === 0) && (
-                    <div className="p-4 text-center text-xs text-gray-400">Empty Heat</div>
-                )}
+
+                {/* Manual Add Surfer UI */}
+                <div className="p-2 text-center">
+                    {isAdding ? (
+                        <div className="flex gap-2">
+                            <input
+                                className="border rounded px-2 py-1 text-sm flex-1"
+                                placeholder="Surfer Name..."
+                                value={searchName}
+                                onChange={e => setSearchName(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && handleAddSurfer()}
+                                autoFocus
+                            />
+                            <button onClick={handleAddSurfer} className="bg-black text-white px-2 rounded text-xs">Add</button>
+                            <button onClick={() => setIsAdding(false)} className="text-gray-400 text-xs px-1">Cancel</button>
+                        </div>
+                    ) : (
+                        <button onClick={() => setIsAdding(true)} className="text-xs text-blue-500 font-bold hover:underline">+ Add Surfer</button>
+                    )}
+                </div>
             </div>
         </div>
     );
