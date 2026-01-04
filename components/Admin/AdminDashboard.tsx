@@ -41,7 +41,8 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
     const handleAddSurfer = async () => {
         if (!searchName.trim()) return;
         try {
-            const surfer = await findSurferByName(searchName);
+            // Use getOrCreate so we can add ANYONE manually if they are missing
+            const surfer = await getOrCreateSurfer(searchName);
             if (surfer) {
                 const { error } = await createHeatAssignment(heat.id, surfer.id);
                 if (error) {
