@@ -98,21 +98,19 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
                                     <div className="font-black text-lg font-mono">{getSurferTotal(surfer.id)}</div>
                                 </div>
 
-                                {heat.status === 'LIVE' && (
-                                    <div className="flex flex-col items-end gap-1">
-                                        <input
-                                            type="number"
-                                            placeholder="Score"
-                                            className="w-16 border rounded p-1 text-right font-mono text-sm focus:ring-2 focus:ring-black focus:outline-none"
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    handleScoreSubmit(surfer.id, (e.target as HTMLInputElement).value);
-                                                    (e.target as HTMLInputElement).value = '';
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                )}
+                                <div className="flex flex-col items-end gap-1">
+                                    <input
+                                        type="number"
+                                        placeholder="Score"
+                                        className="w-16 border rounded p-1 text-right font-mono text-sm focus:ring-2 focus:ring-black focus:outline-none"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleScoreSubmit(surfer.id, (e.target as HTMLInputElement).value);
+                                                (e.target as HTMLInputElement).value = '';
+                                            }
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
                     );
@@ -284,17 +282,19 @@ const AdminDashboard: React.FC = () => {
                                 assignedCount++;
 
                                 // Scores?
-                                // If user file has score cols (Col 3, 4 etc)
-                                // User file now: Heat | Name | Country. No scores.
-                                // Code checks row[3]... might be undefined.
-                                if (row[3]) {
-                                    const w1 = parseFloat(row[3]);
+                                // User Format: Heat (0) | Name (1) | Country (2) | Total (3) | Wave 1 (4) | Wave 2 (5) | Status (6)
+                                if (row[4]) {
+                                    const w1 = parseFloat(row[4]);
                                     if (!isNaN(w1)) await submitWaveScore(heatId, surfer.id, w1);
                                 }
-                                if (row[4]) {
-                                    const w2 = parseFloat(row[4]);
+                                if (row[5]) {
+                                    const w2 = parseFloat(row[5]);
                                     if (!isNaN(w2)) await submitWaveScore(heatId, surfer.id, w2);
                                 }
+
+                                const status = row[6]?.toString().toUpperCase() || '';
+                                if (status.includes('ELIMINATED')) await eliminateSurfer(surfer.id);
+                                else if (status.includes('ADV')) await advanceSurfer(surfer.id);
                             } else {
                                 console.warn('Surfer not found:', surferName);
                             }
@@ -306,7 +306,7 @@ const AdminDashboard: React.FC = () => {
                 }
 
                 setLoading(false);
-                alert(`Import Processed.\nHeats Created: ${processedCount}\nAssignments: ${assignedCount}`);
+                alert(`Import Processed.\nHeats Checked: ${processedCount}\nAssignments: ${assignedCount}`);
                 loadHeats(selectedEvent.id);
             }
         });
