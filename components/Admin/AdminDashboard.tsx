@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, deleteEvent, deleteHeat, createHeatAssignment, deleteHeatAssignment, submitWaveScore,
     eliminateSurfer, advanceSurfer, getOrCreateSurfer,
-    finalizeHeat
+    finalizeHeat, updateEvent, getUsers, toggleUserBan
 } from '../../services/adminService';
 import { supabase } from '../../services/supabase';
 import Papa from 'papaparse';
@@ -530,8 +530,8 @@ const AdminDashboard: React.FC = () => {
                                             <button
                                                 onClick={() => handleToggleBan(user.id, user.is_banned)}
                                                 className={`text-xs font-bold px-3 py-1.5 rounded border transition ${user.is_banned
-                                                        ? 'border-gray-200 text-gray-500 hover:border-green-500 hover:text-green-600'
-                                                        : 'border-gray-200 text-gray-500 hover:border-red-500 hover:text-red-600'
+                                                    ? 'border-gray-200 text-gray-500 hover:border-green-500 hover:text-green-600'
+                                                    : 'border-gray-200 text-gray-500 hover:border-red-500 hover:text-red-600'
                                                     }`}
                                             >
                                                 {user.is_banned ? 'UNBAN' : 'BAN USER'}
@@ -565,7 +565,7 @@ const AdminDashboard: React.FC = () => {
 
                         {/* LIST EVENTS */}
                         <div className="space-y-2">
-                             {events.map(event => (
+                            {events.map(event => (
                                 <button
                                     key={event.id}
                                     onClick={() => { setSelectedEvent(event); loadHeats(event.id); }}
@@ -579,7 +579,7 @@ const AdminDashboard: React.FC = () => {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            if(confirm('Delete event?')) handleDeleteEvent(event.id);
+                                            if (confirm('Delete event?')) handleDeleteEvent(event.id);
                                         }}
                                         className="mt-3 text-[10px] text-red-500 hover:underline opacity-50 hover:opacity-100"
                                     >
@@ -588,56 +588,104 @@ const AdminDashboard: React.FC = () => {
                                 </button>
                             ))}
                         </div>
-                                        <select
-                                            value={targetRound}
-                                            onChange={e => setTargetRound(parseInt(e.target.value))}
-                                            className="text-xs border rounded p-1 text-blue-800 bg-white"
-                                        >
-                                            <option value={0}>Auto-Detect Round</option>
-                                            <option value={1}>Opening Round</option>
-                                            <option value={2}>Elimination Round</option>
-                                            <option value={3}>Round of 16</option>
-                                            <option value={4}>Quarterfinals</option>
-                                            <option value={5}>Semifinals</option>
-                                            <option value={6}>Final</option>
-                                        </select>
+                    </div>
+
+                    {/* MAIN CONTENT AREA */}
+                    <div className="lg:col-span-3">
+                        {selectedEvent ? (
+                            <div className="space-y-6">
+                                {/* EVENT HEADER & EDIT */}
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h2 className="text-2xl font-black">{selectedEvent.name}</h2>
+                                            <p className="text-gray-400 text-xs font-mono mt-1">{selectedEvent.id}</p>
+                                        </div>
+                                        <div className="space-x-3">
+                                            <button onClick={() => updateEventStatus(selectedEvent.id, 'LIVE').then(loadEvents)} className={`px-4 py-2 rounded-lg font-bold text-sm text-white ${selectedEvent.status === 'LIVE' ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}>
+                                                {selectedEvent.status === 'LIVE' ? 'LIVE NOW' : 'GO LIVE'}
+                                            </button>
+                                            <button onClick={() => updateEventStatus(selectedEvent.id, 'COMPLETED').then(loadEvents)} className="bg-gray-900 text-white px-4 py-2 rounded-lg font-bold text-sm">
+                                                END
+                                            </button>
+                                        </div>
                                     </div>
-                                    <input type="file" accept=".csv" onChange={handleFileUpload} className="text-xs text-blue-600 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-200 file:text-blue-800 hover:file:bg-blue-300" />
+
+                                    {/* Quick Edit for Context/Image */}
+                                    <details className="text-sm text-gray-500 cursor-pointer">
+                                        <summary className="hover:text-blue-500 font-bold mb-2">Edit Details (Image/AI Context)</summary>
+                                        <div className="space-y-3 p-4 bg-gray-50 rounded-xl mt-2 cursor-default">
+                                            <div>
+                                                <label className="block text-xs font-bold mb-1">Header Image</label>
+                                                <input className="w-full border rounded p-2" defaultValue={selectedEvent.header_image || ''}
+                                                    onBlur={(e) => updateEvent(selectedEvent.id, { header_image: e.target.value })}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold mb-1">AI Context</label>
+                                                <textarea className="w-full border rounded p-2 h-20" defaultValue={selectedEvent.ai_context || ''}
+                                                    onBlur={(e) => updateEvent(selectedEvent.id, { ai_context: e.target.value })}
+                                                />
+                                            </div>
+                                            <p className="text-xs text-green-600 italic">* Changes save on blur (click away)</p>
+                                        </div>
+                                    </details>
                                 </div>
-                                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                    <h3 className="font-bold text-gray-600 text-sm mb-2">Manually Add Heat</h3>
-                                    <div className="flex gap-2">
-                                        <input type="number" className="w-16 border rounded p-1 text-sm text-center" placeholder="Rnd" value={newHeatRound} onChange={e => setNewHeatRound(parseInt(e.target.value))} />
-                                        <input type="number" className="w-16 border rounded p-1 text-sm text-center" placeholder="Ht #" value={newHeatNum} onChange={e => setNewHeatNum(parseInt(e.target.value))} />
-                                        <button onClick={handleCreateHeat} className="bg-black text-white px-3 py-1 rounded text-sm font-bold flex-1">Add +</button>
+
+                                {/* ACTIONS: UPLOAD & ADD HEAT */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col justify-center">
+                                        <h3 className="font-bold text-blue-900 text-sm mb-2">📄 Import Heat Draw (CSV)</h3>
+                                        <div className="flex gap-2 items-center mb-2">
+                                            <select
+                                                value={targetRound}
+                                                onChange={e => setTargetRound(parseInt(e.target.value))}
+                                                className="text-xs border rounded p-1 text-blue-800 bg-white"
+                                            >
+                                                <option value={0}>Auto-Detect Round</option>
+                                                <option value={1}>Opening Round</option>
+                                                <option value={2}>Elimination Round</option>
+                                                <option value={3}>Round of 16</option>
+                                                <option value={4}>Quarterfinals</option>
+                                                <option value={5}>Semifinals</option>
+                                                <option value={6}>Final</option>
+                                            </select>
+                                        </div>
+                                        <input type="file" accept=".csv" onChange={handleFileUpload} className="text-xs text-blue-600 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-200 file:text-blue-800 hover:file:bg-blue-300" />
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                        <h3 className="font-bold text-gray-600 text-sm mb-2">Manually Add Heat</h3>
+                                        <div className="flex gap-2">
+                                            <input type="number" className="w-16 border rounded p-1 text-sm text-center" placeholder="Rnd" value={newHeatRound} onChange={e => setNewHeatRound(parseInt(e.target.value))} />
+                                            <input type="number" className="w-16 border rounded p-1 text-sm text-center" placeholder="Ht #" value={newHeatNum} onChange={e => setNewHeatNum(parseInt(e.target.value))} />
+                                            <button onClick={handleCreateHeat} className="bg-black text-white px-3 py-1 rounded text-sm font-bold flex-1">Add +</button>
+                                        </div>
                                     </div>
                                 </div>
+
+                                {/* ROUND TABS */}
+                                {rounds.length > 0 && (
+                                    <AdminRoundTabs rounds={rounds} activeRound={activeRound} onSelect={setActiveRound} />
+                                )}
+
+                                {/* HEAT GRID */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
+                                    {displayedHeats.map(heat => (
+                                        <AdminHeatCard key={heat.id} heat={heat} onRefresh={() => loadHeats(selectedEvent.id)} />
+                                    ))}
+                                </div>
+                                {displayedHeats.length === 0 && <div className="text-center py-20 text-gray-300 font-bold">No heats in this round</div>}
+
                             </div>
-
-                            {/* ROUND TABS */ }
-    {
-        rounds.length > 0 && (
-            <AdminRoundTabs rounds={rounds} activeRound={activeRound} onSelect={setActiveRound} />
-        )
-    }
-
-    {/* HEAT GRID */ }
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
-        {displayedHeats.map(heat => (
-            <AdminHeatCard key={heat.id} heat={heat} onRefresh={() => loadHeats(selectedEvent.id)} />
-        ))}
-    </div>
-    { displayedHeats.length === 0 && <div className="text-center py-20 text-gray-300 font-bold">No heats in this round</div> }
-
-                        </div >
-                    ) : (
-    <div className="h-96 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-3xl">
-        <span className="material-icons-round text-4xl mb-2">event_note</span>
-        <div className="font-bold">Select an event to begin</div>
-    </div>
-)}
-                </div >
-            </div >
+                        ) : (
+                            <div className="h-96 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-3xl">
+                                <span className="material-icons-round text-4xl mb-2">event_note</span>
+                                <div className="font-bold">Select an event to begin</div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div >
     );
 };
