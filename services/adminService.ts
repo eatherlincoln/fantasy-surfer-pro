@@ -114,7 +114,7 @@ export const submitWaveScore = async (heatId: string, surferId: string, score: n
     // 1. Insert Score
     const { data: scoreData, error: scoreError } = await supabase
         .from('scores')
-        .insert({ heat_id: heatId, surfer_id: parseInt(surferId), wave_score: score })
+        .insert({ heat_id: heatId, surfer_id: surferId, wave_score: score })
         .select()
         .single();
 

@@ -1,4 +1,5 @@
 -- Consolidated Fix for Events Schema & RLS
+-- Updated: Uses UUID for surfer_id to match existing DB schema
 
 -- 1. Ensure Tables Exist
 create table if not exists public.events (
@@ -23,7 +24,8 @@ create table if not exists public.heats (
 create table if not exists public.scores (
   id uuid default gen_random_uuid() primary key,
   heat_id uuid references public.heats(id) on delete cascade not null,
-  surfer_id bigint references public.surfers(id) not null,
+  -- Using UUID for surfer_id based on error report (was bigint)
+  surfer_id uuid references public.surfers(id) not null,
   wave_score numeric not null,
   is_best_wave boolean default false,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
