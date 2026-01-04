@@ -45,7 +45,14 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
             if (surfer) {
                 const { error } = await createHeatAssignment(heat.id, surfer.id);
                 if (error) {
-                    alert(`Error adding surfer: ${error.message}`);
+                    if (error.code === '23505') {
+                        alert(`Info: ${surfer.name} is already in this heat.`);
+                        onRefresh(); // Refresh anyway just in case
+                        setSearchName('');
+                        setIsAdding(false);
+                    } else {
+                        alert(`Error adding surfer: ${error.message}`);
+                    }
                 } else {
                     setSearchName('');
                     setIsAdding(false);
@@ -301,19 +308,20 @@ const AdminDashboard: React.FC = () => {
                             if (newHeat) {
                                 heatId = newHeat.id;
                                 heatMap.set(heatKey, heatId); // Update map so next row (same heat) uses this ID
-                                processedCount++;
                             }
                         }
 
                         if (heatId) {
+                            processedCount++;
+
                             // 3. Find Surfer & Assign
                             const surfer = await findSurferByName(surferName);
                             if (surfer) {
                                 // Try assignment (ignore if exists)
                                 const { error: assignErr } = await createHeatAssignment(heatId, surfer.id);
-                                if (!assignErr) {
+                                if (!assignErr || assignErr.code === '23505') {
                                     assignedCount++;
-                                } else if (assignErr.code !== '23505') { // Ignore unique violation
+                                } else {
                                     console.error('Assign Error:', assignErr);
                                 }
 
@@ -332,8 +340,7 @@ const AdminDashboard: React.FC = () => {
                                 if (status.includes('ELIMINATED')) await eliminateSurfer(surfer.id);
                                 else if (status.includes('ADV')) await advanceSurfer(surfer.id);
                             } else {
-                                console.warn('Surfer not found:', surferName);
-                                // Optional: Alert on first few failures?
+                                console.warn(`Surfer not found: ${surferName}`);
                             }
                         }
 
@@ -344,9 +351,9 @@ const AdminDashboard: React.FC = () => {
 
                 setLoading(false);
                 if (processedCount === 0) {
-                    alert("⚠️ No heats were detected!\n\nCheck:\n1. Did you select the correct Round?\n2. Does Column A start with 'HEAT' (e.g. 'HEAT 1')?");
+                    alert("⚠️ No Data Detected!\n\nCheck:\n1. Did you select the correct Round?\n2. Does Column A start with 'HEAT'?");
                 } else {
-                    alert(`✅ Import Complete!\n\n• Heats Found: ${processedCount}\n• Surfers Assigned: ${assignedCount}\n\nIf assignments are low, check surfer name spelling.`);
+                    alert(`✅ Import Complete!\n\n• Heats Processed: ${processedCount}\n• Surfers Assigned: ${assignedCount}`);
                 }
                 loadHeats(selectedEvent.id);
             }
