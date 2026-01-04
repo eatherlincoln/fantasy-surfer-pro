@@ -42,13 +42,14 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
         if (!searchName.trim()) return;
         try {
             // Use getOrCreate so we can add ANYONE manually if they are missing
-            const surfer = await getOrCreateSurfer(searchName);
+            const { data: surfer, error: surferErr } = await getOrCreateSurfer(searchName);
+
             if (surfer) {
                 const { error } = await createHeatAssignment(heat.id, surfer.id);
                 if (error) {
                     if (error.code === '23505') {
                         alert(`Info: ${surfer.name} is already in this heat.`);
-                        onRefresh(); // Refresh anyway just in case
+                        onRefresh();
                         setSearchName('');
                         setIsAdding(false);
                     } else {
@@ -60,7 +61,8 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
                     onRefresh();
                 }
             } else {
-                alert(`Surfer '${searchName}' not found in database. Check spelling.`);
+                // If we get here, creation failed
+                alert(`Failed to create surfer '${searchName}'.\n\nDB Error: ${surferErr?.message || 'Unknown'}\nCode: ${surferErr?.code}\n\nAsk Developer to check 'surfers' table permissions.`);
             }
         } catch (e: any) {
             alert(`System Error: ${e.message}`);

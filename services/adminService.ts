@@ -241,7 +241,7 @@ export const findSurferByName = async (name: string) => {
 export const getOrCreateSurfer = async (name: string) => {
     // 1. Try to find
     const existing = await findSurferByName(name);
-    if (existing) return existing;
+    if (existing) return { data: existing, error: null };
 
     // 2. Create if missing
     // Defaults for new/wildcard surfers
@@ -250,7 +250,7 @@ export const getOrCreateSurfer = async (name: string) => {
         country: 'UNK',
         flag: '🏳️',
         stance: 'Regular',
-        gender: 'Male', // Default to Male for mixed CSVs unless specified? Risk.
+        gender: 'Male',
         tier: 'C',
         value: 5.0,
         image: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`
@@ -262,10 +262,6 @@ export const getOrCreateSurfer = async (name: string) => {
         .select('id, name')
         .single();
 
-    if (error) {
-        console.error('Error auto-creating surfer:', error);
-        return null; // Should we throw?
-    }
-    return data;
+    return { data, error };
 };
 
