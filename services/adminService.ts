@@ -8,6 +8,8 @@ export interface Event {
     status: 'UPCOMING' | 'LIVE' | 'COMPLETED';
     start_date: string;
     end_date: string;
+    header_image?: string;
+    ai_context?: string;
 }
 
 export interface Heat {
@@ -68,6 +70,43 @@ export const updateEventStatus = async (eventId: string, status: 'UPCOMING' | 'L
         .from('events')
         .update({ status })
         .eq('id', eventId)
+        .select()
+        .single();
+
+    if (error) throw error;
+    return data;
+};
+
+export const updateEvent = async (eventId: string, updates: Partial<Event>) => {
+    const { data, error } = await supabase
+        .from('events')
+        .update(updates)
+        .eq('id', eventId)
+        .select()
+        .single();
+
+    if (error) throw error;
+    return data;
+};
+
+// --- User Management ---
+
+export const getUsers = async () => {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+};
+
+export const toggleUserBan = async (userId: string, isBanned: boolean) => {
+    // Requires Admin RLS Policy or Role
+    const { data, error } = await supabase
+        .from('profiles')
+        .update({ is_banned: isBanned })
+        .eq('id', userId)
         .select()
         .single();
 
@@ -234,7 +273,7 @@ export const deleteHeatAssignment = async (heatId: string, surferId: string) => 
 export const findSurferByName = async (name: string) => {
     const { data, error } = await supabase
         .from('surfers')
-        .select('id, name')
+        .select('id, name, country, flag')
         .ilike('name', `%${name}%`)
         .limit(1)
         .single();

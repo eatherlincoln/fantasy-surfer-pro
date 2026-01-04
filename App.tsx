@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Surfer, EventStatus, UserProfile } from './types';
+import { Event } from './services/adminService';
 import { generateSurfCommentary } from './services/aiService';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
@@ -24,6 +25,9 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
 
+  /* New Hook to fetch Active Event */
+  const [activeEvent, setActiveEvent] = useState<Event | null>(null);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -32,6 +36,15 @@ const App: React.FC = () => {
         fetchProfile(session.user.id);
       }
     });
+
+    // Fetch Active Event
+    const fetchEvent = async () => {
+      try {
+        const { data } = await supabase.from('events').select('*').order('start_date', { ascending: false }).limit(1).single();
+        if (data) setActiveEvent(data);
+      } catch (e) { console.error(e); }
+    };
+    fetchEvent();
 
     const {
       data: { subscription },
@@ -148,6 +161,7 @@ const App: React.FC = () => {
               onManageTeam={() => setCurrentView('TEAM_BUILDER')}
               onSimulate={simulateWave}
               userProfile={userProfile}
+              activeEvent={activeEvent}
             />
           )}
 
@@ -158,6 +172,7 @@ const App: React.FC = () => {
               onSave={handleSaveTeam}
               onBack={handleBackFromTeamBuilder}
               userProfile={userProfile}
+              activeEvent={activeEvent}
             />
           )}
 

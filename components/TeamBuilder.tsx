@@ -5,15 +5,18 @@ import { FULL_MOCK_SURFERS } from '../fullMockData';
 import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
 
+import { Event } from '../services/adminService';
+
 interface TeamBuilderProps {
   initialTeam: Surfer[]; // Legacy prop - likely empty or mix
   isLocked: boolean;
   onSave: (team: Surfer[]) => void;
   onBack: () => void;
   userProfile: UserProfile | null;
+  activeEvent: Event | null;
 }
 
-const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave, onBack, userProfile }) => {
+const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave, onBack, userProfile, activeEvent }) => {
   console.log("TeamBuilder Rendered. initialTeam points:", initialTeam?.reduce((sum, s) => sum + (s.points || 0), 0));
 
   // Single Team State
@@ -76,9 +79,10 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const prompt = `You are an expert World Surf League fantasy analyst. 
-      Current Event: Pipeline Pro, Hawaii. 
+      Current Event: ${activeEvent?.name || 'Upcoming Event'}.
+      Context: ${activeEvent?.ai_context || 'Standard conditions expected.'}.
       Available Surfers (Top 5 Value): ${allSurfers.slice(0, 5).map(s => s.name).join(', ')}.
-      Suggest a strategy for selecting a team for Pipeline given a $60M budget.
+      Suggest a strategy for selecting a team for this event given a $60M budget.
       Keep the response concise (max 3 sentences) and highly strategic.`;
 
       const response = await ai.models.generateContent({

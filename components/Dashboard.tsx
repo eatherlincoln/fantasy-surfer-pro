@@ -3,15 +3,18 @@ import { MOCK_SURFERS, MOCK_HEATS } from '../constants';
 import { Surfer, EventStatus, Tier, UserProfile } from '../types';
 import { generateBriefing } from '../services/aiService';
 
+import { Event } from '../services/adminService';
+
 interface DashboardProps {
   userTeam: Surfer[];
   eventStatus: EventStatus;
   onManageTeam: () => void;
   onSimulate: () => void;
   userProfile: UserProfile | null;
+  activeEvent: Event | null;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTeam, onSimulate, userProfile }) => {
+const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTeam, onSimulate, userProfile, activeEvent }) => {
   const [aiBriefing, setAiBriefing] = useState<string | null>(null);
   const [isBriefingLoading, setIsBriefingLoading] = useState(false);
   const displayTeam = userTeam.length > 0 ? userTeam : MOCK_SURFERS.slice(0, 3);
@@ -40,8 +43,8 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
       {/* Custom Replaceable Banner Area */}
       <div className="w-full rounded-[40px] overflow-hidden shadow-2xl mb-10 relative group">
         <img
-          src="/images/ripcurl-banner.jpg"
-          alt="Rip Curl Pro Bells Beach Banner"
+          src={activeEvent?.header_image || "/images/ripcurl-banner.jpg"}
+          alt={activeEvent?.name || "Event Banner"}
           className="w-full h-auto object-cover min-h-[300px]"
           onError={(e) => {
             // Fallback if the user hasn't refreshed or cache issue
