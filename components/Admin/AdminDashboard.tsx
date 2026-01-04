@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, Event, Heat } from '../../services/adminService';
+import { createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, deleteEvent, deleteHeat, createHeatAssignment, findSurferByName, Event, Heat } from '../../services/adminService';
 import { supabase } from '../../services/supabase';
+import Papa from 'papaparse';
 
 const AdminDashboard: React.FC = () => {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -87,6 +88,69 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
+    const handleDeleteEvent = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this event? This cannot be undone.')) return;
+        try {
+            await deleteEvent(id);
+            setSelectedEvent(null);
+            loadEvents();
+        } catch (e) {
+            alert('Error deleting event' + e);
+        }
+    };
+
+    const handleDeleteHeat = async (id: string) => {
+        if (!confirm('Delete heat?')) return;
+        try {
+            await deleteHeat(id);
+            if (selectedEvent) loadHeats(selectedEvent.id);
+        } catch (e) {
+            alert('Error deleting heat');
+        }
+    };
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file || !selectedEvent) return;
+
+        Papa.parse(file, {
+            header: true,
+            complete: async (results) => {
+                console.log('Parsed CSV:', results.data);
+                // Expected format: Round, Heat, Surfer1, Surfer2, Surfer3
+
+                for (const row of results.data as any[]) {
+                    if (!row.Round || !row.Heat) continue;
+
+                    try {
+                        // 1. Create Heat (or find existing - simplistic for now, just creates)
+                        // Better: Try to find heat first? For MVP, we'll assume we are creating NEW heats from the draw.
+                        const heatRes = await createHeat(selectedEvent.id, parseInt(row.Round), parseInt(row.Heat));
+                        const heatId = heatRes?.id;
+
+                        if (heatId) {
+                            // 2. Find and Assign Surfers
+                            const surfers = [row.Surfer1, row.Surfer2, row.Surfer3, row.Surfer4].filter(s => s);
+
+                            for (const sName of surfers) {
+                                const surfer = await findSurferByName(sName);
+                                if (surfer) {
+                                    await createHeatAssignment(heatId, surfer.id);
+                                } else {
+                                    console.warn(`Surfer not found: ${sName}`);
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error processing row", row, e);
+                    }
+                }
+                alert('Heat Draw Upload Processed! Refreshing...');
+                loadHeats(selectedEvent.id);
+            }
+        });
+    };
+
     if (loading) return <div className="p-10">Loading...</div>;
     if (!isAdmin) return <div className="p-10 text-red-500">Access Denied</div>;
 
@@ -133,6 +197,12 @@ const AdminDashboard: React.FC = () => {
                                 <div className={`text-xs font-bold px-2 py-0.5 rounded-full inline-block mt-1 ${ev.status === 'LIVE' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-500'}`}>
                                     {ev.status}
                                 </div>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleDeleteEvent(ev.id); }}
+                                    className="ml-2 text-red-300 hover:text-red-500"
+                                >
+                                    <span className="material-icons-round text-sm">delete</span>
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -194,6 +264,19 @@ const AdminDashboard: React.FC = () => {
                                 </div>
                             </div>
 
+
+                            {/* Bulk CSV Upload */}
+                            <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                                <h3 className="font-bold mb-3 text-blue-900">📄 Upload Heat Draw (CSV)</h3>
+                                <p className="text-xs text-blue-700 mb-2">Format: Round, Heat, Surfer1, Surfer2, Surfer3</p>
+                                <input
+                                    type="file"
+                                    accept=".csv"
+                                    onChange={handleFileUpload}
+                                    className="text-sm text-blue-800 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                                />
+                            </div>
+
                             {/* Heats List */}
                             <div className="space-y-4">
                                 {heats.map(heat => (
@@ -212,6 +295,12 @@ const AdminDashboard: React.FC = () => {
                                             >
                                                 {heat.status === 'UPCOMING' ? 'START' : heat.status === 'LIVE' ? 'FINISH' : 'DONE'}
                                             </button>
+                                            <button
+                                                onClick={() => handleDeleteHeat(heat.id)}
+                                                className="p-2 text-gray-400 hover:text-red-500 transition"
+                                            >
+                                                <span className="material-icons-round">delete</span>
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
@@ -226,7 +315,7 @@ const AdminDashboard: React.FC = () => {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

@@ -150,3 +150,50 @@ export const advanceSurfer = async (surferId: string) => {
     if (error) throw error;
     return data;
 };
+
+// --- Delete Functions ---
+
+export const deleteEvent = async (eventId: string) => {
+    const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', eventId);
+
+    if (error) throw error;
+};
+
+export const deleteHeat = async (heatId: string) => {
+    const { error } = await supabase
+        .from('heats')
+        .delete()
+        .eq('id', heatId);
+
+    if (error) throw error;
+};
+
+// --- Bulk Import / Assignments ---
+
+export const createHeatAssignment = async (heatId: string, surferId: string) => {
+    const { data, error } = await supabase
+        .from('heat_assignments')
+        .insert({ heat_id: heatId, surfer_id: surferId })
+        .select()
+        .single();
+
+    if (error) throw error;
+    return data;
+};
+
+// Helper to find a surfer by name (fuzzy match or exact)
+export const findSurferByName = async (name: string) => {
+    const { data, error } = await supabase
+        .from('surfers')
+        .select('id, name')
+        .ilike('name', `%${name}%`)
+        .limit(1)
+        .single();
+
+    if (error) return null; // Surfer not found
+    return data;
+};
+
