@@ -710,15 +710,18 @@ const AdminDashboard: React.FC = () => {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setEventAsCurrent(event.id).then(loadEvents);
+                                            e.preventDefault();
+                                            setEventAsCurrent(event.id)
+                                                .then(loadEvents)
+                                                .catch(err => alert('Error setting active event: ' + err.message));
                                         }}
-                                        className={`absolute top-4 right-4 p-2 rounded-full transition-all z-10 ${event.is_current
-                                            ? 'text-yellow-400 hover:scale-110 drop-shadow-sm'
-                                            : 'text-gray-200 hover:text-yellow-400'
+                                        className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all z-50 shadow-sm border border-gray-100 ${event.is_current
+                                            ? 'bg-yellow-50 text-yellow-400 scale-110 ring-2 ring-yellow-400 ring-offset-1'
+                                            : 'bg-white text-gray-300 hover:text-yellow-400 hover:scale-110 hover:shadow-md'
                                             }`}
                                         title={event.is_current ? "Currently Active Event" : "Set as Current Event"}
                                     >
-                                        <span className="material-icons-round text-xl">
+                                        <span className="material-icons-round text-2xl">
                                             {event.is_current ? 'star' : 'star_border'}
                                         </span>
                                     </button>
