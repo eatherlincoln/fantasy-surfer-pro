@@ -396,8 +396,18 @@ const AdminDashboard: React.FC = () => {
     return (
         <div className="p-8 pb-24 max-w-7xl mx-auto">
             <div className="flex justify-between items-end mb-8 border-b pb-4">
-                <h1 className="text-3xl font-black text-gray-900">Admin Control Room V2 🎛️</h1>
-                <div className="text-sm text-gray-400">Manage live events and scoring</div>
+                <div>
+                    <h1 className="text-3xl font-black text-gray-900 flex items-center gap-2">
+                        Admin Control Room <span className="text-xs bg-black text-white px-2 py-1 rounded-full">v2.1</span>
+                    </h1>
+                    <div className="text-sm text-gray-400">Manage live events and scoring</div>
+                </div>
+                <button
+                    onClick={() => { console.log('Raw Heats:', heats); alert('Data logged to console. Check Developer Tools.'); }}
+                    className="text-xs text-gray-400 hover:text-black underline"
+                >
+                    Debug Data
+                </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
