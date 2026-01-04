@@ -12,6 +12,24 @@ export interface Event {
     ai_context?: string;
 }
 
+export const uploadEventImage = async (file: File) => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+        .from('event-headers')
+        .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+        .from('event-headers')
+        .getPublicUrl(filePath);
+
+    return data.publicUrl;
+};
+
 export interface Heat {
     id: string;
     event_id: string;

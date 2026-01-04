@@ -3,6 +3,7 @@ import {
     createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, deleteEvent, deleteHeat, createHeatAssignment, deleteHeatAssignment, submitWaveScore,
     eliminateSurfer, advanceSurfer, getOrCreateSurfer,
     finalizeHeat, updateEvent, getUsers, toggleUserBan,
+    uploadEventImage,
     type Event, type Heat
 } from '../../services/adminService';
 import { supabase } from '../../services/supabase';
@@ -234,6 +235,118 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
     );
 };
 
+
+
+// --- Event Details Editor Component ---
+const EventDetailsEditor = ({ event, onUpdate }: { event: Event, onUpdate: () => void }) => {
+    // Local state to prevent "carry over" bugs. Initialized from props.
+    const [headerImage, setHeaderImage] = useState(event.header_image || '');
+    const [aiContext, setAiContext] = useState(event.ai_context || '');
+    const [isSaving, setIsSaving] = useState(false);
+
+    // Sync state when event prop changes (Fixes persistence bug)
+    useEffect(() => {
+        setHeaderImage(event.header_image || '');
+        setAiContext(event.ai_context || '');
+    }, [event.id]);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Optimistic preview could go here
+        try {
+            setIsSaving(true);
+            const publicUrl = await uploadEventImage(file);
+            setHeaderImage(publicUrl);
+            setIsSaving(false);
+        } catch (error: any) {
+            alert('Upload failed: ' + error.message);
+            setIsSaving(false);
+        }
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            await updateEvent(event.id, {
+                header_image: headerImage,
+                ai_context: aiContext
+            });
+            onUpdate();
+            alert('✅ Event details saved!');
+        } catch (e) {
+            alert('Failed to save');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    return (
+        <div className="mt-6 bg-gray-50 rounded-xl p-5 border border-gray-200">
+            <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span className="material-icons-round text-sm bg-gray-200 p-1 rounded-full">edit</span>
+                Edit Event Content
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Image Section */}
+                <div className="space-y-3">
+                    <label className="block text-xs font-bold text-gray-400 uppercase">Header Image</label>
+
+                    {/* Preview */}
+                    <div className="w-full h-32 bg-gray-200 rounded-lg overflow-hidden relative border border-gray-300">
+                        {headerImage ? (
+                            <img src={headerImage} className="w-full h-full object-cover" alt="Header" />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
+                        )}
+                        {isSaving && <div className="absolute inset-0 bg-white/50 flex items-center justify-center"><div className="animate-spin h-6 w-6 border-2 border-black rounded-full border-t-transparent"></div></div>}
+                    </div>
+
+                    {/* Upload Button */}
+                    <div className="flex gap-2">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="text-xs w-full file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-gray-900 file:text-white hover:file:bg-black cursor-pointer"
+                        />
+                    </div>
+                    {/* Fallback URL Input */}
+                    <input
+                        className="w-full text-xs border border-gray-200 rounded p-2"
+                        placeholder="Or paste image URL..."
+                        value={headerImage}
+                        onChange={e => setHeaderImage(e.target.value)}
+                    />
+                </div>
+
+                {/* AI Context Section */}
+                <div className="space-y-3 flex flex-col">
+                    <label className="block text-xs font-bold text-gray-400 uppercase">AI Scout Context</label>
+                    <textarea
+                        className="w-full flex-1 border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black outline-none"
+                        placeholder="Describe the waves, conditions, or specific advice for this event..."
+                        value={aiContext}
+                        onChange={e => setAiContext(e.target.value)}
+                    />
+                </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+                <button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="bg-black text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                    {isSaving ? 'Saving...' : 'Save Changes'}
+                    <span className="material-icons-round text-sm">save</span>
+                </button>
+            </div>
+        </div>
+    );
+};
 
 // --- Main Page ---
 
@@ -618,25 +731,11 @@ const AdminDashboard: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    {/* Quick Edit for Context/Image */}
-                                    <details className="text-sm text-gray-500 cursor-pointer">
-                                        <summary className="hover:text-blue-500 font-bold mb-2">Edit Details (Image/AI Context)</summary>
-                                        <div className="space-y-3 p-4 bg-gray-50 rounded-xl mt-2 cursor-default">
-                                            <div>
-                                                <label className="block text-xs font-bold mb-1">Header Image</label>
-                                                <input className="w-full border rounded p-2" defaultValue={selectedEvent.header_image || ''}
-                                                    onBlur={(e) => updateEvent(selectedEvent.id, { header_image: e.target.value })}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-bold mb-1">AI Context</label>
-                                                <textarea className="w-full border rounded p-2 h-20" defaultValue={selectedEvent.ai_context || ''}
-                                                    onBlur={(e) => updateEvent(selectedEvent.id, { ai_context: e.target.value })}
-                                                />
-                                            </div>
-                                            <p className="text-xs text-green-600 italic">* Changes save on blur (click away)</p>
-                                        </div>
-                                    </details>
+                                    {/* EVENT DETAILS EDITOR */}
+                                    <EventDetailsEditor
+                                        event={selectedEvent}
+                                        onUpdate={() => { loadEvents(); setSelectedEvent(prev => prev ? { ...prev } : null); }} // Force refresh logic could be better, but this works for MVP
+                                    />
                                 </div>
 
                                 {/* ACTIONS: UPLOAD & ADD HEAT */}
@@ -672,7 +771,21 @@ const AdminDashboard: React.FC = () => {
 
                                 {/* ROUND TABS */}
                                 {rounds.length > 0 && (
-                                    <AdminRoundTabs rounds={rounds} activeRound={activeRound} onSelect={setActiveRound} />
+                                    <div className="flex overflow-x-auto space-x-1 bg-gray-100 p-1 rounded-lg mb-6">
+                                        {rounds.map(round => (
+                                            <button
+                                                key={round}
+                                                onClick={() => setActiveRound(round)}
+                                                className={`px-4 py-2 text-sm font-bold rounded-md whitespace-nowrap transition-colors ${activeRound === round
+                                                    ? 'bg-white text-black shadow-sm'
+                                                    : 'text-gray-500 hover:text-gray-700'
+                                                    }`}
+                                            >
+                                                {/* HUMAN READABLE ROUND NAME */}
+                                                {getRoundName(parseInt(round))}
+                                            </button>
+                                        ))}
+                                    </div>
                                 )}
 
                                 {/* HEAT GRID */}
