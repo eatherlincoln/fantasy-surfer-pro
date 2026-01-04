@@ -329,3 +329,93 @@ export const getOrCreateSurfer = async (name: string, countryCode?: string) => {
     return { data, error };
 };
 
+// --- Finalize Heat Logic ---
+
+export const getHeatScores = async (heatId: string) => {
+    const { data, error } = await supabase
+        .from('scores')
+        .select('*')
+        .eq('heat_id', heatId);
+
+    if (error) throw error;
+    return data;
+};
+
+export const finalizeHeat = async (heatId: string) => {
+    // 1. Get all scores for this heat
+    const scores = await getHeatScores(heatId);
+
+    // 2. Get assignments to know who is in the heat
+    const { data: heat } = await supabase
+        .from('heats')
+        .select(`
+            id, 
+            heat_assignments (
+                surfer_id
+            )
+        `)
+        .eq('id', heatId)
+        .single();
+
+    if (!heat || !heat.heat_assignments) throw new Error("Heat data not found");
+
+    // 3. For each surfer, calculate Top 2 waves
+    for (const assignment of heat.heat_assignments) {
+        const surferId = assignment.surfer_id;
+        const surferScores = scores
+            .filter(s => s.surfer_id === surferId)
+            .map(s => parseFloat(s.wave_score))
+            .sort((a, b) => b - a); // Descending
+
+        const top2 = surferScores.slice(0, 2);
+        const heatTotal = top2.reduce((sum, score) => sum + score, 0);
+
+        // A. Save Heat Total to Assignment (History)
+        await supabase
+            .from('heat_assignments')
+            .update({ heat_score: heatTotal })
+            .eq('heat_id', heatId)
+            .eq('surfer_id', surferId);
+
+        // B. Distribute Fantasy Points
+        // Find all users who have this surfer in their active team
+        const { data: userTeams } = await supabase
+            .from('user_teams')
+            .select('id, user_id, points')
+            .eq('surfer_id', surferId);
+
+        if (userTeams) {
+            for (const team of userTeams) {
+                // Add points to the specific pick
+                await supabase
+                    .from('user_teams')
+                    .update({ points: (team.points || 0) + heatTotal })
+                    .eq('id', team.id);
+
+                // Add points to User's Global Total
+                // We do this by RPC or direct fetch-update to avoid race conditions ideally, 
+                // but for MVP direct update is fine.
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('id, total_fantasy_points')
+                    .eq('id', team.user_id)
+                    .single();
+
+                if (profile) {
+                    await supabase
+                        .from('profiles')
+                        .update({ total_fantasy_points: (profile.total_fantasy_points || 0) + heatTotal })
+                        .eq('id', team.user_id);
+                }
+            }
+        }
+    }
+
+    // 4. Mark Heat as Completed
+    await supabase
+        .from('heats')
+        .update({ status: 'COMPLETED' })
+        .eq('id', heatId);
+
+    return { success: true };
+};

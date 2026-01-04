@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, deleteEvent, deleteHeat, createHeatAssignment, deleteHeatAssignment, findSurferByName, getOrCreateSurfer, submitWaveScore, eliminateSurfer, advanceSurfer, Event, Heat } from '../../services/adminService';
+import {
+    createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, deleteEvent, deleteHeat, createHeatAssignment, deleteHeatAssignment, submitWaveScore,
+    eliminateSurfer, advanceSurfer, getOrCreateSurfer,
+    finalizeHeat
+} from '../../services/adminService';
 import { supabase } from '../../services/supabase';
 import Papa from 'papaparse';
 
@@ -142,49 +146,70 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <div className="text-right">
-                                    <div className="text-xs text-gray-400 uppercase">Total</div>
-                                    <div className="font-black text-lg font-mono">{getSurferTotal(surfer.id)}</div>
-                                </div>
                                 <div className="flex flex-col items-end gap-1">
-                                    <input
-                                        type="number"
-                                        placeholder="Score"
-                                        className="w-16 border rounded p-1 text-right font-mono text-sm focus:ring-2 focus:ring-black focus:outline-none"
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                handleScoreSubmit(surfer.id, (e.target as HTMLInputElement).value);
-                                                (e.target as HTMLInputElement).value = '';
-                                            }
-                                        }}
-                                    />
+                                    <div className="text-2xl font-bold font-mono">
+                                        {/* LIVE SCORE CALCULATION */}
+                                        {(() => {
+                                            const surferScores = scores?.filter(s => s.surfer_id === surfer.id).map(s => s.wave_score) || [];
+                                            const top2 = surferScores.sort((a, b) => b - a).slice(0, 2);
+                                            const total = top2.reduce((sum, val) => sum + val, 0);
+                                            return total.toFixed(2);
+                                        })()}
+                                    </div>
+                                    <div className="flex gap-1">
+                                        {scores?.filter(s => s.surfer_id === surfer.id).map((score) => (
+                                            <div key={score.id} className="bg-gray-800 text-white text-xs px-1 rounded">
+                                                {Number(score.wave_score).toFixed(2)}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
+                            <div className="mt-2 flex gap-2">
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    placeholder="Wave Score..."
+                                    className="bg-gray-50 border border-gray-200 text-sm p-1 w-24 rounded"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            const val = parseFloat(e.currentTarget.value);
+                                            if (!isNaN(val)) {
+                                                submitWaveScore(heat.id, surfer.id, val).then(() => {
+                                                    e.currentTarget.value = ''; // Clear
+                                                    onRefresh();
+                                                });
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
                         </div>
-                    );
+                        </div>
+            );
                 })}
 
-                {/* Manual Add Surfer UI */}
-                <div className="p-2 text-center">
-                    {isAdding ? (
-                        <div className="flex gap-2">
-                            <input
-                                className="border rounded px-2 py-1 text-sm flex-1"
-                                placeholder="Surfer Name..."
-                                value={searchName}
-                                onChange={e => setSearchName(e.target.value)}
-                                onKeyDown={e => e.key === 'Enter' && handleAddSurfer()}
-                                autoFocus
-                            />
-                            <button onClick={handleAddSurfer} className="bg-black text-white px-2 rounded text-xs">Add</button>
-                            <button onClick={() => setIsAdding(false)} className="text-gray-400 text-xs px-1">Cancel</button>
-                        </div>
-                    ) : (
-                        <button onClick={() => setIsAdding(true)} className="text-xs text-blue-500 font-bold hover:underline">+ Add Surfer</button>
-                    )}
-                </div>
+            {/* Manual Add Surfer UI */}
+            <div className="p-2 text-center">
+                {isAdding ? (
+                    <div className="flex gap-2">
+                        <input
+                            className="border rounded px-2 py-1 text-sm flex-1"
+                            placeholder="Surfer Name..."
+                            value={searchName}
+                            onChange={e => setSearchName(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && handleAddSurfer()}
+                            autoFocus
+                        />
+                        <button onClick={handleAddSurfer} className="bg-black text-white px-2 rounded text-xs">Add</button>
+                        <button onClick={() => setIsAdding(false)} className="text-gray-400 text-xs px-1">Cancel</button>
+                    </div>
+                ) : (
+                    <button onClick={() => setIsAdding(true)} className="text-xs text-blue-500 font-bold hover:underline">+ Add Surfer</button>
+                )}
             </div>
         </div>
+        </div >
     );
 };
 
