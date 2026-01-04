@@ -1,0 +1,55 @@
+-- Bulk Update Surfer Images with Real Photos
+-- Generated from constants.ts data
+
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/c97a7e74e_Yago-Dora.png' WHERE name = 'Yago Dora';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/f8218596d_molly-picklum.png' WHERE name = 'Molly Picklum';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/53aa937f5_Ethan-Ewing.png' WHERE name = 'Ethan Ewing';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/0e6877764_Griffin-Colapinto.png' WHERE name = 'Griffin Colapinto';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/4f62274f0_Jack-Robinson.png' WHERE name = 'Jack Robinson';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/6cf94906a_caitlyn-simmers.png' WHERE name = 'Caitlin Simmers';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/3ddea78af_Italo-Ferraria.png' WHERE name = 'Italo Ferreira'; -- Note: Map Ferreira/Ferriera spelling variations if necessary
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/3ddea78af_Italo-Ferraria.png' WHERE name = 'Italo Ferriera';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/d589c0194_Jordy-Smith.png' WHERE name = 'Jordy Smith';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/664d54e46_caroline-marks.png' WHERE name = 'Caroline Marks';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/efc922ebc_Filipe-Toledo.png' WHERE name = 'Filipe Toledo';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/552a8cfc5_kanoa-Igarashi.png' WHERE name = 'Kanoa Igarashi';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/8bc34ac4c_Connor-Oleary.png' WHERE name like 'Connor O%';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/aebc31dff_Gabby-Medina.png' WHERE name = 'Gabriel Medina';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/dfa6b644b_betty-lou-sakura.png' WHERE name = 'Betty Lou Sakura Johnson';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/649ca6fb4_Barron-Mamiya.png' WHERE name = 'Barron Mamiya';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/b4e9a0f31_Leo-Fivo.png' WHERE name = 'Leonardo Fioravanti';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/5e0fc50ec_erin-brooks.png' WHERE name = 'Erin Brooks';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/c3a3ce643_gabby-bryant.png' WHERE name = 'Gabriela Bryan';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/abf499dea_tyler-wright.png' WHERE name = 'Tyler Wright';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/e5a59113a_Jaoa-Chianca.png' WHERE name = 'Joao Chianca';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/8cf75c02b_Laim-Obrien.png' WHERE name like 'Liam O%';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/fb635d813_Joel-Vaughan.png' WHERE name = 'Joel Vaughan';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/466443c69_Cole-Houshmand.png' WHERE name = 'Cole Houshmand';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/a9c534c51_Jake-Marshall.png' WHERE name = 'Jake Marshall';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/bad52d00a_lakey-peterson.png' WHERE name = 'Lakey Peterson';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/18462750c_brisa-hennessy.png' WHERE name = 'Brisa Hennessy';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/3d429d86a_Crosby-Colapinto.png' WHERE name = 'Crosby Colapinto';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/71246df27_Matt-Mcgillvary.png' WHERE name = 'Matthew McGillivray';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/316c4ab51_Miggy-Pupo.png' WHERE name = 'Miguel Pupo';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/a76d045f8_Ryan-Callinan.png' WHERE name = 'Ryan Callinan';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/5b1b7ae8f_Sammy-Pupo.png' WHERE name = 'Samuel Pupo';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/b91cac22b_luana-silva.png' WHERE name = 'Luana Silva';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/52b4ebf42_sally-fitzgibbons.png' WHERE name = 'Sally Fitzgibbons';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/90096d2c3_Imaikalani.png' WHERE name = 'Imaikalani deVault';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/f65c34ae8_Rio-M.png' WHERE name = 'Rio Waida';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/88b56d5e2_isabella-nichols.png' WHERE name = 'Isabella Nichols';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/f29351216_sawyer-linblad.png' WHERE name = 'Sawyer Lindblad';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/5c838d264_Seth-Moniz.png' WHERE name = 'Seth Moniz';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/31e93a77d_Jackson-Bunch.png' WHERE name = 'Jackson Bunch';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/af2d4a5a4_Marco-Mignot.png' WHERE name = 'Marco Mignot';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/346b79f60_Al-Cleland.png' WHERE name = 'Alan Cleland';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/409612f2e_Ian-Gentil.png' WHERE name = 'Ian Gentil';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/60acda1fa_Ramzi-Boukhaim.png' WHERE name = 'Ramzi Boukhiam';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/326cc8f41_bella-kenworthy.png' WHERE name = 'Bella Kenworthy';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/5cadaecc4_George-Pittar.png' WHERE name = 'George Pittar';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/94b9eedd2_johanne-defay.png' WHERE name = 'Johanne Defay';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68ce1bb0c05c7a47021428e9/6c42e2917_tatiana-weston-webb.png' WHERE name = 'Tatiana Weston-Webb';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/fa1a35c18_Alejo-Munoz.png' WHERE name = 'Alejo Muniz';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/75c090fdf_Devid-Silva.png' WHERE name = 'Deivid Silva';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/85e334aeb_Ian-Gouveia.png' WHERE name = 'Ian Gouveia';
+UPDATE public.surfers SET image = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68cd1329092f16fac35385c3/44eb6a48f_Ed-groggia.png' WHERE name = 'Edgard Groggia';
