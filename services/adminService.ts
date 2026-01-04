@@ -251,23 +251,51 @@ export const COUNTRY_FLAGS: { [key: string]: string } = {
     'UNK': '🏳️'
 };
 
+const NORMALIZE_COUNTRY: { [key: string]: string } = {
+    'AUSTRALIA': 'AUS', 'AMERICA': 'USA', 'UNITED STATES': 'USA',
+    'BRAZIL': 'BRA', 'BRASIL': 'BRA',
+    'HAWAII': 'HAW',
+    'FRANCE': 'FRA',
+    'SOUTH AFRICA': 'ZAF',
+    'JAPAN': 'JPN',
+    'ITALY': 'ITA',
+    'PORTUGAL': 'PRT',
+    'INDONESIA': 'IDN',
+    'MEXICO': 'MEX',
+    'TAHITI': 'PYF', 'FRENCH POLYNESIA': 'PYF'
+};
+
 export const getOrCreateSurfer = async (name: string, countryCode?: string) => {
-    // Resolve Flag
+    // Resolve Flag and Code
     let flag = '🏳️';
     let country = 'UNK';
 
     if (countryCode) {
-        country = countryCode.toUpperCase();
+        const rawUpper = countryCode.toUpperCase().trim();
+        // 1. Check if it's a known full name
+        if (NORMALIZE_COUNTRY[rawUpper]) {
+            country = NORMALIZE_COUNTRY[rawUpper];
+        } else if (rawUpper.length === 3) {
+            // Assume it's already a code
+            country = rawUpper;
+        } else {
+            // Fallback: Store what we got, but flag will likely be white
+            country = rawUpper;
+        }
+
         flag = COUNTRY_FLAGS[country] || '🏳️';
-        if (country === 'HAW') flag = '🇺🇸'; // Special case override if needed
+        if (country === 'HAW') flag = '🇺🇸'; // Special case override
     }
 
     // 1. Try to find
     const existing = await findSurferByName(name);
 
     if (existing) {
-        // UPDATE if country provided and different
-        if (countryCode && existing.country !== country) {
+        // UPDATE if country provided and different (or if flag is missing/white but we have a better one)
+        // Also update if the existing flag is white/default and we have a real one now.
+        const shouldUpdate = (countryCode && existing.country !== country) || (flag !== '🏳️' && existing.flag === '🏳️');
+
+        if (shouldUpdate) {
             const { data: updated, error: updateErr } = await supabase
                 .from('surfers')
                 .update({ country, flag })

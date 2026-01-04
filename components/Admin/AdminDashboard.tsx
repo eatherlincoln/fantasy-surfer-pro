@@ -115,7 +115,7 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
                                 <div>
                                     <div className="font-bold text-sm text-gray-900 flex items-center gap-2">
                                         {surfer.name}
-                                        <span className="text-xs font-normal opacity-50">{surfer.country} {surfer.flag}</span>
+                                        <span className="text-xl leading-none" title={surfer.country}>{surfer.flag}</span>
                                         <button
                                             onClick={() => {
                                                 if (confirm('Remove ' + surfer.name + ' from heat?')) {
