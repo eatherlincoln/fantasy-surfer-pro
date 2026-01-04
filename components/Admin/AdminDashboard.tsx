@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
     createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, deleteEvent, deleteHeat, createHeatAssignment, deleteHeatAssignment, submitWaveScore,
     eliminateSurfer, advanceSurfer, getOrCreateSurfer,
-    finalizeHeat, updateEvent, getUsers, toggleUserBan
+    finalizeHeat, updateEvent, getUsers, toggleUserBan,
+    type Event, type Heat
 } from '../../services/adminService';
 import { supabase } from '../../services/supabase';
 import Papa from 'papaparse';
@@ -245,21 +246,26 @@ const AdminDashboard: React.FC = () => {
 
     // UI State
     const [activeRound, setActiveRound] = useState<string>('Round 1');
+    const [activeTab, setActiveTab] = useState<'EVENTS' | 'USERS'>('EVENTS');
 
     // Forms
     const [newEventName, setNewEventName] = useState('');
     const [newEventSlug, setNewEventSlug] = useState('');
+    const [newEventImage, setNewEventImage] = useState('');
+    const [newEventAiContext, setNewEventAiContext] = useState('');
+
     const [newHeatRound, setNewHeatRound] = useState(1);
     const [newHeatNum, setNewHeatNum] = useState(1);
+
+    // Users Data
+    const [users, setUsers] = useState<any[]>([]);
 
     // State for CSV Import
     const [targetRound, setTargetRound] = useState<number>(0);
 
     useEffect(() => { checkAdmin(); }, []);
     useEffect(() => { if (isAdmin) loadEvents(); }, [isAdmin]);
-    useEffect(() => {
-        if (selectedEvent) loadHeats(selectedEvent.id);
-    }, [selectedEvent]);
+    useEffect(() => { if (isAdmin && activeTab === 'USERS') loadUsers(); }, [isAdmin, activeTab]);
 
     const checkAdmin = async () => {
         const { data: { user } } = await supabase.auth.getUser();
@@ -268,6 +274,7 @@ const AdminDashboard: React.FC = () => {
     };
 
     const loadEvents = async () => setEvents(await getEvents());
+    const loadUsers = async () => setUsers(await getUsers());
 
     const loadHeats = async (eventId: string) => {
         const data = await getHeats(eventId);
