@@ -111,7 +111,12 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
                     return (
                         <div key={surfer.id} className="p-3 flex items-center justify-between group">
                             <div className="flex items-center gap-3">
-                                <img src={surfer.image} alt={surfer.name} className="w-10 h-10 rounded-full object-cover border border-gray-100 bg-gray-100" />
+                                <img
+                                    src={surfer.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(surfer.name)}&background=random`}
+                                    alt={surfer.name}
+                                    onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(surfer.name)}&background=random`; }}
+                                    className="w-10 h-10 rounded-full object-cover border border-gray-100 bg-gray-100"
+                                />
                                 <div>
                                     <div className="font-bold text-sm text-gray-900 flex items-center gap-2">
                                         {surfer.name}
