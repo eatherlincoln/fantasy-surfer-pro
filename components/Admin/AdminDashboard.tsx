@@ -40,14 +40,22 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
 
     const handleAddSurfer = async () => {
         if (!searchName.trim()) return;
-        const surfer = await findSurferByName(searchName);
-        if (surfer) {
-            await createHeatAssignment(heat.id, surfer.id);
-            setSearchName('');
-            setIsAdding(false);
-            onRefresh();
-        } else {
-            alert(`Surfer '${searchName}' not found in database.`);
+        try {
+            const surfer = await findSurferByName(searchName);
+            if (surfer) {
+                const { error } = await createHeatAssignment(heat.id, surfer.id);
+                if (error) {
+                    alert(`Error adding surfer: ${error.message}`);
+                } else {
+                    setSearchName('');
+                    setIsAdding(false);
+                    onRefresh();
+                }
+            } else {
+                alert(`Surfer '${searchName}' not found in database. Check spelling.`);
+            }
+        } catch (e: any) {
+            alert(`System Error: ${e.message}`);
         }
     };
 
@@ -302,8 +310,12 @@ const AdminDashboard: React.FC = () => {
                             const surfer = await findSurferByName(surferName);
                             if (surfer) {
                                 // Try assignment (ignore if exists)
-                                await createHeatAssignment(heatId, surfer.id).catch(() => { });
-                                assignedCount++;
+                                const { error: assignErr } = await createHeatAssignment(heatId, surfer.id);
+                                if (!assignErr) {
+                                    assignedCount++;
+                                } else if (assignErr.code !== '23505') { // Ignore unique violation
+                                    console.error('Assign Error:', assignErr);
+                                }
 
                                 // Scores?
                                 // User Format: Heat (0) | Name (1) | Country (2) | Total (3) | Wave 1 (4) | Wave 2 (5) | Status (6)
@@ -321,6 +333,7 @@ const AdminDashboard: React.FC = () => {
                                 else if (status.includes('ADV')) await advanceSurfer(surfer.id);
                             } else {
                                 console.warn('Surfer not found:', surferName);
+                                // Optional: Alert on first few failures?
                             }
                         }
 
@@ -330,7 +343,11 @@ const AdminDashboard: React.FC = () => {
                 }
 
                 setLoading(false);
-                alert(`Import Processed.\nHeats Checked: ${processedCount}\nAssignments: ${assignedCount}`);
+                if (processedCount === 0) {
+                    alert("⚠️ No heats were detected!\n\nCheck:\n1. Did you select the correct Round?\n2. Does Column A start with 'HEAT' (e.g. 'HEAT 1')?");
+                } else {
+                    alert(`✅ Import Complete!\n\n• Heats Found: ${processedCount}\n• Surfers Assigned: ${assignedCount}\n\nIf assignments are low, check surfer name spelling.`);
+                }
                 loadHeats(selectedEvent.id);
             }
         });
