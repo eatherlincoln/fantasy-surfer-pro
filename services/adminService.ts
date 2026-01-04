@@ -217,12 +217,17 @@ export const createHeatAssignment = async (heatId: string, surferId: string) => 
 };
 
 export const deleteHeatAssignment = async (heatId: string, surferId: string) => {
+    console.log('Deleting assignment:', { heatId, surferId });
     const { error } = await supabase
         .from('heat_assignments')
         .delete()
-        .match({ heat_id: heatId, surfer_id: surferId });
+        .eq('heat_id', heatId)
+        .eq('surfer_id', surferId); // Logical AND by default
 
-    if (error) throw error;
+    if (error) {
+        console.error('Delete Error:', error);
+        throw error;
+    }
 };
 
 // Helper to find a surfer by name (fuzzy match or exact)

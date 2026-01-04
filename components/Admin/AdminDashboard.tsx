@@ -112,7 +112,13 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
                                         {surfer.name}
                                         <span className="text-xs font-normal opacity-50">{surfer.country} {surfer.flag}</span>
                                         <button
-                                            onClick={() => deleteHeatAssignment(heat.id, surfer.id).then(onRefresh)}
+                                            onClick={() => {
+                                                if (confirm('Remove ' + surfer.name + ' from heat?')) {
+                                                    deleteHeatAssignment(heat.id, surfer.id)
+                                                        .then(onRefresh)
+                                                        .catch(e => alert('Failed to remove: ' + e.message));
+                                                }
+                                            }}
                                             className="text-gray-200 hover:text-red-500 material-icons-round text-[10px]"
                                             title="Remove Surfer"
                                         >
