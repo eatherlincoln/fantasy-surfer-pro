@@ -10,7 +10,14 @@ export interface Event {
     end_date: string;
     header_image?: string;
     ai_context?: string;
+    is_current?: boolean;
 }
+
+export const setEventAsCurrent = async (eventId: string) => {
+    // Call the RPC function we just created
+    const { error } = await supabase.rpc('set_active_event', { target_event_id: eventId });
+    if (error) throw error;
+};
 
 export const uploadEventImage = async (file: File) => {
     const fileExt = file.name.split('.').pop();

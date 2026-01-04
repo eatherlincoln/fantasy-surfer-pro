@@ -3,7 +3,7 @@ import {
     createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, deleteEvent, deleteHeat, createHeatAssignment, deleteHeatAssignment, submitWaveScore,
     eliminateSurfer, advanceSurfer, getOrCreateSurfer,
     finalizeHeat, updateEvent, getUsers, toggleUserBan,
-    uploadEventImage,
+    uploadEventImage, setEventAsCurrent,
     type Event, type Heat
 } from '../../services/adminService';
 import { supabase } from '../../services/supabase';
@@ -704,6 +704,23 @@ const AdminDashboard: React.FC = () => {
                                         className="mt-3 text-[10px] text-red-500 hover:underline opacity-50 hover:opacity-100"
                                     >
                                         Delete Forever
+                                    </button>
+
+                                    {/* Set Active Button */}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEventAsCurrent(event.id).then(loadEvents);
+                                        }}
+                                        className={`absolute top-4 right-4 p-2 rounded-full transition-all ${event.is_current
+                                            ? 'text-yellow-400 hover:scale-110 drop-shadow-sm'
+                                            : 'text-gray-200 hover:text-yellow-400'
+                                            }`}
+                                        title={event.is_current ? "Currently Active Event" : "Set as Current Event"}
+                                    >
+                                        <span className="material-icons-round text-xl">
+                                            {event.is_current ? 'star' : 'star_border'}
+                                        </span>
                                     </button>
                                 </button>
                             ))}

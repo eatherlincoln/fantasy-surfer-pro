@@ -40,6 +40,14 @@ const App: React.FC = () => {
     // Fetch Active Event
     const fetchEvent = async () => {
       try {
+        // 1. Try to find the explicitly marked "current" event
+        const { data: current } = await supabase.from('events').select('*').eq('is_current', true).single();
+        if (current) {
+          setActiveEvent(current);
+          return;
+        }
+
+        // 2. Fallback: Latest upcoming or acting event
         const { data } = await supabase.from('events').select('*').order('start_date', { ascending: false }).limit(1).single();
         if (data) setActiveEvent(data);
       } catch (e) { console.error(e); }
