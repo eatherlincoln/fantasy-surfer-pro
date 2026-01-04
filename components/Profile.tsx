@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
+import { View } from '../types';
 
 interface UserProfile {
   username: string | null;
@@ -10,8 +11,6 @@ interface UserProfile {
   events_won?: number;
   events_lost?: number;
 }
-
-import { View } from '../types';
 
 interface ProfileProps {
   onNavigate?: (view: View) => void;
