@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, deleteEvent, deleteHeat, createHeatAssignment, findSurferByName, submitWaveScore, eliminateSurfer, advanceSurfer, Event, Heat } from '../../services/adminService';
+import { createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, deleteEvent, deleteHeat, createHeatAssignment, deleteHeatAssignment, findSurferByName, getOrCreateSurfer, submitWaveScore, eliminateSurfer, advanceSurfer, Event, Heat } from '../../services/adminService';
 import { supabase } from '../../services/supabase';
 import Papa from 'papaparse';
 

@@ -238,3 +238,34 @@ export const findSurferByName = async (name: string) => {
     return data;
 };
 
+export const getOrCreateSurfer = async (name: string) => {
+    // 1. Try to find
+    const existing = await findSurferByName(name);
+    if (existing) return existing;
+
+    // 2. Create if missing
+    // Defaults for new/wildcard surfers
+    const newSurfer = {
+        name: name,
+        country: 'UNK',
+        flag: '🏳️',
+        stance: 'Regular',
+        gender: 'Male', // Default to Male for mixed CSVs unless specified? Risk.
+        tier: 'C',
+        value: 5.0,
+        image: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`
+    };
+
+    const { data, error } = await supabase
+        .from('surfers')
+        .insert(newSurfer)
+        .select('id, name')
+        .single();
+
+    if (error) {
+        console.error('Error auto-creating surfer:', error);
+        return null; // Should we throw?
+    }
+    return data;
+};
+
