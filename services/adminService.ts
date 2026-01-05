@@ -311,6 +311,7 @@ export const getAllSurfers = async () => {
     const { data, error } = await supabase
         .from('surfers')
         .select('*')
+        .eq('is_on_tour', true)
         .order('value', { ascending: false }); // Default sort by value
 
     if (error) throw error;
