@@ -108,10 +108,30 @@ export const getLeagueLeaderboard = async (leagueId: string) => {
         avatar_url,
         team_name,
         events_won,
-        events_lost
+        events_lost 
       )
     `)
         .eq('league_id', leagueId);
+
+    if (error) throw error;
+    return data;
+};
+
+export const getGlobalLeaderboard = async () => {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+            id,
+            username,
+            full_name,
+            team_name,
+            avatar_url,
+            events_won,
+            events_lost
+        `)
+        // NOTE: total_points doesn't exist yet, so we just return profiles for now.
+        // We will need to calculate points based on their team or add a total_points column later.
+        .limit(100);
 
     if (error) throw error;
     return data;

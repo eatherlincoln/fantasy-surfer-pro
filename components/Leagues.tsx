@@ -1,20 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Surfer, Tier, UserProfile } from '../types';
-import { createLeague, joinLeague, getUserLeagues, getLeagueLeaderboard, League, LeagueMember } from '../services/leagueService';
+import { createLeague, joinLeague, getUserLeagues, getLeagueLeaderboard, getGlobalLeaderboard, League, LeagueMember } from '../services/leagueService';
 import { supabase } from '../services/supabase';
 
 interface LeaguesProps {
   userTeam: Surfer[];
   userProfile: UserProfile | null;
 }
-
-const MOCK_GLOBAL_MEMBERS: any[] = [
-  { id: '2', rank: 2, name: 'Mike', initial: 'M', points: 122.3, surfersLeft: 3, trend: 'down', trendValue: 1, avatar: 'https://ui-avatars.com/api/?name=Mike&background=random' },
-  { id: '3', rank: 3, name: 'Sarah', initial: 'S', points: 118.9, surfersLeft: 2, trend: 'up', trendValue: 2, avatar: 'https://ui-avatars.com/api/?name=Sarah&background=random' },
-  { id: '4', rank: 4, name: 'Jake', initial: 'J', points: 115.2, surfersLeft: 1, trend: 'down', trendValue: 2, avatar: 'https://ui-avatars.com/api/?name=Jake&background=random' },
-  { id: '5', rank: 5, name: 'Emma', initial: 'E', points: 108.7, surfersLeft: 0, trend: 'neutral' },
-  { id: '6', rank: 6, name: 'Chris', initial: 'C', points: 104.1, surfersLeft: 1, trend: 'up', trendValue: 1 },
-];
 
 const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
   const [expandedId, setExpandedId] = useState<string | null>('1');
@@ -26,6 +18,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
   const [userLeagues, setUserLeagues] = useState<League[]>([]);
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null);
   const [leagueMembers, setLeagueMembers] = useState<any[]>([]);
+  const [globalMembers, setGlobalMembers] = useState<any[]>([]);
   const [showLeagueModal, setShowLeagueModal] = useState<'CREATE' | 'JOIN' | null>(null);
   const [leagueInput, setLeagueInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +28,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
   useEffect(() => {
     if (userProfile?.team_name) setTeamName(userProfile.team_name);
     fetchUserLeagues();
+    fetchGlobalLeaderboard();
 
     // Check for Deep Link on mount
     const params = new URLSearchParams(window.location.search);
@@ -55,6 +49,33 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
       setLeagueMembers([]);
     }
   }, [selectedLeague]);
+
+  const fetchGlobalLeaderboard = async () => {
+    try {
+      const data = await getGlobalLeaderboard();
+      // Temporary: Since total_points isn't accurately tracking yet via triggers, we map what we have.
+      const transformedGlobal = data.map((profile: any, idx: number) => ({
+        id: profile.id,
+        rank: idx + 1, // Order of rows
+        name: profile.team_name || profile.username || profile.full_name || 'Unknown',
+        initial: (profile.team_name || profile.username || '?')[0].toUpperCase(),
+        points: profile.events_won || 0, // Placeholder until scoring engine is wired
+        surfersLeft: 4,
+        trend: 'neutral',
+        isUser: profile.id === userProfile?.id,
+        avatar: profile.avatar_url
+      }));
+
+      // Sort by whatever placeholder metric we use (events_won right now)
+      transformedGlobal.sort((a, b) => b.points - a.points);
+
+      // Update ranks post-sort
+      const finalGlobal = transformedGlobal.map((g, i) => ({ ...g, rank: i + 1 }));
+      setGlobalMembers(finalGlobal);
+    } catch (error) {
+      console.error('Error fetching global leaderboard:', error);
+    }
+  };
 
   const fetchUserLeagues = async () => {
     try {
@@ -178,7 +199,11 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
         lineup: userStats.lineup,
         avatar: userProfile?.avatar_url || undefined,
       };
-      return [userMember, ...MOCK_GLOBAL_MEMBERS];
+
+      // Remove double counting the user from the global list, handle it here
+      const filteredGlobal = globalMembers.filter(m => m.id !== userProfile?.id)
+
+      return [userMember, ...filteredGlobal];
     } else {
       // If viewing a custom league
       return leagueMembers.length > 0 ? leagueMembers : [];

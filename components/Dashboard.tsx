@@ -82,10 +82,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
         />
         {/* Overlay Controls */}
         <div className="absolute bottom-8 left-8 z-20">
-          <button onClick={onSimulate} className="h-12 px-8 rounded-full bg-white text-primary-dark font-black uppercase tracking-widest shadow-lg hover:bg-gray-50 active:scale-95 transition flex items-center gap-2">
-            <span className="material-icons-round">bolt</span>
-            Sim Wave
-          </button>
+          {/* Sim Wave button removed for production */}
         </div>
       </div>
 
