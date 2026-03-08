@@ -91,20 +91,20 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     setIsAiLoading(true);
     try {
       const ai = new GoogleGenAI({ apiKey });
-      const prompt = `You are an expert World Surf League fantasy analyst. 
+      const prompt = `Act as a professional, grounded surf journalist analyzing a fantasy surfing roster. 
       Current Event: ${activeEvent?.name || 'Upcoming Event'}.
       Context: ${activeEvent?.ai_context || 'Standard conditions expected.'}.
       Available Surfers (Top 5 Value): ${allSurfers.slice(0, 5).map(s => s.name).join(', ')}.
       Suggest a strategy for selecting a team for this event given a $60M budget.
-      Keep the response concise (max 3 sentences) and highly strategic.`;
+      Rules: Keep the response concise (max 3 sentences). Do NOT use markdown symbols (no asterisks or bolding). Write in a tight, analytical tone.`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash-exp',
+        model: 'gemini-2.5-flash',
         contents: prompt,
       });
       setAiAdvice(response.text);
     } catch (error) {
-      setAiAdvice("Scouting report unavailable. Trust your instincts, champ.");
+      setAiAdvice("Scouting report system is currently offline. Please rely on your own heat analysis for this draft.");
     } finally {
       setIsAiLoading(false);
     }

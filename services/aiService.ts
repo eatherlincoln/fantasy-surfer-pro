@@ -61,10 +61,11 @@ export const generateBriefing = async (team: { name: string, tier: string }[], t
     if (!aiClient) return "AI Endpoint Missing: VITE_GEMINI_API_KEY must be added to Vercel Environment Variables.";
 
     const roster = team.map(s => `${s.name} (${s.tier})`).join(', ');
-    const prompt = `You are a hype-man and strategic analyst for a fantasy surfing app. 
-    The user has drafted this team for the Pipeline Pro: ${roster}. 
+    const prompt = `Act as a professional, grounded surf journalist analyzing a fantasy surfing app. 
+    The user has drafted this team for the upcoming event: ${roster}. 
     Total Points so far: ${totalPoints.toFixed(2)}. 
-    Give a 2-sentence energetic summary of their roster's potential and one "surfer to watch" today.`;
+    Give a 2-sentence analytical summary of their roster's potential and one "surfer to watch" today.
+    Rules: Do NOT use markdown symbols (no asterisks or bolding). Write in a tight, professional tone.`;
 
     try {
         const response = await aiClient.models.generateContent({
