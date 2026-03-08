@@ -1,21 +1,19 @@
-
 import { GoogleGenAI } from "@google/genai";
 
-// Initialize the Google GenAI client
-// Using process.env.GEMINI_API_KEY as defined in vite.config.ts defaults
-const apiKey = process.env.GEMINI_API_KEY || '';
-
-// We handle the case where API key might be missing gracefully in the functions
-let aiClient: GoogleGenAI | null = null;
-if (apiKey) {
+const getAiClient = () => {
+    // We check import.meta.env.VITE_GEMINI_API_KEY
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) return null;
     try {
-        aiClient = new GoogleGenAI({ apiKey });
+        return new GoogleGenAI({ apiKey });
     } catch (err) {
         console.error("Failed to initialize GoogleGenAI client:", err);
+        return null;
     }
-}
+};
 
 export const generateSurfCommentary = async (surferName: string, score: number, status: string): Promise<string> => {
+    const aiClient = getAiClient();
     if (!aiClient) {
         console.warn("Gemini API Key missing, returning fallback commentary.");
         return `Great surfing by ${surferName}! Scored ${score}.`;
@@ -42,6 +40,7 @@ export const generateSurfCommentary = async (surferName: string, score: number, 
 };
 
 export const predictHeatOutcome = async (surfers: { name: string, country: string, tier: string }[]): Promise<string> => {
+    const aiClient = getAiClient();
     if (!aiClient) return "Prediction unavailable.";
 
     const surferList = surfers.map(s => `${s.name} (${s.country}, Tier ${s.tier})`).join(", ");
@@ -61,6 +60,7 @@ export const predictHeatOutcome = async (surfers: { name: string, country: strin
 };
 
 export const generateBriefing = async (team: { name: string, tier: string }[], totalPoints: number): Promise<string> => {
+    const aiClient = getAiClient();
     if (!aiClient) return "Draft your team to get your personalized AI scouting report.";
 
     const roster = team.map(s => `${s.name} (${s.tier})`).join(', ');

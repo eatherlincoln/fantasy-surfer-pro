@@ -84,6 +84,7 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
     const [inputs, setInputs] = useState<{ [surferId: string]: string }>({});
     const [isAdding, setIsAdding] = useState(false);
     const [searchName, setSearchName] = useState('');
+    const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
     const handleAddSurfer = async () => {
         if (!searchName.trim()) return;
@@ -202,6 +203,47 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
             <div className="bg-gray-50 p-3 border-t border-gray-100 flex justify-end gap-2">
                 {heat.status !== 'COMPLETED' ? (
                     <>
+                        {isConfirmingDelete ? (
+                            <div className="mr-auto flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest">SURE?</span>
+                                <button
+                                    type="button"
+                                    onClick={async (e) => {
+                                        e.preventDefault();
+                                        try {
+                                            await deleteHeat(heat.id);
+                                            onRefresh();
+                                        } catch (e: any) {
+                                            alert('Error: ' + e.message);
+                                        }
+                                    }}
+                                    className="text-[10px] bg-red-500 text-white px-2 py-1 rounded font-bold hover:bg-red-600"
+                                >
+                                    YES
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setIsConfirmingDelete(false);
+                                    }}
+                                    className="text-[10px] bg-gray-200 text-gray-700 px-2 py-1 rounded font-bold hover:bg-gray-300"
+                                >
+                                    NO
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setIsConfirmingDelete(true);
+                                }}
+                                className="text-[10px] mr-auto text-red-400 hover:text-red-700 font-bold uppercase tracking-wider"
+                            >
+                                DELETE
+                            </button>
+                        )}
                         {heat.status !== 'LIVE' && (
                             <button
                                 onClick={() => startHeat(heat.id).then(onRefresh)}
@@ -242,23 +284,40 @@ const EventDetailsEditor = ({ event, onUpdate }: { event: Event, onUpdate: () =>
     // Local state to prevent "carry over" bugs. Initialized from props.
     const [headerImage, setHeaderImage] = useState(event.header_image || '');
     const [aiContext, setAiContext] = useState(event.ai_context || '');
+    const [swellHeight, setSwellHeight] = useState(event.swell_height || '');
+    const [conditions, setConditions] = useState(event.conditions || '');
+    const [swellStatus, setSwellStatus] = useState(event.swell_status || '');
     const [isSaving, setIsSaving] = useState(false);
 
     // Sync state when event prop changes (Fixes persistence bug)
     useEffect(() => {
         setHeaderImage(event.header_image || '');
         setAiContext(event.ai_context || '');
+        setSwellHeight(event.swell_height || '');
+        setConditions(event.conditions || '');
+        setSwellStatus(event.swell_status || '');
     }, [event.id]);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Optimistic preview could go here
+        // Optimistic preview
         try {
             setIsSaving(true);
             const publicUrl = await uploadEventImage(file);
             setHeaderImage(publicUrl);
+
+            // Auto-save the event since file uploads intuitively should save immediately
+            await updateEvent(event.id, {
+                header_image: publicUrl,
+                ai_context: aiContext,
+                swell_height: swellHeight,
+                conditions: conditions,
+                swell_status: swellStatus
+            });
+            onUpdate();
+
             setIsSaving(false);
         } catch (error: any) {
             alert('Upload failed: ' + error.message);
@@ -271,7 +330,10 @@ const EventDetailsEditor = ({ event, onUpdate }: { event: Event, onUpdate: () =>
         try {
             await updateEvent(event.id, {
                 header_image: headerImage,
-                ai_context: aiContext
+                ai_context: aiContext,
+                swell_height: swellHeight,
+                conditions: conditions,
+                swell_status: swellStatus
             });
             onUpdate();
             alert('✅ Event details saved!');
@@ -334,6 +396,37 @@ const EventDetailsEditor = ({ event, onUpdate }: { event: Event, onUpdate: () =>
                 </div>
             </div>
 
+            {/* Forecast Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div className="space-y-3 flex flex-col">
+                    <label className="block text-xs font-bold text-gray-400 uppercase">Swell Status Pill</label>
+                    <input
+                        className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black outline-none"
+                        placeholder="e.g. Good, Trash, Pumping..."
+                        value={swellStatus}
+                        onChange={e => setSwellStatus(e.target.value)}
+                    />
+                </div>
+                <div className="space-y-3 flex flex-col">
+                    <label className="block text-xs font-bold text-gray-400 uppercase">Swell Height</label>
+                    <input
+                        className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black outline-none"
+                        placeholder="e.g. 6-8ft"
+                        value={swellHeight}
+                        onChange={e => setSwellHeight(e.target.value)}
+                    />
+                </div>
+                <div className="space-y-3 flex flex-col md:col-span-2">
+                    <label className="block text-xs font-bold text-gray-400 uppercase">Forecast Conditions Description</label>
+                    <input
+                        className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black outline-none"
+                        placeholder="e.g. Clean • Light Offshore"
+                        value={conditions}
+                        onChange={e => setConditions(e.target.value)}
+                    />
+                </div>
+            </div>
+
             <div className="mt-6 flex justify-end">
                 <button
                     onClick={handleSave}
@@ -358,7 +451,7 @@ const AdminDashboard: React.FC = () => {
     const [heats, setHeats] = useState<Heat[]>([]);
 
     // UI State
-    const [activeRound, setActiveRound] = useState<string>('Round 1');
+    const [activeRound, setActiveRound] = useState<string>('1');
     const [activeTab, setActiveTab] = useState<'EVENTS' | 'USERS'>('EVENTS');
 
     // Forms
@@ -409,7 +502,13 @@ const AdminDashboard: React.FC = () => {
 
     const handleDeleteEvent = async (id: string) => {
         if (!confirm('Are you sure?')) return;
-        await deleteEvent(id); setSelectedEvent(null); loadEvents();
+        try {
+            await deleteEvent(id);
+            setSelectedEvent(null);
+            loadEvents();
+        } catch (e: any) {
+            alert('Failed to delete event: ' + e.message);
+        }
     };
 
     const handleCreateHeat = async () => {
@@ -449,13 +548,14 @@ const AdminDashboard: React.FC = () => {
 
                 // Helper to detect round from section headers
                 const getRoundFromLine = (line: any[]) => {
-                    const text = line.join(' ').toUpperCase();
-                    if (text.includes('OPEN ROUND') || text.includes('OPENING ROUND')) return 1;
-                    if (text.includes('ELIM ROUND') || text.includes('ELIMINATION')) return 2;
-                    if (text.includes('ROUND OF 16')) return 3;
-                    if (text.includes('QUARTER') || text.includes('QF')) return 4;
-                    if (text.includes('SEMI') || text.includes('SF')) return 5;
-                    if (text.includes('FINAL')) return 6;
+                    const text = (line[0] || '').toString().toUpperCase();
+                    if (text.includes('ROUND OF 80') || text.includes('OPENING') || text.includes('R80')) return 1;
+                    if (text.includes('ROUND OF 64') || text.includes('ELIMINATION') || text.includes('R64')) return 2;
+                    if (text.includes('ROUND OF 32') || text.includes('R32')) return 3;
+                    if (text.includes('ROUND OF 16')) return 4;
+                    if (text.includes('QUARTER') || text.includes('QF')) return 5;
+                    if (text.includes('SEMI') || text.includes('SF')) return 6;
+                    if (text.includes('FINAL') && !text.includes('QUARTER') && !text.includes('SEMI')) return 7;
                     return null;
                 };
 
@@ -478,17 +578,16 @@ const AdminDashboard: React.FC = () => {
 
                     if (!surferName) continue;
 
-                    // Basic validation: does col 0 look like "HEAT X" or just a number?
-                    // User format: "HEAT 1"
+                    // Basic validation: User format: "HEAT 1" or "1"
+                    let parsedHeatNum = parseInt(heatStr);
                     if (!heatStr.toUpperCase().includes('HEAT') && !heatStr.toUpperCase().includes('QF') && !heatStr.toUpperCase().includes('SF') && !heatStr.toUpperCase().includes('FINAL')) {
                         // Some files might just have numbers "1", "2" etc? 
-                        // Check if it's a number
-                        if (isNaN(parseInt(heatStr))) continue;
+                        if (isNaN(parsedHeatNum)) continue; // Skip if it's completely invalid text
                     }
 
                     try {
                         const heatNumMatch = heatStr.match(/(\d+)/);
-                        const heatNum = heatNumMatch ? parseInt(heatNumMatch[0]) : 1;
+                        const heatNum = heatNumMatch ? parseInt(heatNumMatch[0]) : (isNaN(parseInt(heatStr)) ? 1 : parseInt(heatStr));
 
                         // 2. Get OR Create Heat
                         const heatKey = `${currentRound}-${heatNum}`;
@@ -575,17 +674,18 @@ const AdminDashboard: React.FC = () => {
 
     // Better Round Names Mapping
     const getRoundName = (r: number) => {
-        if (r === 1) return 'Opening Round';
-        if (r === 2) return 'Elimination Round';
-        if (r === 3) return 'Round of 16';
-        if (r === 4) return 'Quarterfinals';
-        if (r === 5) return 'Semifinals';
-        if (r === 6) return 'Final';
+        if (r === 1) return 'round of 80';
+        if (r === 2) return 'round of 64';
+        if (r === 3) return 'round of 32';
+        if (r === 4) return 'round of 16';
+        if (r === 5) return 'quarter finals';
+        if (r === 6) return 'semi finals';
+        if (r === 7) return 'final';
         return `Round ${r}`;
     };
 
-    const rounds = [...new Set(heats.map(h => `${h.round_number}`))] // Convert to string for tab comparison
-        .sort((a, b) => parseInt(a) - parseInt(b)); // Sort numerically
+    // Always render tabs 1 through 7 for the Challenger Series (so commissioners can proactively view/add to future rounds)
+    const rounds = ['1', '2', '3', '4', '5', '6', '7'];
 
     const displayedHeats = heats.filter(h => `${h.round_number}` === activeRound || (activeRound === 'All'));
 
@@ -769,12 +869,13 @@ const AdminDashboard: React.FC = () => {
                                                 className="text-xs border rounded p-1 text-blue-800 bg-white"
                                             >
                                                 <option value={0}>Auto-Detect Round</option>
-                                                <option value={1}>Opening Round</option>
-                                                <option value={2}>Elimination Round</option>
-                                                <option value={3}>Round of 16</option>
-                                                <option value={4}>Quarterfinals</option>
-                                                <option value={5}>Semifinals</option>
-                                                <option value={6}>Final</option>
+                                                <option value={1}>round of 80</option>
+                                                <option value={2}>round of 64</option>
+                                                <option value={3}>round of 32</option>
+                                                <option value={4}>round of 16</option>
+                                                <option value={5}>quarter finals</option>
+                                                <option value={6}>semi finals</option>
+                                                <option value={7}>final</option>
                                             </select>
                                         </div>
                                         <input type="file" accept=".csv" onChange={handleFileUpload} className="text-xs text-blue-600 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-200 file:text-blue-800 hover:file:bg-blue-300" />

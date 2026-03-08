@@ -6,7 +6,7 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [isSignUpMode, setIsSignUpMode] = useState(false);
+  const [mode, setMode] = useState<'OAUTH' | 'SIGNUP' | 'LOGIN'>('OAUTH');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,10 +23,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         },
       });
       if (error) throw error;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login failed:", error);
-      // Fallback for demo/local if no keys
-      onLogin();
+      alert("Google Login Error: " + error.message + "\n\n(Please enable Google provider in your Supabase Auth settings)");
     }
   };
 
@@ -43,7 +42,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         onLogin();
       } else {
         alert('Check your email for the confirmation link! (For local dev, check Supabase Inbucket)');
-        setIsSignUpMode(false);
+        setMode('LOGIN');
       }
     } catch (error: any) {
       alert(error.message);
@@ -80,10 +79,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
       <h1 className="text-4xl font-extrabold tracking-tight mb-4">Fantasy Surfer</h1>
       <p className="text-gray-500 font-medium mb-12 max-w-[280px]">
-        {isSignUpMode ? 'Create an account to save your team.' : 'Build your dream team. Compete with friends.'}
+        {mode === 'SIGNUP' ? 'Create an account to save your team.' :
+          mode === 'LOGIN' ? 'Welcome back. Log in to manage your team.' :
+            'Build your dream team. Compete with friends.'}
       </p>
 
-      {isSignUpMode ? (
+      {mode === 'SIGNUP' ? (
         <form onSubmit={handleEmailSignUp} className="w-full max-w-sm space-y-4 animate-in fade-in slide-in-from-bottom-4">
           <input
             type="email"
@@ -112,10 +113,58 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
           <button
             type="button"
-            onClick={() => setIsSignUpMode(false)}
-            className="w-full text-gray-500 font-bold py-2"
+            onClick={() => setMode('LOGIN')}
+            className="w-full text-gray-500 font-bold py-2 hover:text-black transition-colors"
           >
-            Back to Login
+            Already have an account? Log In
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('OAUTH')}
+            className="w-full text-gray-400 font-medium text-sm py-1"
+          >
+            Back
+          </button>
+        </form>
+      ) : mode === 'LOGIN' ? (
+        <form onSubmit={handleEmailSignIn} className="w-full max-w-sm space-y-4 animate-in fade-in slide-in-from-bottom-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-4 rounded-2xl border border-stone-greige bg-white focus:outline-none focus:ring-2 focus:ring-sage-deep"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-4 rounded-2xl border border-stone-greige bg-white focus:outline-none focus:ring-2 focus:ring-sage-deep"
+            required
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-black text-white py-4 rounded-2xl font-bold transform transition-transform active:scale-95 disabled:opacity-50"
+          >
+            {loading ? 'Logging In...' : 'Log In'}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMode('SIGNUP')}
+            className="w-full text-gray-500 font-bold py-2 hover:text-black transition-colors"
+          >
+            Don't have an account? Sign Up
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('OAUTH')}
+            className="w-full text-gray-400 font-medium text-sm py-1"
+          >
+            Back
           </button>
         </form>
       ) : (
@@ -153,11 +202,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           </div>
 
           <button
-            onClick={() => setIsSignUpMode(true)}
+            onClick={() => setMode('LOGIN')}
             className="text-sage-deep font-bold hover:underline"
           >
-            Sign up with email
+            Log in with email
           </button>
+          <div className="text-xs text-gray-400 mt-2">
+            Don't have an account? <button onClick={() => setMode('SIGNUP')} className="font-bold cursor-pointer hover:underline text-gray-500">Sign Up</button>
+          </div>
         </div>
       )}
 

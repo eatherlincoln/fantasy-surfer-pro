@@ -11,6 +11,9 @@ export interface Event {
     header_image?: string;
     ai_context?: string;
     is_current?: boolean;
+    swell_height?: string;
+    conditions?: string;
+    swell_status?: string;
 }
 
 export const setEventAsCurrent = async (eventId: string) => {
@@ -206,6 +209,45 @@ export const endHeat = async (heatId: string) => {
 
 // --- Scoring & Surfer Management ---
 
+export const recalculateSurferPoints = async (surferId: string) => {
+    // 1. Fetch all scores for this surfer
+    const { data: scores, error } = await supabase
+        .from('scores')
+        .select('heat_id, wave_score')
+        .eq('surfer_id', surferId);
+
+    if (error) {
+        console.error("Error fetching scores for recalculation", error);
+        return;
+    }
+
+    // 2. Group by heat
+    const heatScores: Record<string, number[]> = {};
+    scores.forEach(s => {
+        if (!heatScores[s.heat_id]) heatScores[s.heat_id] = [];
+        heatScores[s.heat_id].push(Number(s.wave_score));
+    });
+
+    // 3. For each heat, sum top 2 waves
+    let totalPoints = 0;
+    for (const heatId in heatScores) {
+        const waves = heatScores[heatId].sort((a, b) => b - a);
+        const top2 = waves.slice(0, 2);
+        const heatTotal = top2.reduce((acc, val) => acc + val, 0);
+        totalPoints += heatTotal;
+    }
+
+    // 4. Update surfer
+    const { error: updateError } = await supabase
+        .from('surfers')
+        .update({ points: totalPoints })
+        .eq('id', surferId);
+
+    if (updateError) {
+        console.error("Error updating surfer points", updateError);
+    }
+};
+
 export const submitWaveScore = async (heatId: string, surferId: string, score: number) => {
     // 1. Insert Score
     const { data: scoreData, error: scoreError } = await supabase
@@ -216,9 +258,8 @@ export const submitWaveScore = async (heatId: string, surferId: string, score: n
 
     if (scoreError) throw scoreError;
 
-    // 2. Update Surfer's current heat points (Simplified logic for now)
-    // In a real app, we'd query top 2 waves and sum them here, or use a DB trigger.
-    // For MVP, we presume the frontend/admin calculates the total or we just log waves.
+    // 2. Automatically recalculate their entire event total (Sum of Best 2 waves per heat)
+    await recalculateSurferPoints(surferId);
 
     return scoreData;
 };
@@ -316,6 +357,32 @@ export const getAllSurfers = async () => {
 
     if (error) throw error;
     return data;
+};
+
+export const getEventSurfers = async (eventId: string) => {
+    const { data, error } = await supabase
+        .from('heats')
+        .select(`
+            heat_assignments (
+                surfers (*)
+            )
+        `)
+        .eq('event_id', eventId);
+
+    if (error) throw error;
+
+    // Flatten and deduplicate
+    const surfersMap = new Map();
+    data.forEach((heat: any) => {
+        heat.heat_assignments?.forEach((ha: any) => {
+            if (ha.surfers) {
+                surfersMap.set(ha.surfers.id, ha.surfers);
+            }
+        });
+    });
+
+    // Sort by value (High to Low)
+    return Array.from(surfersMap.values()).sort((a: any, b: any) => b.value - a.value);
 };
 
 // Flag Mapping

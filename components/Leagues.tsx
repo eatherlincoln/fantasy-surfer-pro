@@ -248,7 +248,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
           onClick={() => { setActiveTab('GLOBAL'); setSelectedLeague(null); }}
           className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${activeTab === 'GLOBAL' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}
         >
-          Pipeline Pro Global
+          Global Standings
         </button>
         <button
           onClick={() => setActiveTab('LEAGUES')}
@@ -261,7 +261,23 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
       {successMsg && (
         <div className="bg-green-100 text-green-700 p-3 rounded-xl mb-4 text-sm font-bold flex items-center gap-2">
           <span className="material-icons-round">check_circle</span> {successMsg}
-          <button onClick={() => setSuccessMsg(null)} className="ml-auto"><span className="material-icons-round">close</span></button>
+          <div className="ml-auto flex items-center gap-2">
+            {successMsg.includes('Code:') && (
+              <button
+                onClick={() => {
+                  const codeMatch = successMsg.match(/Code: ([A-Z0-9]+)/);
+                  if (codeMatch) {
+                    navigator.clipboard.writeText(`Join my Fantasy Pro Surfer league! Code: ${codeMatch[1]}`);
+                    alert('Invite text copied to clipboard!');
+                  }
+                }}
+                className="bg-green-200 text-green-800 px-3 py-1 rounded-lg text-[10px] uppercase tracking-wider flex items-center gap-1 hover:bg-green-300 transition"
+              >
+                <span className="material-icons-round text-xs">content_copy</span> Share
+              </button>
+            )}
+            <button onClick={() => setSuccessMsg(null)} className="opacity-50 hover:opacity-100"><span className="material-icons-round">close</span></button>
+          </div>
         </div>
       )}
 
@@ -317,6 +333,16 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
                       <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-md">
                         <span className="text-[10px] uppercase font-bold text-white/60">Invite Code:</span>
                         <span className="text-sm font-mono font-bold tracking-widest text-primary">{selectedLeague.code}</span>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(`Join my Fantasy Pro Surfer league! Code: ${selectedLeague.code}`);
+                            alert('League invite copied to clipboard!');
+                          }}
+                          className="ml-2 bg-white/20 hover:bg-white/30 text-white rounded p-1 transition flex items-center justify-center pointer-events-auto relative z-20"
+                          title="Copy Share Text"
+                        >
+                          <span className="material-icons-round text-sm">share</span>
+                        </button>
                       </div>
                     </div>
                     <span className="material-icons-round absolute -right-4 -bottom-4 text-9xl text-white/5 rotate-12">emoji_events</span>

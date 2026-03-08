@@ -76,8 +76,7 @@ const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
         id: user.id,
         username: formData.username,
         team_name: formData.team_name,
-        avatar_url: formData.avatar_url,
-        updated_at: new Date(),
+        avatar_url: formData.avatar_url
       };
 
       const { error } = await supabase.from('profiles').upsert(updates);

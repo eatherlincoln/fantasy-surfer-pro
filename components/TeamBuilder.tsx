@@ -4,7 +4,7 @@ import { TOTAL_BUDGET, TIER_LIMITS } from '../constants';
 import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
 
-import { Event, getAllSurfers } from '../services/adminService';
+import { Event, getEventSurfers } from '../services/adminService';
 
 interface TeamBuilderProps {
   initialTeam: Surfer[]; // Legacy prop - likely empty or mix
@@ -33,8 +33,9 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   useEffect(() => {
     // FETCH REAL DATA
     const loadSurfers = async () => {
+      if (!activeEvent) return;
       try {
-        const data = await getAllSurfers();
+        const data = await getEventSurfers(activeEvent.id);
         if (data) setAllSurfers(data);
       } catch (e) {
         console.error(e);
@@ -43,7 +44,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
       }
     };
     loadSurfers();
-  }, []);
+  }, [activeEvent]);
 
   // 1. Sync local team state with prop updates (e.g. Live Points from App.tsx)
   useEffect(() => {
@@ -62,7 +63,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   }, [team]);
 
   const totalSpent = useMemo(() => {
-    return team.reduce((acc, s) => acc + s.value, 0);
+    return team.reduce((acc, s) => acc + (s.value || 0), 0);
   }, [team]);
 
   const totalPoints = useMemo(() => {
@@ -82,10 +83,11 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     counts[Tier.C] === TIER_LIMITS[Tier.C];
 
   const fetchAiAdvice = async () => {
-    if (!process.env.API_KEY) return; // Guard
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) return; // Guard
     setIsAiLoading(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey });
       const prompt = `You are an expert World Surf League fantasy analyst. 
       Current Event: ${activeEvent?.name || 'Upcoming Event'}.
       Context: ${activeEvent?.ai_context || 'Standard conditions expected.'}.
@@ -118,7 +120,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
       if (currentTierCount >= TIER_LIMITS[surfer.tier]) return;
 
       // Check Global Budget
-      if (totalSpent + surfer.value > TOTAL_BUDGET) return;
+      if (totalSpent + (surfer.value || 0) > TOTAL_BUDGET) return;
 
       setTeam([...team, surfer]);
     }
@@ -137,10 +139,26 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     }
   };
 
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const getAvatarUrl = (surfer: Surfer) => {
+    if (!surfer.image || surfer.image.includes('ui-avatars')) {
+      return `https://ui-avatars.com/api/?name=${getInitials(surfer.name)}&background=random&color=fff&size=128`;
+    }
+    return `${surfer.image}${surfer.image.includes('?') ? '&' : '?'}v=1`;
+  };
+
   const renderSurferCard = (surfer: Surfer, inGrid: boolean = false) => {
     const isSelected = team.some(s => s.id === surfer.id);
-    const isFull = !isSelected && counts[surfer.tier] >= TIER_LIMITS[surfer.tier];
-    const isEliminated = surfer.status === 'Eliminated';
+    const currentTierCount = team.filter(s => s.tier === surfer.tier).length;
+    const isFull = currentTierCount >= TIER_LIMITS[surfer.tier] && !isSelected;
+    const isEliminated = surfer.status?.toLowerCase() === 'eliminated';
     const tierColor = getTierColor(surfer.tier);
 
     return (
@@ -154,14 +172,14 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
           <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto bg-gray-50 overflow-hidden border-2 ${isSelected ? tierColor : 'border-background'} shadow-sm`}>
             {/* Added fallback for broken images if any */}
             <img
-              src={surfer.image.startsWith('http') ? `${surfer.image}${surfer.image.includes('?') ? '&' : '?'}v=1` : surfer.image}
+              src={getAvatarUrl(surfer)}
               alt={surfer.name}
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover object-top"
               onError={(e) => {
-                // Fallback to initial if image fails
+                // Fallback to initial if custom headshot fails
                 console.warn(`Failed to load image for ${surfer.name}: ${surfer.image}`);
-                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${surfer.name}&background=random`;
+                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${getInitials(surfer.name)}&background=random&color=fff&size=128`;
               }}
             />
           </div>
@@ -177,7 +195,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{surfer.country}</p>
         </div>
         <div className={`rounded-full py-2.5 px-4 transition-colors ${isSelected ? tierColor.replace('border-', 'bg-').replace('-400', '-500') + ' text-white' : 'bg-background text-primary-dark'}`}>
-          <span className="text-xs md:text-sm font-black tracking-tight">${surfer.value.toFixed(1)}M</span>
+          <span className="text-xs md:text-sm font-black tracking-tight">${(surfer.value || 0).toFixed(1)}M</span>
         </div>
       </button>
     );
@@ -186,9 +204,9 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   const renderTier = (tier: Tier, label: string) => {
     // Show ALL surfers in this tier (No Gender Filter)
     const surfers = allSurfers
-      .filter(s => s.tier === tier)
+      .filter(s => (s.tier === tier || (tier === Tier.C && !s.tier))) // Default unknown to Tier C
       // Sort by Value (High -> Low), then Logic for Selected Selection
-      .sort((a, b) => b.value - a.value)
+      .sort((a, b) => (b.value || 0) - (a.value || 0))
       .sort((a, b) => {
         const aSelected = team.some(s => s.id === a.id);
         const bSelected = team.some(s => s.id === b.id);
@@ -246,7 +264,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-gray-900">
             {userProfile?.team_name || 'Draft Team'}
           </h2>
-          <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-3">Rip Curl Pro • Bells Beach</p>
+          <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-3">{activeEvent?.name?.toUpperCase() || 'UPCOMING EVENT'}</p>
         </div>
 
         <button onClick={onBack} className="text-sm md:text-base font-black text-primary-dark underline p-4 hover:opacity-70 transition decoration-2 underline-offset-4">
@@ -321,17 +339,17 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             <div className="grid grid-cols-4 md:grid-cols-5 gap-x-2 gap-y-8 md:gap-x-6 md:gap-y-10">
               {/* Tier A (3 Slots) */}
               {[0, 1, 2].map(i => (
-                <RosterSlot key={`a-${i}`} surfer={team.filter(s => s.tier === Tier.A)[i]} tier={Tier.A} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} />
+                <RosterSlot key={`a-${i}`} surfer={team.filter(s => s.tier === Tier.A)[i]} tier={Tier.A} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} />
               ))}
 
               {/* Tier B (4 Slots) */}
               {[0, 1, 2, 3].map(i => (
-                <RosterSlot key={`b-${i}`} surfer={team.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} />
+                <RosterSlot key={`b-${i}`} surfer={team.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} />
               ))}
 
               {/* Tier C (3 Slots) */}
               {[0, 1, 2].map(i => (
-                <RosterSlot key={`c-${i}`} surfer={team.filter(s => s.tier === Tier.C)[i]} tier={Tier.C} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} />
+                <RosterSlot key={`c-${i}`} surfer={team.filter(s => s.tier === Tier.C)[i]} tier={Tier.C} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} />
               ))}
             </div>
 
@@ -368,9 +386,10 @@ interface RosterSlotProps {
   isLocked: boolean;
   onToggle: (s: Surfer) => void;
   getTierColor: (t: Tier) => string;
+  getAvatarUrl: (s: Surfer) => string;
 }
 
-const RosterSlot: React.FC<RosterSlotProps> = ({ surfer, tier, isLocked, onToggle, getTierColor }) => {
+const RosterSlot: React.FC<RosterSlotProps> = ({ surfer, tier, isLocked, onToggle, getTierColor, getAvatarUrl }) => {
   const tierColor = getTierColor(tier);
   return (
     <div className="flex flex-col items-center">
@@ -378,7 +397,16 @@ const RosterSlot: React.FC<RosterSlotProps> = ({ surfer, tier, isLocked, onToggl
         <div className={`w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${surfer ? `bg-white ${tierColor} shadow-lg scale-105` : 'border-dashed border-gray-200 bg-gray-50/50'}`}>
           {surfer ? (
             <div className="w-full h-full rounded-full overflow-hidden shadow-inner border border-gray-50 group relative">
-              <img src={surfer.image} className="w-full h-full object-cover object-top" alt={surfer.name} />
+              <img
+                src={getAvatarUrl(surfer)}
+                className="w-full h-full object-cover object-top"
+                alt={surfer.name}
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  console.warn(`Failed to load roster image for ${surfer.name}`);
+                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${surfer.name.split(' ').map(n => n[0]).join('')}&background=random&color=fff&size=128`;
+                }}
+              />
               {!isLocked && (
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <button
@@ -410,7 +438,7 @@ const RosterSlot: React.FC<RosterSlotProps> = ({ surfer, tier, isLocked, onToggl
 
             <div className="flex items-center gap-1 mt-0.5 opacity-70">
               <span className="text-[10px] md:text-[11px]">{surfer.flag}</span>
-              <span className="text-[8px] md:text-[9px] font-bold text-gray-500 uppercase tracking-widest">{surfer.stance[0]}</span>
+              <span className="text-[8px] md:text-[9px] font-bold text-gray-500 uppercase tracking-widest">{(surfer.stance || 'R')[0]}</span>
             </div>
           </>
         ) : (

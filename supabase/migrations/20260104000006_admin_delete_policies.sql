@@ -4,7 +4,7 @@
 create table if not exists public.heat_assignments (
   id uuid default gen_random_uuid() primary key,
   heat_id uuid references public.heats(id) on delete cascade not null,
-  surfer_id uuid references public.surfers(id) not null,
+  surfer_id bigint references public.surfers(id) not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   unique(heat_id, surfer_id)
 );

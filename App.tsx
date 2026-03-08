@@ -40,16 +40,35 @@ const App: React.FC = () => {
     // Fetch Active Event
     const fetchEvent = async () => {
       try {
+        let ev = null;
         // 1. Try to find the explicitly marked "current" event
         const { data: current } = await supabase.from('events').select('*').eq('is_current', true).single();
         if (current) {
           setActiveEvent(current);
-          return;
+          ev = current;
+        } else {
+          // 2. Fallback: Latest upcoming or acting event
+          const { data } = await supabase.from('events').select('*').order('start_date', { ascending: false }).limit(1).single();
+          if (data) {
+            setActiveEvent(data);
+            ev = data;
+          }
         }
 
-        // 2. Fallback: Latest upcoming or acting event
-        const { data } = await supabase.from('events').select('*').order('start_date', { ascending: false }).limit(1).single();
-        if (data) setActiveEvent(data);
+        // Auto-sync stale localStorage teams (0 budget values, wrong tiers) with DB
+        if (ev && userTeam.length > 0) {
+          const { getEventSurfers } = await import('./services/adminService');
+          const liveSurfers = await getEventSurfers(ev.id);
+          if (liveSurfers) {
+            setUserTeam(prev => {
+              const synced = prev.map(s => {
+                const latest = liveSurfers.find(a => a.id == s.id || a.name === s.name);
+                return latest ? { ...s, value: latest.value, tier: latest.tier, image: latest.image } : s;
+              });
+              return JSON.stringify(synced) !== JSON.stringify(prev) ? synced : prev;
+            });
+          }
+        }
       } catch (e) { console.error(e); }
     };
     fetchEvent();

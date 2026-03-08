@@ -1,9 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { MOCK_SURFERS, MOCK_HEATS } from '../constants';
+import { MOCK_SURFERS } from '../constants';
 import { Surfer, EventStatus, Tier, UserProfile } from '../types';
 import { generateBriefing } from '../services/aiService';
 
-import { Event } from '../services/adminService';
+import { Event, Heat, getHeats } from '../services/adminService';
+
+const getInitials = (name: string) => {
+  const parts = name.trim().split(' ');
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+};
+
+const getAvatarUrl = (image: string | undefined, name: string) => {
+  if (!image || image.includes('ui-avatars')) {
+    return `https://ui-avatars.com/api/?name=${getInitials(name)}&background=random&color=fff&size=128`;
+  }
+  return `${image}${image.includes('?') ? '&' : '?'}v=1`;
+};
 
 interface DashboardProps {
   userTeam: Surfer[];
@@ -17,9 +32,23 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTeam, onSimulate, userProfile, activeEvent }) => {
   const [aiBriefing, setAiBriefing] = useState<string | null>(null);
   const [isBriefingLoading, setIsBriefingLoading] = useState(false);
+  const [currentHeats, setCurrentHeats] = useState<Heat[]>([]);
   const displayTeam = userTeam.length > 0 ? userTeam : MOCK_SURFERS.slice(0, 3);
 
   const totalPoints = userTeam.reduce((acc, s) => acc + (s.points || 0), 0);
+
+  useEffect(() => {
+    const fetchHeats = async () => {
+      if (!activeEvent) return;
+      try {
+        const data = await getHeats(activeEvent.id);
+        setCurrentHeats(data || []);
+      } catch (e) {
+        console.error('Failed to fetch heats:', e);
+      }
+    };
+    fetchHeats();
+  }, [activeEvent]);
 
   useEffect(() => {
     const fetchBriefing = async () => {
@@ -107,10 +136,10 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
 
           <div className="flex justify-between items-start relative z-10">
             <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur text-[10px] font-bold uppercase tracking-wide">
-              {eventStatus === 'LIVE' ? 'Live Conditions' : 'Waiting for Swell'}
+              {activeEvent?.swell_status || (eventStatus === 'LIVE' ? 'Live Conditions' : 'Waiting for Swell')}
             </span>
             <div className="text-right">
-              <div className="text-6xl font-black tracking-tighter leading-none">6-8<span className="text-2xl font-bold opacity-60">ft</span></div>
+              <div className="text-6xl font-black tracking-tighter leading-none">{activeEvent?.swell_height?.replace(/ft/i, '') || '6-8'}<span className="text-2xl font-bold opacity-60">ft</span></div>
               <div className="text-[10px] font-bold opacity-60 uppercase tracking-widest mt-1">Swell Height</div>
             </div>
           </div>
@@ -118,12 +147,14 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
           <div className="flex items-end justify-between relative z-10">
             <div>
               <h3 className="text-xl font-bold">Conditions</h3>
-              <p className="text-xs font-medium opacity-80 mt-1">Clean • Light Offshore</p>
+              <p className="text-xs font-medium opacity-80 mt-1 max-w-[280px] leading-relaxed">
+                {activeEvent?.conditions || 'Clean • Light Offshore'}
+              </p>
             </div>
-            <button className="px-6 py-2 bg-white text-[#14746f] rounded-full text-xs font-black uppercase tracking-widest shadow hover:bg-gray-50 active:scale-95 transition flex items-center gap-2">
-              <span className="material-icons-round text-base">play_arrow</span>
+            <a href="https://www.worldsurfleague.com/" target="_blank" rel="noopener noreferrer" className="bg-white text-[#14746f] px-5 py-2.5 rounded-full text-[10px] font-black tracking-widest uppercase hover:bg-gray-100 transition shadow-md flex items-center gap-1">
+              <span className="material-icons-round text-sm">play_arrow</span>
               Watch
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -209,30 +240,53 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
           <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Heat Center</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {MOCK_HEATS.map((heat) => (
-            <div key={heat.id} className="bg-white p-8 rounded-[40px] apple-shadow border border-accent relative overflow-hidden group hover:border-primary/20 transition-all">
-              <div className="flex justify-between items-center mb-8 relative z-10">
-                <span className="bg-accent/40 px-3 py-1.5 rounded-full text-xs font-black text-primary-dark uppercase tracking-tight">Heat {heat.number}</span>
-                <span className="text-xs font-bold text-gray-400 flex items-center gap-1.5">
-                  <span className="material-icons-round text-base">schedule</span>
-                  {heat.time}
-                </span>
-              </div>
-              <div className="space-y-4 relative z-10">
-                {heat.surfers.map((s, idx) => (
-                  <div key={idx} className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-2 h-10 rounded-full shadow-sm ${s.color === 'red' ? 'bg-red-500' : 'bg-blue-600'}`}></div>
-                      <div className="flex flex-col">
-                        <span className="font-black text-base text-gray-800 tracking-tight">{s.name}</span>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{s.country}</span>
+          {(() => {
+            if (currentHeats.length === 0) {
+              return (
+                <div className="col-span-full py-10 text-center text-gray-500 font-medium bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                  No heats available for this event yet.
+                </div>
+              );
+            }
+
+            // Find the lowest round number that has incomplete heats
+            const incompleteHeats = currentHeats.filter((h: any) => h.status !== 'COMPLETED');
+            const activeRoundNum = incompleteHeats.length > 0
+              ? Math.min(...incompleteHeats.map((h: any) => h.round_number || 1))
+              : Math.max(...currentHeats.map((h: any) => h.round_number || 1));
+
+            const heatsToDisplay = currentHeats.filter((h: any) => (h.round_number || 1) === activeRoundNum);
+
+            return heatsToDisplay.map((heat: any) => (
+              <div key={heat.id} className="bg-white p-8 rounded-[40px] apple-shadow border border-accent relative overflow-hidden group hover:border-primary/20 transition-all">
+                <div className="flex justify-between items-center mb-8 relative z-10">
+                  <span className="bg-accent/40 px-3 py-1.5 rounded-full text-xs font-black text-primary-dark uppercase tracking-tight">Round {activeRoundNum} • Heat {heat.heat_number}</span>
+                  <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${heat.status === 'LIVE' ? 'bg-red-100 text-red-600 animate-pulse' : heat.status === 'COMPLETED' ? 'bg-gray-100 text-gray-500' : 'bg-blue-100 text-blue-600'}`}>
+                    {heat.status}
+                  </span>
+                </div>
+                <div className="space-y-4 relative z-10">
+                  {heat.heat_assignments?.map((assignment: any) => {
+                    const s = assignment.surfers;
+                    if (!s) return null;
+                    return (
+                      <div key={s.id} className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <img src={getAvatarUrl(s.image, s.name)} alt={s.name} className="w-10 h-10 rounded-full object-cover bg-gray-100 shadow-sm" onError={(e) => { (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${getInitials(s.name)}&background=random&color=fff&size=128`; }} />
+                          <div className="flex flex-col">
+                            <span className="font-black text-base text-gray-800 tracking-tight">{s.name}</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                              {s.flag} {s.country}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ));
+          })()}
         </div>
       </section>
     </div>
@@ -256,7 +310,7 @@ const SurferRow: React.FC<{ surfer: Surfer }> = ({ surfer }) => {
   return (
     <div className={`flex items-center p-5 border-b border-gray-50 last:border-0 transition-all ${isInWater ? 'bg-primary/5' : 'hover:bg-gray-50/50'}`}>
       <div className="relative">
-        <img src={surfer.image} alt={surfer.name} className={`h-16 w-16 rounded-2xl object-cover object-top ${isEliminated ? 'grayscale opacity-60' : ''} ${isInWater ? 'ring-2 ring-primary ring-offset-2' : ''}`} />
+        <img src={getAvatarUrl(surfer.image, surfer.name)} alt={surfer.name} className={`h-16 w-16 rounded-2xl object-cover object-top ${isEliminated ? 'grayscale opacity-60' : ''} ${isInWater ? 'ring-2 ring-primary ring-offset-2' : ''}`} onError={(e) => { (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${getInitials(surfer.name)}&background=random&color=fff&size=128`; }} />
         {!isEliminated && (
           <div className={`absolute -bottom-1.5 -right-1.5 ${getTierBadgeColor(surfer.tier)} text-[10px] font-black px-2 py-1 rounded-full border-4 border-white shadow-sm`}>{surfer.tier}</div>
         )}

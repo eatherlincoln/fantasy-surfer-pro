@@ -9,6 +9,10 @@ drop policy if exists "Events are viewable by everyone" on public.events;
 drop policy if exists "Admins can insert events" on public.events;
 drop policy if exists "Admins can update events" on public.events;
 drop policy if exists "Admins can delete events" on public.events;
+drop policy if exists "Enable read access for all users" on public.events;
+drop policy if exists "Enable insert for authenticated users only" on public.events;
+drop policy if exists "Enable update for authenticated users only" on public.events;
+drop policy if exists "Enable delete for authenticated users only" on public.events;
 
 create policy "Enable read access for all users" on public.events for select using (true);
 create policy "Enable insert for authenticated users only" on public.events for insert to authenticated with check (true);
@@ -21,6 +25,10 @@ drop policy if exists "Heats are viewable by everyone" on public.heats;
 drop policy if exists "Admins can insert heats" on public.heats;
 drop policy if exists "Admins can update heats" on public.heats;
 drop policy if exists "Admins can delete heats" on public.heats;
+drop policy if exists "Enable read access for all users" on public.heats;
+drop policy if exists "Enable insert for authenticated users only" on public.heats;
+drop policy if exists "Enable update for authenticated users only" on public.heats;
+drop policy if exists "Enable delete for authenticated users only" on public.heats;
 
 create policy "Enable read access for all users" on public.heats for select using (true);
 create policy "Enable insert for authenticated users only" on public.heats for insert to authenticated with check (true);
@@ -33,6 +41,10 @@ drop policy if exists "Surfers are viewable by everyone" on public.surfers;
 drop policy if exists "Admins can insert surfers" on public.surfers;
 drop policy if exists "Admins can update surfers" on public.surfers;
 drop policy if exists "Admins can delete surfers" on public.surfers;
+drop policy if exists "Enable read access for all users" on public.surfers;
+drop policy if exists "Enable insert for authenticated users only" on public.surfers;
+drop policy if exists "Enable update for authenticated users only" on public.surfers;
+drop policy if exists "Enable delete for authenticated users only" on public.surfers;
 
 create policy "Enable read access for all users" on public.surfers for select using (true);
 create policy "Enable insert for authenticated users only" on public.surfers for insert to authenticated with check (true);
@@ -44,6 +56,9 @@ alter table public.heat_assignments enable row level security;
 drop policy if exists "Assignments are viewable by everyone" on public.heat_assignments;
 drop policy if exists "Admins can insert assignments" on public.heat_assignments;
 drop policy if exists "Admins can delete assignments" on public.heat_assignments;
+drop policy if exists "Enable read access for all users" on public.heat_assignments;
+drop policy if exists "Enable insert for authenticated users only" on public.heat_assignments;
+drop policy if exists "Enable delete for authenticated users only" on public.heat_assignments;
 
 create policy "Enable read access for all users" on public.heat_assignments for select using (true);
 create policy "Enable insert for authenticated users only" on public.heat_assignments for insert to authenticated with check (true);
@@ -54,6 +69,9 @@ alter table public.scores enable row level security;
 drop policy if exists "Scores are viewable by everyone" on public.scores;
 drop policy if exists "Admins can submit scores" on public.scores;
 drop policy if exists "Admins can delete scores" on public.scores;
+drop policy if exists "Enable read access for all users" on public.scores;
+drop policy if exists "Enable insert for authenticated users only" on public.scores;
+drop policy if exists "Enable delete for authenticated users only" on public.scores;
 
 create policy "Enable read access for all users" on public.scores for select using (true);
 create policy "Enable insert for authenticated users only" on public.scores for insert to authenticated with check (true);
