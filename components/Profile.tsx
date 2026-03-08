@@ -24,6 +24,7 @@ const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
 
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({ username: '', full_name: '', team_name: '', avatar_url: '' });
 
   // Mock Stripe Payment Link (Replace with actual link later)
@@ -72,9 +73,11 @@ const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
         return;
       }
 
+      const cleanUsername = formData.username.trim() === '' ? null : formData.username.trim();
+
       const updates = {
         id: user.id,
-        username: formData.username,
+        username: cleanUsername,
         team_name: formData.team_name,
         avatar_url: formData.avatar_url
       };
@@ -99,6 +102,36 @@ const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     window.location.reload(); // Simple reload to reset state/view
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setIsUploading(true);
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${session?.id}-${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      setFormData(prev => ({ ...prev, avatar_url: data.publicUrl }));
+    } catch (error: any) {
+      alert('Error uploading avatar: ' + error.message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handlePayment = () => {
@@ -586,14 +619,17 @@ const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
               />
             </div>
             <div>
-              <label className="text-xs font-bold text-gray-400 uppercase ml-1">Avatar URL</label>
-              <input
-                type="text"
-                value={formData.avatar_url}
-                onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                placeholder="https://example.com/image.jpg"
-                className="w-full text-sm font-medium border-b-2 border-gray-100 focus:border-primary outline-none bg-transparent py-2"
-              />
+              <label className="text-xs font-bold text-gray-400 uppercase ml-1">Avatar Image</label>
+              <div className="relative mt-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  disabled={isUploading}
+                  className="w-full text-sm font-medium border-b-2 border-gray-100 focus:border-primary outline-none bg-transparent py-2 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-pop/10 file:text-pop-DEFAULT hover:file:bg-pop/20"
+                />
+                {isUploading && <span className="absolute right-0 top-3 text-xs text-gray-400 font-bold animate-pulse">Uploading...</span>}
+              </div>
             </div>
             <button
               onClick={updateProfile}
