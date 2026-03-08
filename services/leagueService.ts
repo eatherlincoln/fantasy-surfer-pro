@@ -66,7 +66,19 @@ export const joinLeague = async (code: string, userId: string) => {
 
     if (findError) throw new Error('League not found');
 
-    // 2. Insert member
+    // 2. Check for existing membership
+    const { data: existingMember } = await supabase
+        .from('league_members')
+        .select('id')
+        .eq('league_id', league.id)
+        .eq('user_id', userId)
+        .single();
+
+    if (existingMember) {
+        throw new Error('You have already joined this league.');
+    }
+
+    // 3. Insert member
     const { error: joinError } = await supabase
         .from('league_members')
         .insert({
