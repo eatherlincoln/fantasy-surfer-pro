@@ -84,7 +84,10 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
   const fetchAiAdvice = async () => {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey) return; // Guard
+    if (!apiKey) {
+      alert("AI Configuration Missing: Please add 'VITE_GEMINI_API_KEY' to your Vercel Environment Variables.");
+      return;
+    }
     setIsAiLoading(true);
     try {
       const ai = new GoogleGenAI({ apiKey });
@@ -302,7 +305,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             <div className="flex justify-between items-center mb-8">
               <h3 className="text-2xl font-black text-gray-900">Your Roster</h3>
               {!aiAdvice && (
-                <button onClick={fetchAiAdvice} disabled={isAiLoading || isLocked} className="text-xs font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
+                <button onClick={fetchAiAdvice} disabled={isAiLoading} className="text-xs font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
                   {isAiLoading ? "Analyzing..." : "Ask AI"} <span className="material-icons-round text-sm">auto_awesome</span>
                 </button>
               )}

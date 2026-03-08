@@ -52,7 +52,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
 
   useEffect(() => {
     const fetchBriefing = async () => {
-      if (userTeam.length === 0 || aiBriefing) return;
+      if (userTeam.length === 0 || isBriefingLoading) return;
       setIsBriefingLoading(true);
       try {
         const briefing = await generateBriefing(userTeam, totalPoints);

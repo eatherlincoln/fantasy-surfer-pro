@@ -16,32 +16,29 @@ export const generateSurfCommentary = async (surferName: string, score: number, 
     const aiClient = getAiClient();
     if (!aiClient) {
         console.warn("Gemini API Key missing, returning fallback commentary.");
-        return `Great surfing by ${surferName}! Scored ${score}.`;
+        return `[AI Offline] Great surfing by ${surferName}! Scored ${score}.`;
     }
 
     try {
         const prompt = `Write a short, enthusiastic, 1-sentence commentator reaction for a professional surfer named ${surferName} who just scored ${score} points and is currently ${status}. Use surf terminology.`;
 
-        // Using the new SDK signature
         const response = await aiClient.models.generateContent({
             model: 'gemini-1.5-flash',
             contents: prompt,
         });
 
-        // Parse response
-        // Safely access text if available
         const text = (response as any).text || response?.candidates?.[0]?.content?.parts?.[0]?.text || "Wow! What a ride!";
         return text.replace(/\n/g, " ").trim();
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error generating commentary:", error);
-        return `Incredible performance by ${surferName} with a ${score}!`;
+        return `[API Error: ${error.message || "Failed"}] Incredible performance by ${surferName}!`;
     }
 };
 
 export const predictHeatOutcome = async (surfers: { name: string, country: string, tier: string }[]): Promise<string> => {
     const aiClient = getAiClient();
-    if (!aiClient) return "Prediction unavailable.";
+    if (!aiClient) return "[AI Offline] Prediction unavailable.";
 
     const surferList = surfers.map(s => `${s.name} (${s.country}, Tier ${s.tier})`).join(", ");
     const prompt = `Predict the winner of a heat between these surfers: ${surferList}. Provide a 1 sentence reason based on fantasy surf stats/logic.`;
@@ -53,15 +50,15 @@ export const predictHeatOutcome = async (surfers: { name: string, country: strin
         });
 
         return (response as any).text || "Prediction pending...";
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error predicting outcome:", error);
-        return "Could not urge prediction.";
+        return `[API Error: ${error.message || "Failed"}] Could not urge prediction.`;
     }
 };
 
 export const generateBriefing = async (team: { name: string, tier: string }[], totalPoints: number): Promise<string> => {
     const aiClient = getAiClient();
-    if (!aiClient) return "Draft your team to get your personalized AI scouting report.";
+    if (!aiClient) return "AI Endpoint Missing: VITE_GEMINI_API_KEY must be added to Vercel Environment Variables.";
 
     const roster = team.map(s => `${s.name} (${s.tier})`).join(', ');
     const prompt = `You are a hype-man and strategic analyst for a fantasy surfing app. 
@@ -75,8 +72,8 @@ export const generateBriefing = async (team: { name: string, tier: string }[], t
             contents: prompt,
         });
         return (response as any).text || response.candidates?.[0]?.content?.parts?.[0]?.text || "Briefing unavailable.";
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error generating briefing:", error);
-        return "Swell's looking good. Your roster is ready for the incoming set.";
+        return `AI Generation Error: ${error.message || "Invalid API parameters or permissions."}`;
     }
 };
