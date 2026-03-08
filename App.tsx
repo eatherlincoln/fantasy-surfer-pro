@@ -80,6 +80,9 @@ const App: React.FC = () => {
       if (session) {
         setCurrentView(prev => {
           if (prev === 'LOGIN') {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('join')) return 'LEAGUES';
+
             const savedTeam = localStorage.getItem('fantasy_surfer_team');
             const hasTeam = savedTeam ? JSON.parse(savedTeam).length > 0 : false;
             return hasTeam ? 'DASHBOARD' : 'TEAM_BUILDER';

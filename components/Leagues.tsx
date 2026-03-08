@@ -35,6 +35,16 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
   useEffect(() => {
     if (userProfile?.team_name) setTeamName(userProfile.team_name);
     fetchUserLeagues();
+
+    // Check for Deep Link on mount
+    const params = new URLSearchParams(window.location.search);
+    const joinCode = params.get('join');
+    if (joinCode) {
+      setShowLeagueModal('JOIN');
+      setLeagueInput(joinCode.toUpperCase());
+      // Clean up the URL so it doesn't trigger again on reload
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
   }, [userProfile]);
 
   useEffect(() => {
@@ -267,8 +277,10 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
                 onClick={() => {
                   const codeMatch = successMsg.match(/Code: ([A-Z0-9]+)/);
                   if (codeMatch) {
-                    navigator.clipboard.writeText(`Join my Fantasy Pro Surfer league! Code: ${codeMatch[1]}`);
-                    alert('Invite text copied to clipboard!');
+                    const code = codeMatch[1];
+                    const link = `${window.location.origin}?join=${code}`;
+                    navigator.clipboard.writeText(`Join my Fantasy Pro Surfer League!\nClick the link below and enter the code to join:\n${link}\n\nLeague Code: ${code}`);
+                    alert('Invite link copied to clipboard!');
                   }
                 }}
                 className="bg-green-200 text-green-800 px-3 py-1 rounded-lg text-[10px] uppercase tracking-wider flex items-center gap-1 hover:bg-green-300 transition"
@@ -335,7 +347,8 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
                         <span className="text-sm font-mono font-bold tracking-widest text-primary">{selectedLeague.code}</span>
                         <button
                           onClick={() => {
-                            navigator.clipboard.writeText(`Join my Fantasy Pro Surfer league! Code: ${selectedLeague.code}`);
+                            const link = `${window.location.origin}?join=${selectedLeague.code}`;
+                            navigator.clipboard.writeText(`Join my Fantasy Pro Surfer League!\nClick the link below and enter the code to join:\n${link}\n\nLeague Code: ${selectedLeague.code}`);
                             alert('League invite copied to clipboard!');
                           }}
                           className="ml-2 bg-white/20 hover:bg-white/30 text-white rounded p-1 transition flex items-center justify-center pointer-events-auto relative z-20"
