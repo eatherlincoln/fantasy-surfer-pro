@@ -6,28 +6,10 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [mode, setMode] = useState<'OAUTH' | 'SIGNUP' | 'LOGIN'>('OAUTH');
+  const [mode, setMode] = useState<'SIGNUP' | 'LOGIN'>('LOGIN');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const handleGoogleLogin = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
-      if (error) throw error;
-    } catch (error: any) {
-      console.error("Login failed:", error);
-      alert("Google Login Error: " + error.message + "\n\n(Please enable Google provider in your Supabase Auth settings)");
-    }
-  };
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,15 +100,23 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           >
             Already have an account? Log In
           </button>
+
+          <div className="flex items-center gap-4 py-4">
+            <div className="flex-1 h-[1px] bg-stone-greige"></div>
+            <span className="text-[10px] font-bold text-gray-400 uppercase">Or</span>
+            <div className="flex-1 h-[1px] bg-stone-greige"></div>
+          </div>
+
           <button
             type="button"
-            onClick={() => setMode('OAUTH')}
-            className="w-full text-gray-400 font-medium text-sm py-1"
+            onClick={onLogin}
+            className="w-full bg-white border border-stone-greige text-gray-700 flex items-center justify-center gap-3 py-4 rounded-2xl font-bold transform transition-transform active:scale-95 hover:bg-gray-50"
           >
-            Back
+            <span className="material-icons-round">person_outline</span>
+            Continue as Guest
           </button>
         </form>
-      ) : mode === 'LOGIN' ? (
+      ) : (
         <form onSubmit={handleEmailSignIn} className="w-full max-w-sm space-y-4 animate-in fade-in slide-in-from-bottom-4">
           <input
             type="email"
@@ -159,41 +149,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           >
             Don't have an account? Sign Up
           </button>
-          <button
-            type="button"
-            onClick={() => setMode('OAUTH')}
-            className="w-full text-gray-400 font-medium text-sm py-1"
-          >
-            Back
-          </button>
-        </form>
-      ) : (
-        <div className="w-full max-w-sm space-y-4">
-          <button
-            onClick={onLogin}
-            className="w-full bg-black text-white flex items-center justify-center gap-3 py-4 rounded-2xl font-bold transform transition-transform active:scale-95"
-          >
-            <span className="material-icons-round">person_outline</span>
-            Continue as Guest
-          </button>
-
-          <button
-            onClick={handleGoogleLogin}
-            className="w-full bg-white border border-stone-greige text-gray-700 flex items-center justify-center gap-3 py-4 rounded-2xl font-bold transform transition-transform active:scale-95 hover:bg-gray-50"
-          >
-            <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" className="w-5 h-5" alt="Google" />
-            Continue with Google
-          </button>
-
-          <button
-            onClick={() => alert("Facebook Sign In coming soon! Please use 'Sign up with email' below.")}
-            className="w-full bg-[#1877F2] text-white flex items-center justify-center gap-3 py-4 rounded-2xl font-bold transform transition-transform active:scale-95"
-          >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-            </svg>
-            Continue with Facebook
-          </button>
 
           <div className="flex items-center gap-4 py-4">
             <div className="flex-1 h-[1px] bg-stone-greige"></div>
@@ -202,15 +157,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           </div>
 
           <button
-            onClick={() => setMode('LOGIN')}
-            className="text-sage-deep font-bold hover:underline"
+            type="button"
+            onClick={onLogin}
+            className="w-full bg-white border border-stone-greige text-gray-700 flex items-center justify-center gap-3 py-4 rounded-2xl font-bold transform transition-transform active:scale-95 hover:bg-gray-50"
           >
-            Log in with email
+            <span className="material-icons-round">person_outline</span>
+            Continue as Guest
           </button>
-          <div className="text-xs text-gray-400 mt-2">
-            Don't have an account? <button onClick={() => setMode('SIGNUP')} className="font-bold cursor-pointer hover:underline text-gray-500">Sign Up</button>
-          </div>
-        </div>
+        </form>
       )}
 
       <p className="mt-12 text-[10px] text-gray-400 font-medium px-8 leading-relaxed">
