@@ -78,10 +78,18 @@ const App: React.FC = () => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) {
-        if (currentView === 'LOGIN') handleLogin();
+        setCurrentView(prev => {
+          if (prev === 'LOGIN') {
+            const savedTeam = localStorage.getItem('fantasy_surfer_team');
+            const hasTeam = savedTeam ? JSON.parse(savedTeam).length > 0 : false;
+            return hasTeam ? 'DASHBOARD' : 'TEAM_BUILDER';
+          }
+          return prev;
+        });
         fetchProfile(session.user.id);
       } else {
         setUserProfile(null);
+        setCurrentView('LOGIN');
       }
     });
 
@@ -195,7 +203,7 @@ const App: React.FC = () => {
           {currentView === 'TEAM_BUILDER' && (
             <TeamBuilder
               initialTeam={userTeam}
-              isLocked={eventStatus === 'LIVE'}
+              isLocked={activeEvent?.status === 'LIVE' || activeEvent?.status === 'COMPLETED' || eventStatus === 'LIVE'}
               onSave={handleSaveTeam}
               onBack={handleBackFromTeamBuilder}
               userProfile={userProfile}

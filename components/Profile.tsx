@@ -51,7 +51,7 @@ const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
           setFormData({
             username: data.username || '',
             full_name: data.full_name || user.user_metadata.full_name || '',
-            team_name: data.team_name || "Lincoln's Team", // Default fallback
+            team_name: data.team_name || '',
             avatar_url: data.avatar_url || ''
           });
         }
@@ -749,13 +749,15 @@ const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      <button
-        onClick={() => onNavigate?.('ADMIN')}
-        className="w-full mt-10 py-5 rounded-2xl bg-gray-900 text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-black transition active:scale-95 mb-4 shadow-lg"
-      >
-        <span className="material-icons-round text-lg">admin_panel_settings</span>
-        Admin Dashboard
-      </button>
+      {session?.email === 'lincolneather@me.com' && (
+        <button
+          onClick={() => onNavigate?.('ADMIN')}
+          className="w-full mt-10 py-5 rounded-2xl bg-gray-900 text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-black transition active:scale-95 mb-4 shadow-lg"
+        >
+          <span className="material-icons-round text-lg">admin_panel_settings</span>
+          Admin Dashboard
+        </button>
+      )}
 
       <button
         onClick={handleSignOut}
