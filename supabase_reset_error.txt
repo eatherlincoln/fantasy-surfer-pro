@@ -1,0 +1,1011 @@
+open supabase/.temp/profile: no such file or directory
+Supabase CLI 2.77.0
+Using profile: supabase (supabase.co)
+Resetting local database...
+Recreating database...
+2026/03/08 15:08:17 PG Send: {"Type":"StartupMessage","ProtocolVersion":196608,"Parameters":{"database":"postgres","user":"postgres"}}
+2026/03/08 15:08:17 PG Recv: {"Type":"AuthenticationSASL","AuthMechanisms":["SCRAM-SHA-256"]}
+2026/03/08 15:08:17 PG Send: {"Type":"SASLInitialResponse","AuthMechanism":"SCRAM-SHA-256","Data":"n,,n=,r=eCQRnt7CSMqkJfauMAdjmcpL"}
+2026/03/08 15:08:17 PG Recv: {"Type":"AuthenticationSASLContinue","Data":"r=eCQRnt7CSMqkJfauMAdjmcpLqad3Q50AwDfy6F7b7Vqj++DC,s=61cgfbVOcjmh6cVOro09Dw==,i=4096"}
+2026/03/08 15:08:17 PG Send: {"Type":"SASLResponse","Data":"c=biws,r=eCQRnt7CSMqkJfauMAdjmcpLqad3Q50AwDfy6F7b7Vqj++DC,p=JPPApIYo2BUkOOs3UpqgTLGGgzNzy7epkmsNnU6/Wv8="}
+2026/03/08 15:08:17 PG Recv: {"Type":"AuthenticationSASLFinal","Data":"v=vy1JvpUHCqdQGdGdKnpPq+RejghiEoalstsMFf+Cgks="}
+2026/03/08 15:08:17 PG Recv: {"Type":"AuthenticationOK"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"in_hot_standby","Value":"off"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"integer_datetimes","Value":"on"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"TimeZone","Value":"UTC"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"IntervalStyle","Value":"postgres"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"is_superuser","Value":"off"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"application_name","Value":""}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"default_transaction_read_only","Value":"off"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"scram_iterations","Value":"4096"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"DateStyle","Value":"ISO, MDY"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"standard_conforming_strings","Value":"on"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"session_authorization","Value":"postgres"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"client_encoding","Value":"UTF8"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"server_version","Value":"17.6"}
+2026/03/08 15:08:17 PG Recv: {"Type":"ParameterStatus","Name":"server_encoding","Value":"UTF8"}
+2026/03/08 15:08:17 PG Recv: {"Type":"BackendKeyData","ProcessID":258,"SecretKey":765924781}
+2026/03/08 15:08:17 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Initialising schema...
++ ulimit -n
++ '[' '!' -z '' ']'
++ export ERL_CRASH_DUMP=/tmp/erl_crash.dump
++ ERL_CRASH_DUMP=/tmp/erl_crash.dump
++ '[' false = true ']'
++ [[ -n '' ]]
++ echo 'Running migrations'
++ sudo -E -u nobody /app/bin/migrate
++ '[' true = true ']'
++ echo 'Seeding selfhosted Realtime'
++ sudo -E -u nobody /app/bin/realtime eval 'Realtime.Release.seeds(Realtime.Repo)'
+[os_mon] cpu supervisor port (cpu_sup): Erlang has closed
+[os_mon] memory supervisor port (memsup): Erlang has closed
++ echo 'Starting Realtime'
++ ulimit -n
++ exec /app/bin/realtime eval '{:ok, _} = Application.ensure_all_started(:realtime)
+{:ok, _} = Realtime.Tenants.health_check("realtime-dev")'
+[os_mon] cpu supervisor port (cpu_sup): Erlang has closed
+[os_mon] memory supervisor port (memsup): Erlang has closed
+Seeding globals from roles.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"SET lock_timeout = '4s'","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"CREATE SCHEMA IF NOT EXISTS supabase_migrations","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"CREATE TABLE IF NOT EXISTS supabase_migrations.schema_migrations (version text NOT NULL PRIMARY KEY)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"ALTER TABLE supabase_migrations.schema_migrations ADD COLUMN IF NOT EXISTS statements text[]","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"ALTER TABLE supabase_migrations.schema_migrations ADD COLUMN IF NOT EXISTS name text","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"SET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE SCHEMA"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Applying migration 20240101000000_create_surfers_table.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Query","String":"RESET ALL"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"RESET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"CREATE TABLE IF NOT EXISTS public.surfers (\n  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,\n  created_at TIMESTAMPTZ DEFAULT NOW(),\n  name TEXT NOT NULL,\n  country TEXT,\n  flag TEXT,\n  stance TEXT,\n  age INTEGER,\n  value NUMERIC,\n  tier TEXT,\n  image TEXT\n)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"ALTER TABLE public.surfers ENABLE ROW LEVEL SECURITY","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"CREATE POLICY \"Enable read access for all users\" ON public.surfers\n  FOR SELECT USING (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)","ParameterOIDs":[25,25,1009]}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":[0,0,1],"Parameters":[{"text":"20240101000000"},{"text":"create_surfers_table"},{"binary":"00000001000000000000001900000003000000010000010b435245415445205441424c45204946204e4f5420455849535453207075626c69632e7375726665727320280a2020696420424947494e542047454e4552415445442042592044454641554c54204153204944454e54495459205052494d415259204b45592c0a2020637265617465645f61742054494d455354414d50545a2044454641554c54204e4f5728292c0a20206e616d652054455854204e4f54204e554c4c2c0a2020636f756e74727920544558542c0a2020666c616720544558542c0a20207374616e636520544558542c0a202061676520494e54454745522c0a202076616c7565204e554d455249432c0a20207469657220544558542c0a2020696d61676520544558540a2900000034414c544552205441424c45207075626c69632e7375726665727320454e41424c4520524f57204c4556454c2053454355524954590000005c43524541544520504f4c4943592022456e61626c6520726561642061636365737320666f7220616c6c20757365727322204f4e207075626c69632e737572666572730a2020464f522053454c454354205553494e4720287472756529"}],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 1"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Applying migration 20240101000001_add_gender_to_surfers.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Query","String":"RESET ALL"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"RESET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"ALTER TABLE public.surfers ADD COLUMN IF NOT EXISTS gender TEXT CHECK (gender IN ('Male', 'Female'))","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)","ParameterOIDs":[25,25,1009]}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":[0,0,1],"Parameters":[{"text":"20240101000001"},{"text":"add_gender_to_surfers"},{"binary":"000000010000000000000019000000010000000100000064414c544552205441424c45207075626c69632e737572666572732041444420434f4c554d4e204946204e4f54204558495354532067656e646572205445585420434845434b202867656e64657220494e2028274d616c65272c202746656d616c65272929"}],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 1"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Applying migration 20240101000002_create_profiles_table.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Query","String":"RESET ALL"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"RESET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create table public.profiles (\n  id uuid references auth.users not null primary key,\n  updated_at timestamp with time zone,\n  username text unique,\n  full_name text,\n  avatar_url text,\n  constraint username_length check (char_length(username) \u003e= 3)\n)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"alter table public.profiles enable row level security","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Public profiles are viewable by everyone.\" on public.profiles for select using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Users can insert their own profile.\" on public.profiles for insert with check (auth.uid() = id)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Users can update own profile.\" on public.profiles for update using (auth.uid() = id)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)","ParameterOIDs":[25,25,1009]}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":[0,0,1],"Parameters":[{"text":"20240101000002"},{"text":"create_profiles_table"},{"binary":"0000000100000000000000190000000500000001000000fa637265617465207461626c65207075626c69632e70726f66696c657320280a202069642075756964207265666572656e63657320617574682e7573657273206e6f74206e756c6c207072696d617279206b65792c0a2020757064617465645f61742074696d657374616d7020776974682074696d65207a6f6e652c0a2020757365726e616d65207465787420756e697175652c0a202066756c6c5f6e616d6520746578742c0a20206176617461725f75726c20746578742c0a2020636f6e73747261696e7420757365726e616d655f6c656e67746820636865636b2028636861725f6c656e67746828757365726e616d6529203e3d2033290a2900000035616c746572207461626c65207075626c69632e70726f66696c657320656e61626c6520726f77206c6576656c2073656375726974790000006463726561746520706f6c69637920225075626c69632070726f66696c657320617265207669657761626c652062792065766572796f6e652e22206f6e207075626c69632e70726f66696c657320666f722073656c656374207573696e67202874727565290000006e63726561746520706f6c696379202255736572732063616e20696e73657274207468656972206f776e2070726f66696c652e22206f6e207075626c69632e70726f66696c657320666f7220696e73657274207769746820636865636b2028617574682e7569642829203d206964290000006363726561746520706f6c696379202255736572732063616e20757064617465206f776e2070726f66696c652e22206f6e207075626c69632e70726f66696c657320666f7220757064617465207573696e672028617574682e7569642829203d20696429"}],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 1"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Applying migration 20240103000000_add_profile_fields.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Query","String":"RESET ALL"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"RESET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Add team_name and full_name to profiles table\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS team_name text","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS full_name text","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)","ParameterOIDs":[25,25,1009]}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":[0,0,1],"Parameters":[{"text":"20240103000000"},{"text":"add_profile_fields"},{"binary":"0000000100000000000000190000000200000001000000742d2d20416464207465616d5f6e616d6520616e642066756c6c5f6e616d6520746f2070726f66696c6573207461626c650a414c544552205441424c45207075626c69632e70726f66696c65732041444420434f4c554d4e204946204e4f5420455849535453207465616d5f6e616d65207465787400000043414c544552205441424c45207075626c69632e70726f66696c65732041444420434f4c554d4e204946204e4f54204558495354532066756c6c5f6e616d652074657874"}],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Severity":"NOTICE","SeverityUnlocalized":"NOTICE","Code":"42701","Message":"column \"full_name\" of relation \"profiles\" already exists, skipping","Detail":"","Hint":"","Position":0,"InternalPosition":0,"InternalQuery":"","Where":"","SchemaName":"","TableName":"","ColumnName":"","DataTypeName":"","ConstraintName":"","File":"tablecmds.c","Line":7471,"Routine":"check_for_column_name_collision","UnknownFields":null}
+NOTICE (42701): column "full_name" of relation "profiles" already exists, skipping
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 1"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Applying migration 20260104000000_create_leagues_tables.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Query","String":"RESET ALL"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"RESET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Create leagues table\ncreate table public.leagues (\n  id uuid default gen_random_uuid() primary key,\n  created_at timestamp with time zone default timezone('utc'::text, now()) not null,\n  name text not null,\n  code text not null unique,\n  created_by uuid references public.profiles(id) not null\n)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Create league_members table\ncreate table public.league_members (\n  id uuid default gen_random_uuid() primary key,\n  joined_at timestamp with time zone default timezone('utc'::text, now()) not null,\n  league_id uuid references public.leagues(id) on delete cascade not null,\n  user_id uuid references public.profiles(id) not null,\n  is_admin boolean default false,\n  unique(league_id, user_id)\n)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Enable RLS\nalter table public.leagues enable row level security","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"alter table public.league_members enable row level security","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Policies for leagues\ncreate policy \"Leagues are viewable by everyone\"\n  on public.leagues for select\n  using ( true )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Users can create leagues\"\n  on public.leagues for insert\n  with check ( auth.uid() = created_by )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Policies for league_members\ncreate policy \"League members are viewable by everyone\"\n  on public.league_members for select\n  using ( true )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Users can join leagues\"\n  on public.league_members for insert\n  with check ( auth.uid() = user_id )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Users can leave leagues\"\n  on public.league_members for delete\n  using ( auth.uid() = user_id )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)","ParameterOIDs":[25,25,1009]}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":[0,0,1],"Parameters":[{"text":"20260104000000"},{"text":"create_leagues_tables"},{"binary":"00000001000000000000001900000009000000010000012a2d2d20437265617465206c656167756573207461626c650a637265617465207461626c65207075626c69632e6c65616775657320280a2020696420757569642064656661756c742067656e5f72616e646f6d5f757569642829207072696d617279206b65792c0a2020637265617465645f61742074696d657374616d7020776974682074696d65207a6f6e652064656661756c742074696d657a6f6e652827757463273a3a746578742c206e6f77282929206e6f74206e756c6c2c0a20206e616d652074657874206e6f74206e756c6c2c0a2020636f64652074657874206e6f74206e756c6c20756e697175652c0a2020637265617465645f62792075756964207265666572656e636573207075626c69632e70726f66696c657328696429206e6f74206e756c6c0a290000018c2d2d20437265617465206c65616775655f6d656d62657273207461626c650a637265617465207461626c65207075626c69632e6c65616775655f6d656d6265727320280a2020696420757569642064656661756c742067656e5f72616e646f6d5f757569642829207072696d617279206b65792c0a20206a6f696e65645f61742074696d657374616d7020776974682074696d65207a6f6e652064656661756c742074696d657a6f6e652827757463273a3a746578742c206e6f77282929206e6f74206e756c6c2c0a20206c65616775655f69642075756964207265666572656e636573207075626c69632e6c65616775657328696429206f6e2064656c6574652063617363616465206e6f74206e756c6c2c0a2020757365725f69642075756964207265666572656e636573207075626c69632e70726f66696c657328696429206e6f74206e756c6c2c0a202069735f61646d696e20626f6f6c65616e2064656661756c742066616c73652c0a2020756e69717565286c65616775655f69642c20757365725f6964290a29000000422d2d20456e61626c6520524c530a616c746572207461626c65207075626c69632e6c65616775657320656e61626c6520726f77206c6576656c2073656375726974790000003b616c746572207461626c65207075626c69632e6c65616775655f6d656d6265727320656e61626c6520726f77206c6576656c207365637572697479000000782d2d20506f6c696369657320666f72206c6561677565730a63726561746520706f6c69637920224c65616775657320617265207669657761626c652062792065766572796f6e65220a20206f6e207075626c69632e6c65616775657320666f722073656c6563740a20207573696e672028207472756520290000007063726561746520706f6c696379202255736572732063616e20637265617465206c656167756573220a20206f6e207075626c69632e6c65616775657320666f7220696e736572740a20207769746820636865636b202820617574682e7569642829203d20637265617465645f627920290000008d2d2d20506f6c696369657320666f72206c65616775655f6d656d626572730a63726561746520706f6c69637920224c6561677565206d656d6265727320617265207669657761626c652062792065766572796f6e65220a20206f6e207075626c69632e6c65616775655f6d656d6265727320666f722073656c6563740a20207573696e672028207472756520290000007263726561746520706f6c696379202255736572732063616e206a6f696e206c656167756573220a20206f6e207075626c69632e6c65616775655f6d656d6265727320666f7220696e736572740a20207769746820636865636b202820617574682e7569642829203d20757365725f696420290000006e63726561746520706f6c696379202255736572732063616e206c65617665206c656167756573220a20206f6e207075626c69632e6c65616775655f6d656d6265727320666f722064656c6574650a20207573696e67202820617574682e7569642829203d20757365725f69642029"}],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 1"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Applying migration 20260104000001_fix_leagues_rls.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Query","String":"RESET ALL"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"RESET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Safely update RLS policies for leagues (Idempotent)\n\n-- Leagues Table Policies\ndrop policy if exists \"Leagues are viewable by everyone\" on public.leagues","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"drop policy if exists \"Users can create leagues\" on public.leagues","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Leagues are viewable by everyone\"\n  on public.leagues for select\n  using ( true )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Users can create leagues\"\n  on public.leagues for insert\n  to authenticated\n  with check ( auth.uid() = created_by )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- League Members Table Policies\ndrop policy if exists \"League members are viewable by everyone\" on public.league_members","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"drop policy if exists \"Users can join leagues\" on public.league_members","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"drop policy if exists \"Users can leave leagues\" on public.league_members","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"League members are viewable by everyone\"\n  on public.league_members for select\n  using ( true )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Users can join leagues\"\n  on public.league_members for insert\n  to authenticated\n  with check ( auth.uid() = user_id )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Users can leave leagues\"\n  on public.league_members for delete\n  using ( auth.uid() = user_id )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Explicitly grant permissions\ngrant all on table public.leagues to authenticated","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"grant all on table public.league_members to authenticated","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)","ParameterOIDs":[25,25,1009]}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":[0,0,1],"Parameters":[{"text":"20260104000001"},{"text":"fix_leagues_rls"},{"binary":"0000000100000000000000190000000c000000010000009c2d2d20536166656c792075706461746520524c5320706f6c696369657320666f72206c65616775657320284964656d706f74656e74290a0a2d2d204c656167756573205461626c6520506f6c69636965730a64726f7020706f6c6963792069662065786973747320224c65616775657320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e6c6561677565730000004264726f7020706f6c69637920696620657869737473202255736572732063616e20637265617465206c65616775657322206f6e207075626c69632e6c6561677565730000006063726561746520706f6c69637920224c65616775657320617265207669657761626c652062792065766572796f6e65220a20206f6e207075626c69632e6c65616775657320666f722073656c6563740a20207573696e672028207472756520290000008363726561746520706f6c696379202255736572732063616e20637265617465206c656167756573220a20206f6e207075626c69632e6c65616775657320666f7220696e736572740a2020746f2061757468656e746963617465640a20207769746820636865636b202820617574682e7569642829203d20637265617465645f62792029000000792d2d204c6561677565204d656d62657273205461626c6520506f6c69636965730a64726f7020706f6c6963792069662065786973747320224c6561677565206d656d6265727320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e6c65616775655f6d656d626572730000004764726f7020706f6c69637920696620657869737473202255736572732063616e206a6f696e206c65616775657322206f6e207075626c69632e6c65616775655f6d656d626572730000004864726f7020706f6c69637920696620657869737473202255736572732063616e206c65617665206c65616775657322206f6e207075626c69632e6c65616775655f6d656d626572730000006e63726561746520706f6c69637920224c6561677565206d656d6265727320617265207669657761626c652062792065766572796f6e65220a20206f6e207075626c69632e6c65616775655f6d656d6265727320666f722073656c6563740a20207573696e672028207472756520290000008563726561746520706f6c696379202255736572732063616e206a6f696e206c656167756573220a20206f6e207075626c69632e6c65616775655f6d656d6265727320666f7220696e736572740a2020746f2061757468656e746963617465640a20207769746820636865636b202820617574682e7569642829203d20757365725f696420290000006e63726561746520706f6c696379202255736572732063616e206c65617665206c656167756573220a20206f6e207075626c69632e6c65616775655f6d656d6265727320666f722064656c6574650a20207573696e67202820617574682e7569642829203d20757365725f69642029000000522d2d204578706c696369746c79206772616e74207065726d697373696f6e730a6772616e7420616c6c206f6e207461626c65207075626c69632e6c65616775657320746f2061757468656e74696361746564000000396772616e7420616c6c206f6e207461626c65207075626c69632e6c65616775655f6d656d6265727320746f2061757468656e74696361746564"}],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 1"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Applying migration 20260104000002_ensure_is_admin.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Query","String":"RESET ALL"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"RESET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Ensure is_admin column exists in league_members (Idempotent fix)\nalter table public.league_members \nadd column if not exists is_admin boolean default false","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Re-grant permissions just in case\ngrant all on table public.league_members to authenticated","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)","ParameterOIDs":[25,25,1009]}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":[0,0,1],"Parameters":[{"text":"20260104000002"},{"text":"ensure_is_admin"},{"binary":"00000001000000000000001900000002000000010000009e2d2d20456e737572652069735f61646d696e20636f6c756d6e2065786973747320696e206c65616775655f6d656d6265727320284964656d706f74656e7420666978290a616c746572207461626c65207075626c69632e6c65616775655f6d656d62657273200a61646420636f6c756d6e206966206e6f74206578697374732069735f61646d696e20626f6f6c65616e2064656661756c742066616c73650000005e2d2d2052652d6772616e74207065726d697373696f6e73206a75737420696e20636173650a6772616e7420616c6c206f6e207461626c65207075626c69632e6c65616775655f6d656d6265727320746f2061757468656e74696361746564"}],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Severity":"NOTICE","SeverityUnlocalized":"NOTICE","Code":"42701","Message":"column \"is_admin\" of relation \"league_members\" already exists, skipping","Detail":"","Hint":"","Position":0,"InternalPosition":0,"InternalQuery":"","Where":"","SchemaName":"","TableName":"","ColumnName":"","DataTypeName":"","ConstraintName":"","File":"tablecmds.c","Line":7471,"Routine":"check_for_column_name_collision","UnknownFields":null}
+NOTICE (42701): column "is_admin" of relation "league_members" already exists, skipping
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 1"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Applying migration 20260104000003_create_events_schema.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Query","String":"RESET ALL"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"RESET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Update surfers table\nalter table public.surfers \nadd column if not exists status text default 'ACTIVE', -- ACTIVE, ELIMINATED, IN_HEAT\nadd column if not exists current_season_points numeric default 0","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Create events table\ncreate table if not exists public.events (\n  id uuid default gen_random_uuid() primary key,\n  created_at timestamp with time zone default timezone('utc'::text, now()) not null,\n  name text not null,\n  slug text unique not null,\n  status text default 'UPCOMING', -- UPCOMING, LIVE, COMPLETED\n  start_date timestamp with time zone,\n  end_date timestamp with time zone\n)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Create heats table\ncreate table if not exists public.heats (\n  id uuid default gen_random_uuid() primary key,\n  event_id uuid references public.events(id) on delete cascade not null,\n  round_number int not null,\n  heat_number int not null,\n  status text default 'UPCOMING', -- UPCOMING, LIVE, COMPLETED\n  created_at timestamp with time zone default timezone('utc'::text, now()) not null\n)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Create scores table (logs every scored wave)\ncreate table if not exists public.scores (\n  id uuid default gen_random_uuid() primary key,\n  heat_id uuid references public.heats(id) on delete cascade not null,\n  surfer_id bigint references public.surfers(id) not null,\n  wave_score numeric not null,\n  is_best_wave boolean default false,\n  created_at timestamp with time zone default timezone('utc'::text, now()) not null\n)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Enable RLS\nalter table public.events enable row level security","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"alter table public.heats enable row level security","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"alter table public.scores enable row level security","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Public Read Policies\ncreate policy \"Events are viewable by everyone\" on public.events for select using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Heats are viewable by everyone\" on public.heats for select using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Scores are viewable by everyone\" on public.scores for select using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Admin Write Policies (initially allowing all authenticated for simplicity, SHOULD be restricted to admin in production)\ncreate policy \"Admins can insert events\" on public.events for insert to authenticated with check (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can update events\" on public.events for update to authenticated using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can insert heats\" on public.heats for insert to authenticated with check (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can update heats\" on public.heats for update to authenticated using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can insert scores\" on public.scores for insert to authenticated with check (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can update scores\" on public.scores for update to authenticated using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Grant Permissions\ngrant all on table public.events to authenticated","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"grant all on table public.heats to authenticated","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"grant all on table public.scores to authenticated","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)","ParameterOIDs":[25,25,1009]}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":[0,0,1],"Parameters":[{"text":"20260104000003"},{"text":"create_events_schema"},{"binary":"0000000100000000000000190000001300000001000000ca2d2d205570646174652073757266657273207461626c650a616c746572207461626c65207075626c69632e73757266657273200a61646420636f6c756d6e206966206e6f74206578697374732073746174757320746578742064656661756c742027414354495645272c202d2d204143544956452c20454c494d494e415445442c20494e5f484541540a61646420636f6c756d6e206966206e6f74206578697374732063757272656e745f736561736f6e5f706f696e7473206e756d657269632064656661756c742030000001862d2d20437265617465206576656e7473207461626c650a637265617465207461626c65206966206e6f7420657869737473207075626c69632e6576656e747320280a2020696420757569642064656661756c742067656e5f72616e646f6d5f757569642829207072696d617279206b65792c0a2020637265617465645f61742074696d657374616d7020776974682074696d65207a6f6e652064656661756c742074696d657a6f6e652827757463273a3a746578742c206e6f77282929206e6f74206e756c6c2c0a20206e616d652074657874206e6f74206e756c6c2c0a2020736c7567207465787420756e69717565206e6f74206e756c6c2c0a202073746174757320746578742064656661756c7420275550434f4d494e47272c202d2d205550434f4d494e472c204c4956452c20434f4d504c455445440a202073746172745f646174652074696d657374616d7020776974682074696d65207a6f6e652c0a2020656e645f646174652074696d657374616d7020776974682074696d65207a6f6e650a29000001872d2d20437265617465206865617473207461626c650a637265617465207461626c65206966206e6f7420657869737473207075626c69632e686561747320280a2020696420757569642064656661756c742067656e5f72616e646f6d5f757569642829207072696d617279206b65792c0a20206576656e745f69642075756964207265666572656e636573207075626c69632e6576656e747328696429206f6e2064656c6574652063617363616465206e6f74206e756c6c2c0a2020726f756e645f6e756d62657220696e74206e6f74206e756c6c2c0a2020686561745f6e756d62657220696e74206e6f74206e756c6c2c0a202073746174757320746578742064656661756c7420275550434f4d494e47272c202d2d205550434f4d494e472c204c4956452c20434f4d504c455445440a2020637265617465645f61742074696d657374616d7020776974682074696d65207a6f6e652064656661756c742074696d657a6f6e652827757463273a3a746578742c206e6f77282929206e6f74206e756c6c0a29000001a82d2d204372656174652073636f726573207461626c6520286c6f67732065766572792073636f7265642077617665290a637265617465207461626c65206966206e6f7420657869737473207075626c69632e73636f72657320280a2020696420757569642064656661756c742067656e5f72616e646f6d5f757569642829207072696d617279206b65792c0a2020686561745f69642075756964207265666572656e636573207075626c69632e686561747328696429206f6e2064656c6574652063617363616465206e6f74206e756c6c2c0a20207375726665725f696420626967696e74207265666572656e636573207075626c69632e7375726665727328696429206e6f74206e756c6c2c0a2020776176655f73636f7265206e756d65726963206e6f74206e756c6c2c0a202069735f626573745f7761766520626f6f6c65616e2064656661756c742066616c73652c0a2020637265617465645f61742074696d657374616d7020776974682074696d65207a6f6e652064656661756c742074696d657a6f6e652827757463273a3a746578742c206e6f77282929206e6f74206e756c6c0a29000000412d2d20456e61626c6520524c530a616c746572207461626c65207075626c69632e6576656e747320656e61626c6520726f77206c6576656c20736563757269747900000032616c746572207461626c65207075626c69632e686561747320656e61626c6520726f77206c6576656c20736563757269747900000033616c746572207461626c65207075626c69632e73636f72657320656e61626c6520726f77206c6576656c207365637572697479000000702d2d205075626c6963205265616420506f6c69636965730a63726561746520706f6c69637920224576656e747320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e6576656e747320666f722073656c656374207573696e67202874727565290000005663726561746520706f6c6963792022486561747320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e686561747320666f722073656c656374207573696e67202874727565290000005863726561746520706f6c696379202253636f72657320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e73636f72657320666f722073656c656374207573696e6720287472756529000000e22d2d2041646d696e20577269746520506f6c69636965732028696e697469616c6c7920616c6c6f77696e6720616c6c2061757468656e7469636174656420666f722073696d706c69636974792c2053484f554c44206265207265737472696374656420746f2061646d696e20696e2070726f64756374696f6e290a63726561746520706f6c696379202241646d696e732063616e20696e73657274206576656e747322206f6e207075626c69632e6576656e747320666f7220696e7365727420746f2061757468656e74696361746564207769746820636865636b202874727565290000006263726561746520706f6c696379202241646d696e732063616e20757064617465206576656e747322206f6e207075626c69632e6576656e747320666f722075706461746520746f2061757468656e74696361746564207573696e67202874727565290000006563726561746520706f6c696379202241646d696e732063616e20696e7365727420686561747322206f6e207075626c69632e686561747320666f7220696e7365727420746f2061757468656e74696361746564207769746820636865636b202874727565290000006063726561746520706f6c696379202241646d696e732063616e2075706461746520686561747322206f6e207075626c69632e686561747320666f722075706461746520746f2061757468656e74696361746564207573696e67202874727565290000006763726561746520706f6c696379202241646d696e732063616e20696e736572742073636f72657322206f6e207075626c69632e73636f72657320666f7220696e7365727420746f2061757468656e74696361746564207769746820636865636b202874727565290000006263726561746520706f6c696379202241646d696e732063616e207570646174652073636f72657322206f6e207075626c69632e73636f72657320666f722075706461746520746f2061757468656e74696361746564207573696e6720287472756529000000462d2d204772616e74205065726d697373696f6e730a6772616e7420616c6c206f6e207461626c65207075626c69632e6576656e747320746f2061757468656e74696361746564000000306772616e7420616c6c206f6e207461626c65207075626c69632e686561747320746f2061757468656e74696361746564000000316772616e7420616c6c206f6e207461626c65207075626c69632e73636f72657320746f2061757468656e74696361746564"}],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 1"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Applying migration 20260104000004_seed_real_data.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Query","String":"RESET ALL"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"RESET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Helper function to clear data safely (optional, but good for idempotent runs if filtered)\n-- For this migration, we will use INSERT ON CONFLICT or simple INSERTS.\n-- Since IDs are serial/uuid, we need to be careful.\n\n-- 1. Insert Surfers\n-- We use a temporary table or VALUES to insert.\nINSERT INTO public.surfers (name, country, flag, stance, age, value, tier, gender, image, status, current_season_points)\nVALUES \n    -- MEN (A)\n    ('John John Florence', 'HAW', '🇺🇸', 'Regular', 31, 10.0, 'A', 'Male', 'https://ui-avatars.com/api/?name=John+John+Florence\u0026background=random', 'ACTIVE', 0),\n    ('Jack Robinson', 'AUS', '🇦🇺', 'Regular', 26, 9.5, 'A', 'Male', 'https://ui-avatars.com/api/?name=Jack+Robinson\u0026background=random', 'ACTIVE', 0),\n    ('Griffin Colapinto', 'USA', '🇺🇸', 'Regular', 25, 9.0, 'A', 'Male', 'https://ui-avatars.com/api/?name=Griffin+Colapinto\u0026background=random', 'ACTIVE', 0),\n    ('Ethan Ewing', 'AUS', '🇦🇺', 'Regular', 25, 8.5, 'A', 'Male', 'https://ui-avatars.com/api/?name=Ethan+Ewing\u0026background=random', 'ACTIVE', 0),\n    -- MEN (B)\n    ('Gabriel Medina', 'BRA', '🇧🇷', 'Goofy', 30, 8.0, 'B', 'Male', 'https://ui-avatars.com/api/?name=Gabriel+Medina\u0026background=random', 'ACTIVE', 0),\n    ('Italo Ferreira', 'BRA', '🇧🇷', 'Goofy', 29, 7.5, 'B', 'Male', 'https://ui-avatars.com/api/?name=Italo+Ferreira\u0026background=random', 'ACTIVE', 0),\n    ('Jordy Smith', 'RSA', '🇿🇦', 'Regular', 36, 7.0, 'B', 'Male', 'https://ui-avatars.com/api/?name=Jordy+Smith\u0026background=random', 'ACTIVE', 0),\n    ('Kanoa Igarashi', 'JPN', '🇯🇵', 'Regular', 26, 6.5, 'B', 'Male', 'https://ui-avatars.com/api/?name=Kanoa+Igarashi\u0026background=random', 'ACTIVE', 0),\n    -- MEN (C)\n    ('Kelly Slater', 'USA', '🇺🇸', 'Regular', 52, 5.0, 'C', 'Male', 'https://ui-avatars.com/api/?name=Kelly+Slater\u0026background=random', 'ACTIVE', 0),\n    -- WOMEN (A)\n    ('Caitlin Simmers', 'USA', '🇺🇸', 'Regular', 18, 10.0, 'A', 'Female', 'https://ui-avatars.com/api/?name=Caity+Simmers\u0026background=random', 'ACTIVE', 0),\n    ('Caroline Marks', 'USA', '🇺🇸', 'Goofy', 22, 9.5, 'A', 'Female', 'https://ui-avatars.com/api/?name=Caroline+Marks\u0026background=random', 'ACTIVE', 0),\n    ('Molly Picklum', 'AUS', '🇦🇺', 'Regular', 21, 9.0, 'A', 'Female', 'https://ui-avatars.com/api/?name=Molly+Picklum\u0026background=random', 'ACTIVE', 0),\n    -- WOMEN (B)\n    ('Tyler Wright', 'AUS', '🇦🇺', 'Regular', 29, 8.0, 'B', 'Female', 'https://ui-avatars.com/api/?name=Tyler+Wright\u0026background=random', 'ACTIVE', 0),\n    ('Stephanie Gilmore', 'AUS', '🇦🇺', 'Regular', 36, 7.5, 'B', 'Female', 'https://ui-avatars.com/api/?name=Steph+Gilmore\u0026background=random', 'ACTIVE', 0)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- 2. Insert Event\nINSERT INTO public.events (name, slug, status, start_date, end_date)\nVALUES \n    ('Lexus Pipe Pro', 'lexus-pipe-pro-2024', 'UPCOMING', now(), now() + interval '14 days')\nON CONFLICT (slug) DO NOTHING","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- 3. Insert Heats (Dynamically select event ID)\nDO $$\nDECLARE\n    eid uuid;\nBEGIN\n    SELECT id INTO eid FROM public.events WHERE slug = 'lexus-pipe-pro-2024' LIMIT 1;\n    \n    INSERT INTO public.heats (event_id, round_number, heat_number, status)\n    VALUES\n        (eid, 1, 1, 'UPCOMING'),\n        (eid, 1, 2, 'UPCOMING'),\n        (eid, 1, 3, 'UPCOMING');\nEND $$","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)","ParameterOIDs":[25,25,1009]}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":[0,0,1],"Parameters":[{"text":"20260104000004"},{"text":"seed_real_data"},{"binary":"000000010000000000000019000000030000000100000a922d2d2048656c7065722066756e6374696f6e20746f20636c656172206461746120736166656c7920286f7074696f6e616c2c2062757420676f6f6420666f72206964656d706f74656e742072756e732069662066696c7465726564290a2d2d20466f722074686973206d6967726174696f6e2c2077652077696c6c2075736520494e53455254204f4e20434f4e464c494354206f722073696d706c6520494e53455254532e0a2d2d2053696e636520494473206172652073657269616c2f757569642c207765206e65656420746f206265206361726566756c2e0a0a2d2d20312e20496e7365727420537572666572730a2d2d2057652075736520612074656d706f72617279207461626c65206f722056414c55455320746f20696e736572742e0a494e5345525420494e544f207075626c69632e7375726665727320286e616d652c20636f756e7472792c20666c61672c207374616e63652c206167652c2076616c75652c20746965722c2067656e6465722c20696d6167652c207374617475732c2063757272656e745f736561736f6e5f706f696e7473290a56414c554553200a202020202d2d204d454e202841290a2020202028274a6f686e204a6f686e20466c6f72656e6365272c2027484157272c2027f09f87baf09f87b8272c2027526567756c6172272c2033312c2031302e302c202741272c20274d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d4a6f686e2b4a6f686e2b466c6f72656e6365266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a2020202028274a61636b20526f62696e736f6e272c2027415553272c2027f09f87a6f09f87ba272c2027526567756c6172272c2032362c20392e352c202741272c20274d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d4a61636b2b526f62696e736f6e266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a2020202028274772696666696e20436f6c6170696e746f272c2027555341272c2027f09f87baf09f87b8272c2027526567756c6172272c2032352c20392e302c202741272c20274d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d4772696666696e2b436f6c6170696e746f266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a202020202827457468616e204577696e67272c2027415553272c2027f09f87a6f09f87ba272c2027526567756c6172272c2032352c20382e352c202741272c20274d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d457468616e2b4577696e67266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a202020202d2d204d454e202842290a2020202028274761627269656c204d6564696e61272c2027425241272c2027f09f87a7f09f87b7272c2027476f6f6679272c2033302c20382e302c202742272c20274d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d4761627269656c2b4d6564696e61266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a2020202028274974616c6f204665727265697261272c2027425241272c2027f09f87a7f09f87b7272c2027476f6f6679272c2032392c20372e352c202742272c20274d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d4974616c6f2b4665727265697261266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a2020202028274a6f72647920536d697468272c2027525341272c2027f09f87bff09f87a6272c2027526567756c6172272c2033362c20372e302c202742272c20274d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d4a6f7264792b536d697468266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a2020202028274b616e6f61204967617261736869272c20274a504e272c2027f09f87aff09f87b5272c2027526567756c6172272c2032362c20362e352c202742272c20274d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d4b616e6f612b4967617261736869266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a202020202d2d204d454e202843290a2020202028274b656c6c7920536c61746572272c2027555341272c2027f09f87baf09f87b8272c2027526567756c6172272c2035322c20352e302c202743272c20274d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d4b656c6c792b536c61746572266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a202020202d2d20574f4d454e202841290a202020202827436169746c696e2053696d6d657273272c2027555341272c2027f09f87baf09f87b8272c2027526567756c6172272c2031382c2031302e302c202741272c202746656d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d43616974792b53696d6d657273266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a2020202028274361726f6c696e65204d61726b73272c2027555341272c2027f09f87baf09f87b8272c2027476f6f6679272c2032322c20392e352c202741272c202746656d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d4361726f6c696e652b4d61726b73266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a2020202028274d6f6c6c79205069636b6c756d272c2027415553272c2027f09f87a6f09f87ba272c2027526567756c6172272c2032312c20392e302c202741272c202746656d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d4d6f6c6c792b5069636b6c756d266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a202020202d2d20574f4d454e202842290a20202020282754796c657220577269676874272c2027415553272c2027f09f87a6f09f87ba272c2027526567756c6172272c2032392c20382e302c202742272c202746656d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d54796c65722b577269676874266261636b67726f756e643d72616e646f6d272c2027414354495645272c2030292c0a2020202028275374657068616e69652047696c6d6f7265272c2027415553272c2027f09f87a6f09f87ba272c2027526567756c6172272c2033362c20372e352c202742272c202746656d616c65272c202768747470733a2f2f75692d617661746172732e636f6d2f6170692f3f6e616d653d53746570682b47696c6d6f7265266261636b67726f756e643d72616e646f6d272c2027414354495645272c203029000000da2d2d20322e20496e73657274204576656e740a494e5345525420494e544f207075626c69632e6576656e747320286e616d652c20736c75672c207374617475732c2073746172745f646174652c20656e645f64617465290a56414c554553200a2020202028274c6578757320506970652050726f272c20276c657875732d706970652d70726f2d32303234272c20275550434f4d494e47272c206e6f7728292c206e6f772829202b20696e74657276616c20273134206461797327290a4f4e20434f4e464c4943542028736c75672920444f204e4f5448494e470000016d2d2d20332e20496e73657274204865617473202844796e616d6963616c6c792073656c656374206576656e74204944290a444f2024240a4445434c4152450a2020202065696420757569643b0a424547494e0a2020202053454c45435420696420494e544f206569642046524f4d207075626c69632e6576656e747320574845524520736c7567203d20276c657875732d706970652d70726f2d3230323427204c494d495420313b0a202020200a20202020494e5345525420494e544f207075626c69632e686561747320286576656e745f69642c20726f756e645f6e756d6265722c20686561745f6e756d6265722c20737461747573290a2020202056414c5545530a2020202020202020286569642c20312c20312c20275550434f4d494e4727292c0a2020202020202020286569642c20312c20322c20275550434f4d494e4727292c0a2020202020202020286569642c20312c20332c20275550434f4d494e4727293b0a454e44202424"}],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 14"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 1"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DO"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 1"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Applying migration 20260104000005_fix_events_schema.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Query","String":"RESET ALL"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"RESET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Consolidated Fix for Events Schema \u0026 RLS\n-- Updated: Uses UUID for surfer_id\n-- Updated: Ensures 'gender' column exists\n\n-- 1. Ensure Tables Exist\ncreate table if not exists public.events (\n  id uuid default gen_random_uuid() primary key,\n  created_at timestamp with time zone default timezone('utc'::text, now()) not null,\n  name text not null,\n  slug text unique not null,\n  status text default 'UPCOMING',\n  start_date timestamp with time zone,\n  end_date timestamp with time zone\n)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create table if not exists public.heats (\n  id uuid default gen_random_uuid() primary key,\n  event_id uuid references public.events(id) on delete cascade not null,\n  round_number int not null,\n  heat_number int not null,\n  status text default 'UPCOMING',\n  created_at timestamp with time zone default timezone('utc'::text, now()) not null\n)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create table if not exists public.scores (\n  id uuid default gen_random_uuid() primary key,\n  heat_id uuid references public.heats(id) on delete cascade not null,\n  -- Using UUID for surfer_id based on error report (was bigint)\n  surfer_id uuid references public.surfers(id) not null,\n  wave_score numeric not null,\n  is_best_wave boolean default false,\n  created_at timestamp with time zone default timezone('utc'::text, now()) not null\n)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- 2. Update Surfers Table (if not already done)\nalter table public.surfers \nadd column if not exists status text default 'ACTIVE',\nadd column if not exists current_season_points numeric default 0,\nadd column if not exists gender text check (gender in ('Male', 'Female'))","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- 3. Reset RLS Policies (Drop first to avoid conflicts)\nalter table public.events enable row level security","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"alter table public.heats enable row level security","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"alter table public.scores enable row level security","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Events\ndrop policy if exists \"Events are viewable by everyone\" on public.events","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"drop policy if exists \"Admins can insert events\" on public.events","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"drop policy if exists \"Admins can update events\" on public.events","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Events are viewable by everyone\" on public.events for select using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can insert events\" on public.events for insert to authenticated with check (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can update events\" on public.events for update to authenticated using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Heats\ndrop policy if exists \"Heats are viewable by everyone\" on public.heats","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"drop policy if exists \"Admins can insert heats\" on public.heats","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"drop policy if exists \"Admins can update heats\" on public.heats","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Heats are viewable by everyone\" on public.heats for select using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can insert heats\" on public.heats for insert to authenticated with check (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can update heats\" on public.heats for update to authenticated using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Scores\ndrop policy if exists \"Scores are viewable by everyone\" on public.scores","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"drop policy if exists \"Admins can insert scores\" on public.scores","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"drop policy if exists \"Admins can update scores\" on public.scores","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Scores are viewable by everyone\" on public.scores for select using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can insert scores\" on public.scores for insert to authenticated with check (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can update scores\" on public.scores for update to authenticated using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- 4. Grant Permissions (Crucial for Vercel/Supabase connections)\ngrant all on table public.events to authenticated","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"grant all on table public.heats to authenticated","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"grant all on table public.scores to authenticated","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"grant all on table public.events to anon","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"grant all on table public.heats to anon","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"grant all on table public.scores to anon","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)","ParameterOIDs":[25,25,1009]}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":[0,0,1],"Parameters":[{"text":"20260104000005"},{"text":"fix_events_schema"},{"binary":"0000000100000000000000190000001f00000001000001e82d2d20436f6e736f6c6964617465642046697820666f72204576656e747320536368656d61202620524c530a2d2d20557064617465643a2055736573205555494420666f72207375726665725f69640a2d2d20557064617465643a20456e7375726573202767656e6465722720636f6c756d6e206578697374730a0a2d2d20312e20456e73757265205461626c65732045786973740a637265617465207461626c65206966206e6f7420657869737473207075626c69632e6576656e747320280a2020696420757569642064656661756c742067656e5f72616e646f6d5f757569642829207072696d617279206b65792c0a2020637265617465645f61742074696d657374616d7020776974682074696d65207a6f6e652064656661756c742074696d657a6f6e652827757463273a3a746578742c206e6f77282929206e6f74206e756c6c2c0a20206e616d652074657874206e6f74206e756c6c2c0a2020736c7567207465787420756e69717565206e6f74206e756c6c2c0a202073746174757320746578742064656661756c7420275550434f4d494e47272c0a202073746172745f646174652074696d657374616d7020776974682074696d65207a6f6e652c0a2020656e645f646174652074696d657374616d7020776974682074696d65207a6f6e650a2900000154637265617465207461626c65206966206e6f7420657869737473207075626c69632e686561747320280a2020696420757569642064656661756c742067656e5f72616e646f6d5f757569642829207072696d617279206b65792c0a20206576656e745f69642075756964207265666572656e636573207075626c69632e6576656e747328696429206f6e2064656c6574652063617363616465206e6f74206e756c6c2c0a2020726f756e645f6e756d62657220696e74206e6f74206e756c6c2c0a2020686561745f6e756d62657220696e74206e6f74206e756c6c2c0a202073746174757320746578742064656661756c7420275550434f4d494e47272c0a2020637265617465645f61742074696d657374616d7020776974682074696d65207a6f6e652064656661756c742074696d657a6f6e652827757463273a3a746578742c206e6f77282929206e6f74206e756c6c0a29000001b7637265617465207461626c65206966206e6f7420657869737473207075626c69632e73636f72657320280a2020696420757569642064656661756c742067656e5f72616e646f6d5f757569642829207072696d617279206b65792c0a2020686561745f69642075756964207265666572656e636573207075626c69632e686561747328696429206f6e2064656c6574652063617363616465206e6f74206e756c6c2c0a20202d2d205573696e67205555494420666f72207375726665725f6964206261736564206f6e206572726f72207265706f7274202877617320626967696e74290a20207375726665725f69642075756964207265666572656e636573207075626c69632e7375726665727328696429206e6f74206e756c6c2c0a2020776176655f73636f7265206e756d65726963206e6f74206e756c6c2c0a202069735f626573745f7761766520626f6f6c65616e2064656661756c742066616c73652c0a2020637265617465645f61742074696d657374616d7020776974682074696d65207a6f6e652064656661756c742074696d657a6f6e652827757463273a3a746578742c206e6f77282929206e6f74206e756c6c0a290000010f2d2d20322e205570646174652053757266657273205461626c6520286966206e6f7420616c726561647920646f6e65290a616c746572207461626c65207075626c69632e73757266657273200a61646420636f6c756d6e206966206e6f74206578697374732073746174757320746578742064656661756c742027414354495645272c0a61646420636f6c756d6e206966206e6f74206578697374732063757272656e745f736561736f6e5f706f696e7473206e756d657269632064656661756c7420302c0a61646420636f6c756d6e206966206e6f74206578697374732067656e646572207465787420636865636b202867656e64657220696e2028274d616c65272c202746656d616c652729290000006c2d2d20332e20526573657420524c5320506f6c6963696573202844726f7020666972737420746f2061766f696420636f6e666c69637473290a616c746572207461626c65207075626c69632e6576656e747320656e61626c6520726f77206c6576656c20736563757269747900000032616c746572207461626c65207075626c69632e686561747320656e61626c6520726f77206c6576656c20736563757269747900000033616c746572207461626c65207075626c69632e73636f72657320656e61626c6520726f77206c6576656c207365637572697479000000522d2d204576656e74730a64726f7020706f6c6963792069662065786973747320224576656e747320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e6576656e74730000004164726f7020706f6c69637920696620657869737473202241646d696e732063616e20696e73657274206576656e747322206f6e207075626c69632e6576656e74730000004164726f7020706f6c69637920696620657869737473202241646d696e732063616e20757064617465206576656e747322206f6e207075626c69632e6576656e74730000005863726561746520706f6c69637920224576656e747320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e6576656e747320666f722073656c656374207573696e67202874727565290000006763726561746520706f6c696379202241646d696e732063616e20696e73657274206576656e747322206f6e207075626c69632e6576656e747320666f7220696e7365727420746f2061757468656e74696361746564207769746820636865636b202874727565290000006263726561746520706f6c696379202241646d696e732063616e20757064617465206576656e747322206f6e207075626c69632e6576656e747320666f722075706461746520746f2061757468656e74696361746564207573696e67202874727565290000004f2d2d2048656174730a64726f7020706f6c696379206966206578697374732022486561747320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e68656174730000003f64726f7020706f6c69637920696620657869737473202241646d696e732063616e20696e7365727420686561747322206f6e207075626c69632e68656174730000003f64726f7020706f6c69637920696620657869737473202241646d696e732063616e2075706461746520686561747322206f6e207075626c69632e68656174730000005663726561746520706f6c6963792022486561747320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e686561747320666f722073656c656374207573696e67202874727565290000006563726561746520706f6c696379202241646d696e732063616e20696e7365727420686561747322206f6e207075626c69632e686561747320666f7220696e7365727420746f2061757468656e74696361746564207769746820636865636b202874727565290000006063726561746520706f6c696379202241646d696e732063616e2075706461746520686561747322206f6e207075626c69632e686561747320666f722075706461746520746f2061757468656e74696361746564207573696e6720287472756529000000522d2d2053636f7265730a64726f7020706f6c69637920696620657869737473202253636f72657320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e73636f7265730000004164726f7020706f6c69637920696620657869737473202241646d696e732063616e20696e736572742073636f72657322206f6e207075626c69632e73636f7265730000004164726f7020706f6c69637920696620657869737473202241646d696e732063616e207570646174652073636f72657322206f6e207075626c69632e73636f7265730000005863726561746520706f6c696379202253636f72657320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e73636f72657320666f722073656c656374207573696e67202874727565290000006763726561746520706f6c696379202241646d696e732063616e20696e736572742073636f72657322206f6e207075626c69632e73636f72657320666f7220696e7365727420746f2061757468656e74696361746564207769746820636865636b202874727565290000006263726561746520706f6c696379202241646d696e732063616e207570646174652073636f72657322206f6e207075626c69632e73636f72657320666f722075706461746520746f2061757468656e74696361746564207573696e6720287472756529000000732d2d20342e204772616e74205065726d697373696f6e7320284372756369616c20666f722056657263656c2f537570616261736520636f6e6e656374696f6e73290a6772616e7420616c6c206f6e207461626c65207075626c69632e6576656e747320746f2061757468656e74696361746564000000306772616e7420616c6c206f6e207461626c65207075626c69632e686561747320746f2061757468656e74696361746564000000316772616e7420616c6c206f6e207461626c65207075626c69632e73636f72657320746f2061757468656e74696361746564000000286772616e7420616c6c206f6e207461626c65207075626c69632e6576656e747320746f20616e6f6e000000276772616e7420616c6c206f6e207461626c65207075626c69632e686561747320746f20616e6f6e000000286772616e7420616c6c206f6e207461626c65207075626c69632e73636f72657320746f20616e6f6e"}],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Severity":"NOTICE","SeverityUnlocalized":"NOTICE","Code":"42P07","Message":"relation \"events\" already exists, skipping","Detail":"","Hint":"","Position":0,"InternalPosition":0,"InternalQuery":"","Where":"","SchemaName":"","TableName":"","ColumnName":"","DataTypeName":"","ConstraintName":"","File":"parse_utilcmd.c","Line":207,"Routine":"transformCreateStmt","UnknownFields":null}
+NOTICE (42P07): relation "events" already exists, skipping
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Severity":"NOTICE","SeverityUnlocalized":"NOTICE","Code":"42P07","Message":"relation \"heats\" already exists, skipping","Detail":"","Hint":"","Position":0,"InternalPosition":0,"InternalQuery":"","Where":"","SchemaName":"","TableName":"","ColumnName":"","DataTypeName":"","ConstraintName":"","File":"parse_utilcmd.c","Line":207,"Routine":"transformCreateStmt","UnknownFields":null}
+NOTICE (42P07): relation "heats" already exists, skipping
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Severity":"NOTICE","SeverityUnlocalized":"NOTICE","Code":"42P07","Message":"relation \"scores\" already exists, skipping","Detail":"","Hint":"","Position":0,"InternalPosition":0,"InternalQuery":"","Where":"","SchemaName":"","TableName":"","ColumnName":"","DataTypeName":"","ConstraintName":"","File":"parse_utilcmd.c","Line":207,"Routine":"transformCreateStmt","UnknownFields":null}
+NOTICE (42P07): relation "scores" already exists, skipping
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Severity":"NOTICE","SeverityUnlocalized":"NOTICE","Code":"42701","Message":"column \"status\" of relation \"surfers\" already exists, skipping","Detail":"","Hint":"","Position":0,"InternalPosition":0,"InternalQuery":"","Where":"","SchemaName":"","TableName":"","ColumnName":"","DataTypeName":"","ConstraintName":"","File":"tablecmds.c","Line":7471,"Routine":"check_for_column_name_collision","UnknownFields":null}
+2026/03/08 15:08:21 PG Recv: {"Severity":"NOTICE","SeverityUnlocalized":"NOTICE","Code":"42701","Message":"column \"current_season_points\" of relation \"surfers\" already exists, skipping","Detail":"","Hint":"","Position":0,"InternalPosition":0,"InternalQuery":"","Where":"","SchemaName":"","TableName":"","ColumnName":"","DataTypeName":"","ConstraintName":"","File":"tablecmds.c","Line":7471,"Routine":"check_for_column_name_collision","UnknownFields":null}
+2026/03/08 15:08:21 PG Recv: {"Severity":"NOTICE","SeverityUnlocalized":"NOTICE","Code":"42701","Message":"column \"gender\" of relation \"surfers\" already exists, skipping","Detail":"","Hint":"","Position":0,"InternalPosition":0,"InternalQuery":"","Where":"","SchemaName":"","TableName":"","ColumnName":"","DataTypeName":"","ConstraintName":"","File":"tablecmds.c","Line":7471,"Routine":"check_for_column_name_collision","UnknownFields":null}
+NOTICE (42701): column "status" of relation "surfers" already exists, skipping
+NOTICE (42701): column "current_season_points" of relation "surfers" already exists, skipping
+NOTICE (42701): column "gender" of relation "surfers" already exists, skipping
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"ALTER TABLE"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"DROP POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"CREATE POLICY"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"GRANT"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:21 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"INSERT 0 1"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+Applying migration 20260104000006_admin_delete_policies.sql...
+2026/03/08 15:08:21 PG Send: {"Type":"Query","String":"RESET ALL"}
+2026/03/08 15:08:21 PG Recv: {"Type":"CommandComplete","CommandTag":"RESET"}
+2026/03/08 15:08:21 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Admin Enhancements: Delete Policies \u0026 Heat Assignments\n\n-- 1. Create heat_assignments table (for Heat Draws)\ncreate table if not exists public.heat_assignments (\n  id uuid default gen_random_uuid() primary key,\n  heat_id uuid references public.heats(id) on delete cascade not null,\n  surfer_id uuid references public.surfers(id) not null,\n  created_at timestamp with time zone default timezone('utc'::text, now()) not null,\n  unique(heat_id, surfer_id)\n)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Enable RLS for assignment\nalter table public.heat_assignments enable row level security","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Policies for assignments\ncreate policy \"Assignments are viewable by everyone\" on public.heat_assignments for select using (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can insert assignments\" on public.heat_assignments for insert to authenticated with check (true)","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"create policy \"Admins can delete assignments\" on public.heat_assignments for delete using (auth.role() = 'authenticated')","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Simplified for MVP\n\n-- 2. Add DELETE Policies for Admin (Authenticated users)\n\n-- Events\ncreate policy \"Admins can delete events\" \n  on public.events for delete \n  using ( auth.role() = 'authenticated' )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Heats\ncreate policy \"Admins can delete heats\" \n  on public.heats for delete \n  using ( auth.role() = 'authenticated' )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Scores\ncreate policy \"Admins can delete scores\" \n  on public.scores for delete \n  using ( auth.role() = 'authenticated' )","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"-- Grant permissions for new table\ngrant all on table public.heat_assignments to authenticated","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"grant all on table public.heat_assignments to anon","ParameterOIDs":null}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":null,"Parameters":[],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Parse","Name":"","Query":"INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)","ParameterOIDs":[25,25,1009]}
+2026/03/08 15:08:21 PG Send: {"Type":"Bind","DestinationPortal":"","PreparedStatement":"","ParameterFormatCodes":[0,0,1],"Parameters":[{"text":"20260104000006"},{"text":"admin_delete_policies"},{"binary":"0000000100000000000000190000000a00000001000001c92d2d2041646d696e20456e68616e63656d656e74733a2044656c65746520506f6c6963696573202620486561742041737369676e6d656e74730a0a2d2d20312e2043726561746520686561745f61737369676e6d656e7473207461626c652028666f722048656174204472617773290a637265617465207461626c65206966206e6f7420657869737473207075626c69632e686561745f61737369676e6d656e747320280a2020696420757569642064656661756c742067656e5f72616e646f6d5f757569642829207072696d617279206b65792c0a2020686561745f69642075756964207265666572656e636573207075626c69632e686561747328696429206f6e2064656c6574652063617363616465206e6f74206e756c6c2c0a20207375726665725f69642075756964207265666572656e636573207075626c69632e7375726665727328696429206e6f74206e756c6c2c0a2020637265617465645f61742074696d657374616d7020776974682074696d65207a6f6e652064656661756c742074696d657a6f6e652827757463273a3a746578742c206e6f77282929206e6f74206e756c6c2c0a2020756e6971756528686561745f69642c207375726665725f6964290a290000005a2d2d20456e61626c6520524c5320666f722061737369676e6d656e740a616c746572207461626c65207075626c69632e686561745f61737369676e6d656e747320656e61626c6520726f77206c6576656c207365637572697479000000832d2d20506f6c696369657320666f722061737369676e6d656e74730a63726561746520706f6c696379202241737369676e6d656e747320617265207669657761626c652062792065766572796f6e6522206f6e207075626c69632e686561745f61737369676e6d656e747320666f722073656c656374207573696e67202874727565290000007663726561746520706f6c696379202241646d696e732063616e20696e736572742061737369676e6d656e747322206f6e207075626c69632e686561745f61737369676e6d656e747320666f7220696e7365727420746f2061757468656e74696361746564207769746820636865636b202874727565290000007963726561746520706f6c696379202241646d696e732063616e2064656c6574652061737369676e6d656e747322206f6e207075626c69632e686561745f61737369676e6d656e747320666f722064656c657465207573696e672028617574682e726f6c652829203d202761757468656e746963617465642729000000ce2d2d2053696d706c696669656420666f72204d56500a0a2d2d20322e204164642044454c45544520506f6c696369657320666f722041646d696e202841757468656e74696361746564207573657273290a0a2d2d204576656e74730a63726561746520706f6c696379202241646d696e732063616e2064656c657465206576656e747322200a20206f6e207075626c69632e6576656e747320666f722064656c657465200a20207573696e67202820617574682e726f6c652829203d202761757468656e74696361746564272029000000792d2d2048656174730a63726561746520706f6c696379202241646d696e732063616e2064656c65746520686561747322200a20206f6e207075626c69632e686561747320666f722064656c657465200a20207573696e67202820617574682e726f6c652829203d202761757468656e746963617465642720290000007c2d2d2053636f7265730a63726561746520706f6c696379202241646d696e732063616e2064656c6574652073636f72657322200a20206f6e207075626c69632e73636f72657320666f722064656c657465200a20207573696e67202820617574682e726f6c652829203d202761757468656e746963617465642720290000005e2d2d204772616e74207065726d697373696f6e7320666f72206e6577207461626c650a6772616e7420616c6c206f6e207461626c65207075626c69632e686561745f61737369676e6d656e747320746f2061757468656e74696361746564000000326772616e7420616c6c206f6e207461626c65207075626c69632e686561745f61737369676e6d656e747320746f20616e6f6e"}],"ResultFormatCodes":[]}
+2026/03/08 15:08:21 PG Send: {"Type":"Describe","ObjectType":"P","Name":""}
+2026/03/08 15:08:21 PG Send: {"Type":"Execute","Portal":"","MaxRows":0}
+2026/03/08 15:08:21 PG Send: {"Type":"Sync"}
+2026/03/08 15:08:22 PG Recv: {"Type":"ParseComplete"}
+2026/03/08 15:08:22 PG Recv: {"Type":"BindComplete"}
+2026/03/08 15:08:22 PG Recv: {"Type":"NoData"}
+2026/03/08 15:08:22 PG Recv: {"Type":"ErrorResponse","Severity":"ERROR","SeverityUnlocalized":"ERROR","Code":"42804","Message":"foreign key constraint \"heat_assignments_surfer_id_fkey\" cannot be implemented","Detail":"Key columns \"surfer_id\" and \"id\" are of incompatible types: uuid and bigint.","Hint":"","Position":0,"InternalPosition":0,"InternalQuery":"","Where":"","SchemaName":"","TableName":"","ColumnName":"","DataTypeName":"","ConstraintName":"","File":"tablecmds.c","Line":9896,"Routine":"ATAddForeignKeyConstraint","UnknownFields":null}
+2026/03/08 15:08:22 PG Recv: {"Type":"ReadyForQuery","TxStatus":"I"}
+2026/03/08 15:08:22 PG Send: {"Type":"Terminate"}
+ERROR: foreign key constraint "heat_assignments_surfer_id_fkey" cannot be implemented (SQLSTATE 42804)
+Key columns "surfer_id" and "id" are of incompatible types: uuid and bigint.                          
+At statement: 0                                                                                       
+-- Admin Enhancements: Delete Policies & Heat Assignments                                             
+                                                                                                      
+-- 1. Create heat_assignments table (for Heat Draws)                                                  
+create table if not exists public.heat_assignments (                                                  
+  id uuid default gen_random_uuid() primary key,                                                      
+  heat_id uuid references public.heats(id) on delete cascade not null,                                
+  surfer_id uuid references public.surfers(id) not null,                                              
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,                  
+  unique(heat_id, surfer_id)                                                                          
+)                                                                                                     
