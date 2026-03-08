@@ -130,31 +130,31 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
         </div>
 
         {/* Conditions/Watching Card (Teal) */}
-        <div className="bg-[#207a68] rounded-[32px] p-8 text-white relative flex flex-col justify-between h-[260px] shadow-sm">
-          <div className="flex justify-between items-start w-full relative z-10">
-            <span className="px-4 py-1.5 mt-2 rounded-full bg-white/20 text-[11px] font-bold uppercase tracking-wider text-white">
+        <div className="bg-[#237c6a] rounded-[30px] p-6 text-white relative flex flex-col justify-between h-[256px]">
+          <div className="flex justify-between items-start w-full relative z-10 pt-2 lg:pt-0">
+            <span className="px-3.5 py-1.5 rounded-full bg-white/20 text-[10px] font-bold uppercase tracking-widest text-white mt-2 lg:mt-0 shadow-sm backdrop-blur-sm">
               {activeEvent?.swell_status || (eventStatus === 'LIVE' ? 'Live Conditions' : 'Waiting for Swell')}
             </span>
 
-            <div className="text-right absolute -top-4 right-0 flex flex-col items-end">
+            <div className="text-right absolute -top-3 right-2 flex flex-col items-end">
               <div className="flex items-baseline tracking-tighter text-white">
-                <span className="text-[100px] font-black leading-none tracking-[-0.05em] drop-shadow-sm">{activeEvent?.swell_height?.replace(/ft/i, '') || '6-8'}</span>
-                <span className="text-[40px] font-black leading-none ml-2 opacity-80 drop-shadow-sm">ft</span>
+                <span className="text-[104px] font-black leading-[0.85] tracking-tight">{activeEvent?.swell_height?.replace(/ft/i, '') || '6-8'}</span>
+                <span className="text-[28px] font-bold leading-none ml-[2px] opacity-80 pb-3">ft</span>
               </div>
-              <div className="text-[11px] font-bold opacity-80 uppercase tracking-[0.2em] -mt-2 mr-1">Swell Height</div>
+              <div className="text-[10px] font-bold opacity-70 uppercase tracking-[0.2em] -mt-1 mr-2">Swell Height</div>
             </div>
           </div>
 
-          <div className="flex items-end justify-between relative z-10 w-full mt-auto">
-            <div>
-              <h3 className="text-[28px] font-bold tracking-tight mb-2 drop-shadow-sm">Conditions</h3>
-              <p className="text-[15px] text-white/90 leading-[1.6] max-w-[360px] whitespace-pre-wrap">
+          <div className="flex items-end justify-between relative z-10 w-full mt-auto pb-1 pl-1">
+            <div className="pr-12">
+              <h3 className="text-2xl font-bold tracking-tight mb-1.5">Conditions</h3>
+              <p className="text-[13px] text-white/90 leading-[1.65] max-w-[280px] font-medium whitespace-pre-wrap">
                 {activeEvent?.conditions || 'Clean • Light Offshore'}
               </p>
             </div>
 
-            <a href="https://www.worldsurfleague.com/" target="_blank" rel="noopener noreferrer" className="bg-white text-[#207a68] px-6 py-3 rounded-[24px] text-[12px] font-black tracking-widest uppercase hover:bg-gray-50 transition shadow-sm flex items-center gap-2 mb-1">
-              <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+            <a href="https://www.worldsurfleague.com/" target="_blank" rel="noopener noreferrer" className="bg-white text-[#237c6a] pl-5 pr-6 py-2.5 rounded-full text-[11px] font-bold tracking-widest uppercase hover:bg-emerald-50 transition shadow-sm flex items-center gap-2 mb-1 shrink-0">
+              <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
               Watch
             </a>
           </div>
