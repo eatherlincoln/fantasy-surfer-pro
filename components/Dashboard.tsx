@@ -108,24 +108,24 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
         {/* Event Status Card */}
-        <div className="bg-white rounded-[32px] p-8 apple-shadow border border-gray-100 relative overflow-hidden flex flex-col justify-between h-[220px]">
-          <div className="flex justify-between items-start">
-            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${eventStatus === 'LIVE' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
+        <div className="bg-white rounded-[32px] p-8 apple-shadow border border-gray-100 relative overflow-hidden flex flex-col justify-between h-[256px]">
+          <div className="flex justify-between items-start w-full relative z-10">
+            <span className={`px-4 py-1.5 mt-1 rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm ${eventStatus === 'LIVE' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
               {eventStatus === 'LIVE' ? 'Drafting' : 'Waiting'}
             </span>
-            <div className="text-right">
-              <div className="text-xs font-bold text-gray-400 uppercase tracking-wide">Total Points</div>
-              <div className="text-3xl font-black text-primary-dark tracking-tight">{totalPoints.toFixed(2)}</div>
-              <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Ranked #132 Global</div>
+            <div className="text-right flex flex-col items-end">
+              <div className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1 mr-1">Total Points</div>
+              <div className="text-[56px] font-black text-primary-dark tracking-[-0.05em] leading-[0.85]">{totalPoints.toFixed(2)}</div>
+              <div className="text-[10px] text-gray-400 font-bold uppercase mt-2 tracking-widest mr-1">Ranked #132 Global</div>
             </div>
           </div>
 
-          <div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-6xl font-black text-gray-900 tracking-tighter">1st</span>
-              <span className="text-xl font-bold text-gray-300">/ 12</span>
+          <div className="mt-auto pb-1 pl-1">
+            <div className="flex items-baseline gap-1 tracking-tighter">
+              <span className="text-[80px] font-black text-gray-900 leading-[0.85] tracking-tight">1st</span>
+              <span className="text-[28px] font-bold text-gray-300 leading-none ml-[2px] pb-3">/ 12</span>
             </div>
-            <div className="text-xs font-bold text-primary-dark uppercase tracking-widest mt-1">Friends League</div>
+            <div className="text-[11px] font-bold text-primary-dark uppercase tracking-[0.2em] mt-2">Friends League</div>
           </div>
         </div>
 
