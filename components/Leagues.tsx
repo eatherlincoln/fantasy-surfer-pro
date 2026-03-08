@@ -18,7 +18,7 @@ const MOCK_GLOBAL_MEMBERS: any[] = [
 
 const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
   const [expandedId, setExpandedId] = useState<string | null>('1');
-  const [teamName, setTeamName] = useState(userProfile?.team_name || "Lincoln's Team");
+  const [teamName, setTeamName] = useState(userProfile?.team_name || "Jane Doe");
   const [isEditingName, setIsEditingName] = useState(false);
 
   // League State

@@ -95,7 +95,12 @@ const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
       alert("✅ Profile updated successfully!");
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      alert(`❌ Failed to update profile: ${error.message || error}`);
+
+      if (error.message?.includes('profiles_username_key')) {
+        alert("❌ That username is already taken. Please choose another one.");
+      } else {
+        alert(`❌ Failed to update profile: ${error.message || error}`);
+      }
     }
   };
 
@@ -640,7 +645,7 @@ const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
           </div>
         ) : (
           <>
-            <h2 className="text-2xl font-bold text-gray-900">{profile?.team_name || "Lincoln's Team"}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{profile?.team_name || "Jane Doe"}</h2>
             <p className="text-gray-400 font-medium text-sm">@{profile?.username || 'Surfer'}</p>
           </>
         )}
