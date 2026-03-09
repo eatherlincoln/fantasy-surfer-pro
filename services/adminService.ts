@@ -142,6 +142,14 @@ export const toggleUserBan = async (userId: string, isBanned: boolean) => {
     return data;
 };
 
+export const deleteUser = async (userId: string) => {
+    // Requires Admin calling a SECURITY DEFINER Postgres function to delete from auth.users
+    const { error } = await supabase.rpc('delete_user', { target_user_id: userId });
+
+    if (error) throw error;
+    return true;
+};
+
 // --- Heat Management ---
 
 export const createHeat = async (eventId: string, round: number, heatNum: number) => {

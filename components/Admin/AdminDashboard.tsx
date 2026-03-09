@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, deleteEvent, deleteHeat, createHeatAssignment, deleteHeatAssignment, submitWaveScore,
     eliminateSurfer, advanceSurfer, getOrCreateSurfer,
-    finalizeHeat, updateEvent, getUsers, toggleUserBan,
+    finalizeHeat, updateEvent, getUsers, toggleUserBan, deleteUser,
     uploadEventImage, setEventAsCurrent,
     type Event, type Heat
 } from '../../services/adminService';
@@ -662,6 +662,16 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
+    const handleDeleteUser = async (userId: string, username: string) => {
+        if (!confirm(`Are you absolutely sure you want to PERMANENTLY delete user ${username || userId}? This action cannot be undone and will wipe their drafted teams and authentication record.`)) return;
+        try {
+            await deleteUser(userId);
+            loadUsers();
+        } catch (e: any) {
+            alert(`Error deleting user: ${e.message}`);
+        }
+    };
+
     // --- Derived State ---
 
     // Group heats by Round
@@ -747,15 +757,23 @@ const AdminDashboard: React.FC = () => {
                                             )}
                                         </td>
                                         <td className="py-4 text-right">
-                                            <button
-                                                onClick={() => handleToggleBan(user.id, user.is_banned)}
-                                                className={`text-xs font-bold px-3 py-1.5 rounded border transition ${user.is_banned
-                                                    ? 'border-gray-200 text-gray-500 hover:border-green-500 hover:text-green-600'
-                                                    : 'border-gray-200 text-gray-500 hover:border-red-500 hover:text-red-600'
-                                                    }`}
-                                            >
-                                                {user.is_banned ? 'UNBAN' : 'BAN USER'}
-                                            </button>
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => handleToggleBan(user.id, user.is_banned)}
+                                                    className={`text-xs font-bold px-3 py-1.5 rounded border transition ${user.is_banned
+                                                        ? 'border-gray-200 text-gray-500 hover:border-green-500 hover:text-green-600'
+                                                        : 'border-gray-200 text-gray-500 hover:border-red-500 hover:text-red-600'
+                                                        }`}
+                                                >
+                                                    {user.is_banned ? 'UNBAN' : 'BAN USER'}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteUser(user.id, user.username)}
+                                                    className="text-xs font-bold px-3 py-1.5 rounded border border-gray-200 text-gray-500 hover:border-red-600 hover:bg-red-50 hover:text-red-600 transition"
+                                                >
+                                                    DELETE
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -763,170 +781,173 @@ const AdminDashboard: React.FC = () => {
                         </table>
                     </div>
                 </div>
-            )}
+            )
+            }
 
-            {activeTab === 'EVENTS' && (
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    {/* LEFT SIDEBAR: EVENT LIST & CREATE */}
-                    <div className="lg:col-span-1 space-y-6">
-                        {/* CREATE EVENT */}
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                            <h3 className="font-bold text-gray-900 mb-4">Create New Event</h3>
-                            <div className="space-y-3">
-                                <input className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold" placeholder="Event Name (e.g. Pipeline Pro)" value={newEventName} onChange={e => setNewEventName(e.target.value)} />
-                                <input className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-mono text-gray-500" placeholder="Slug (e.g. pipeline-2024)" value={newEventSlug} onChange={e => setNewEventSlug(e.target.value)} />
-                                {/* New Fields */}
-                                <input className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm" placeholder="Header Image URL" value={newEventImage} onChange={e => setNewEventImage(e.target.value)} />
-                                <textarea className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm h-24" placeholder="AI Context (e.g. 'Waves are 10ft and heavy...')" value={newEventAiContext} onChange={e => setNewEventAiContext(e.target.value)} />
+            {
+                activeTab === 'EVENTS' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        {/* LEFT SIDEBAR: EVENT LIST & CREATE */}
+                        <div className="lg:col-span-1 space-y-6">
+                            {/* CREATE EVENT */}
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                                <h3 className="font-bold text-gray-900 mb-4">Create New Event</h3>
+                                <div className="space-y-3">
+                                    <input className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold" placeholder="Event Name (e.g. Pipeline Pro)" value={newEventName} onChange={e => setNewEventName(e.target.value)} />
+                                    <input className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-mono text-gray-500" placeholder="Slug (e.g. pipeline-2024)" value={newEventSlug} onChange={e => setNewEventSlug(e.target.value)} />
+                                    {/* New Fields */}
+                                    <input className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm" placeholder="Header Image URL" value={newEventImage} onChange={e => setNewEventImage(e.target.value)} />
+                                    <textarea className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm h-24" placeholder="AI Context (e.g. 'Waves are 10ft and heavy...')" value={newEventAiContext} onChange={e => setNewEventAiContext(e.target.value)} />
 
-                                <button onClick={handleCreateEvent} className="w-full bg-black text-white hover:bg-gray-800 font-bold py-3 rounded-xl transition-all active:scale-95">Create Event</button>
+                                    <button onClick={handleCreateEvent} className="w-full bg-black text-white hover:bg-gray-800 font-bold py-3 rounded-xl transition-all active:scale-95">Create Event</button>
+                                </div>
+                            </div>
+
+                            {/* LIST EVENTS */}
+                            <div className="space-y-2">
+                                {events.map(event => (
+                                    <div
+                                        key={event.id}
+                                        onClick={() => { setSelectedEvent(event); loadHeats(event.id); }}
+                                        className={`relative group w-full text-left p-4 rounded-xl border transition-all cursor-pointer ${selectedEvent?.id === event.id ? 'bg-blue-50 border-blue-500 shadow-md ring-1 ring-blue-500' : 'bg-white border-gray-200 hover:border-gray-300'}`}
+                                    >
+                                        <div className="font-bold text-gray-900">{event.name}</div>
+                                        <div className="flex justify-between items-center mt-2">
+                                            <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase ${event.status === 'LIVE' ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 text-gray-500'}`}>{event.status}</span>
+                                            <span className="text-xs text-gray-400 font-mono">{event.start_date.split('T')[0]}</span>
+                                        </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (confirm('Delete event?')) handleDeleteEvent(event.id);
+                                            }}
+                                            className="mt-3 text-[10px] text-red-500 hover:underline opacity-50 hover:opacity-100"
+                                        >
+                                            Delete Forever
+                                        </button>
+
+                                        {/* Set Active Button */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                e.preventDefault();
+                                                setEventAsCurrent(event.id)
+                                                    .then(loadEvents)
+                                                    .catch(err => alert('Error setting active event: ' + err.message));
+                                            }}
+                                            className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all z-50 shadow-sm border border-gray-100 ${event.is_current
+                                                ? 'bg-yellow-50 text-yellow-400 scale-110 ring-2 ring-yellow-400 ring-offset-1'
+                                                : 'bg-white text-gray-300 hover:text-yellow-400 hover:scale-110 hover:shadow-md'
+                                                }`}
+                                            title={event.is_current ? "Currently Active Event" : "Set as Current Event"}
+                                        >
+                                            <span className="material-icons-round text-2xl">
+                                                {event.is_current ? 'star' : 'star_border'}
+                                            </span>
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
-                        {/* LIST EVENTS */}
-                        <div className="space-y-2">
-                            {events.map(event => (
-                                <div
-                                    key={event.id}
-                                    onClick={() => { setSelectedEvent(event); loadHeats(event.id); }}
-                                    className={`relative group w-full text-left p-4 rounded-xl border transition-all cursor-pointer ${selectedEvent?.id === event.id ? 'bg-blue-50 border-blue-500 shadow-md ring-1 ring-blue-500' : 'bg-white border-gray-200 hover:border-gray-300'}`}
-                                >
-                                    <div className="font-bold text-gray-900">{event.name}</div>
-                                    <div className="flex justify-between items-center mt-2">
-                                        <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase ${event.status === 'LIVE' ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 text-gray-500'}`}>{event.status}</span>
-                                        <span className="text-xs text-gray-400 font-mono">{event.start_date.split('T')[0]}</span>
-                                    </div>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (confirm('Delete event?')) handleDeleteEvent(event.id);
-                                        }}
-                                        className="mt-3 text-[10px] text-red-500 hover:underline opacity-50 hover:opacity-100"
-                                    >
-                                        Delete Forever
-                                    </button>
-
-                                    {/* Set Active Button */}
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            e.preventDefault();
-                                            setEventAsCurrent(event.id)
-                                                .then(loadEvents)
-                                                .catch(err => alert('Error setting active event: ' + err.message));
-                                        }}
-                                        className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all z-50 shadow-sm border border-gray-100 ${event.is_current
-                                            ? 'bg-yellow-50 text-yellow-400 scale-110 ring-2 ring-yellow-400 ring-offset-1'
-                                            : 'bg-white text-gray-300 hover:text-yellow-400 hover:scale-110 hover:shadow-md'
-                                            }`}
-                                        title={event.is_current ? "Currently Active Event" : "Set as Current Event"}
-                                    >
-                                        <span className="material-icons-round text-2xl">
-                                            {event.is_current ? 'star' : 'star_border'}
-                                        </span>
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* MAIN CONTENT AREA */}
-                    <div className="lg:col-span-3">
-                        {selectedEvent ? (
-                            <div className="space-y-6">
-                                {/* EVENT HEADER & EDIT */}
-                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div>
-                                            <h2 className="text-2xl font-black">{selectedEvent.name}</h2>
-                                            <p className="text-gray-400 text-xs font-mono mt-1">{selectedEvent.id}</p>
+                        {/* MAIN CONTENT AREA */}
+                        <div className="lg:col-span-3">
+                            {selectedEvent ? (
+                                <div className="space-y-6">
+                                    {/* EVENT HEADER & EDIT */}
+                                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h2 className="text-2xl font-black">{selectedEvent.name}</h2>
+                                                <p className="text-gray-400 text-xs font-mono mt-1">{selectedEvent.id}</p>
+                                            </div>
+                                            <div className="space-x-3">
+                                                <button onClick={() => updateEventStatus(selectedEvent.id, 'LIVE').then(loadEvents)} className={`px-4 py-2 rounded-lg font-bold text-sm text-white ${selectedEvent.status === 'LIVE' ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}>
+                                                    {selectedEvent.status === 'LIVE' ? 'LIVE NOW' : 'GO LIVE'}
+                                                </button>
+                                                <button onClick={() => updateEventStatus(selectedEvent.id, 'COMPLETED').then(loadEvents)} className="bg-gray-900 text-white px-4 py-2 rounded-lg font-bold text-sm">
+                                                    END
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div className="space-x-3">
-                                            <button onClick={() => updateEventStatus(selectedEvent.id, 'LIVE').then(loadEvents)} className={`px-4 py-2 rounded-lg font-bold text-sm text-white ${selectedEvent.status === 'LIVE' ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}>
-                                                {selectedEvent.status === 'LIVE' ? 'LIVE NOW' : 'GO LIVE'}
-                                            </button>
-                                            <button onClick={() => updateEventStatus(selectedEvent.id, 'COMPLETED').then(loadEvents)} className="bg-gray-900 text-white px-4 py-2 rounded-lg font-bold text-sm">
-                                                END
-                                            </button>
+
+                                        {/* EVENT DETAILS EDITOR */}
+                                        <EventDetailsEditor
+                                            event={selectedEvent}
+                                            onUpdate={() => { loadEvents(); setSelectedEvent(prev => prev ? { ...prev } : null); }} // Force refresh logic could be better, but this works for MVP
+                                        />
+                                    </div>
+
+                                    {/* ACTIONS: UPLOAD & ADD HEAT */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col justify-center">
+                                            <h3 className="font-bold text-blue-900 text-sm mb-2">📄 Import Heat Draw (CSV)</h3>
+                                            <div className="flex gap-2 items-center mb-2">
+                                                <select
+                                                    value={targetRound}
+                                                    onChange={e => setTargetRound(parseInt(e.target.value))}
+                                                    className="text-xs border rounded p-1 text-blue-800 bg-white"
+                                                >
+                                                    <option value={0}>Auto-Detect Round</option>
+                                                    <option value={1}>round of 80</option>
+                                                    <option value={2}>round of 64</option>
+                                                    <option value={3}>round of 32</option>
+                                                    <option value={4}>round of 16</option>
+                                                    <option value={5}>quarter finals</option>
+                                                    <option value={6}>semi finals</option>
+                                                    <option value={7}>final</option>
+                                                </select>
+                                            </div>
+                                            <input type="file" accept=".csv" onChange={handleFileUpload} className="text-xs text-blue-600 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-200 file:text-blue-800 hover:file:bg-blue-300" />
+                                        </div>
+                                        <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                            <h3 className="font-bold text-gray-600 text-sm mb-2">Manually Add Heat</h3>
+                                            <div className="flex gap-2">
+                                                <input type="number" className="w-16 border rounded p-1 text-sm text-center" placeholder="Rnd" value={newHeatRound} onChange={e => setNewHeatRound(parseInt(e.target.value))} />
+                                                <input type="number" className="w-16 border rounded p-1 text-sm text-center" placeholder="Ht #" value={newHeatNum} onChange={e => setNewHeatNum(parseInt(e.target.value))} />
+                                                <button onClick={handleCreateHeat} className="bg-black text-white px-3 py-1 rounded text-sm font-bold flex-1">Add +</button>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* EVENT DETAILS EDITOR */}
-                                    <EventDetailsEditor
-                                        event={selectedEvent}
-                                        onUpdate={() => { loadEvents(); setSelectedEvent(prev => prev ? { ...prev } : null); }} // Force refresh logic could be better, but this works for MVP
-                                    />
-                                </div>
-
-                                {/* ACTIONS: UPLOAD & ADD HEAT */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col justify-center">
-                                        <h3 className="font-bold text-blue-900 text-sm mb-2">📄 Import Heat Draw (CSV)</h3>
-                                        <div className="flex gap-2 items-center mb-2">
-                                            <select
-                                                value={targetRound}
-                                                onChange={e => setTargetRound(parseInt(e.target.value))}
-                                                className="text-xs border rounded p-1 text-blue-800 bg-white"
-                                            >
-                                                <option value={0}>Auto-Detect Round</option>
-                                                <option value={1}>round of 80</option>
-                                                <option value={2}>round of 64</option>
-                                                <option value={3}>round of 32</option>
-                                                <option value={4}>round of 16</option>
-                                                <option value={5}>quarter finals</option>
-                                                <option value={6}>semi finals</option>
-                                                <option value={7}>final</option>
-                                            </select>
+                                    {/* ROUND TABS */}
+                                    {rounds.length > 0 && (
+                                        <div className="flex overflow-x-auto space-x-1 bg-gray-100 p-1 rounded-lg mb-6">
+                                            {rounds.map(round => (
+                                                <button
+                                                    key={round}
+                                                    onClick={() => setActiveRound(round)}
+                                                    className={`px-4 py-2 text-sm font-bold rounded-md whitespace-nowrap transition-colors ${activeRound === round
+                                                        ? 'bg-white text-black shadow-sm'
+                                                        : 'text-gray-500 hover:text-gray-700'
+                                                        }`}
+                                                >
+                                                    {/* HUMAN READABLE ROUND NAME */}
+                                                    {getRoundName(parseInt(round))}
+                                                </button>
+                                            ))}
                                         </div>
-                                        <input type="file" accept=".csv" onChange={handleFileUpload} className="text-xs text-blue-600 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-200 file:text-blue-800 hover:file:bg-blue-300" />
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                        <h3 className="font-bold text-gray-600 text-sm mb-2">Manually Add Heat</h3>
-                                        <div className="flex gap-2">
-                                            <input type="number" className="w-16 border rounded p-1 text-sm text-center" placeholder="Rnd" value={newHeatRound} onChange={e => setNewHeatRound(parseInt(e.target.value))} />
-                                            <input type="number" className="w-16 border rounded p-1 text-sm text-center" placeholder="Ht #" value={newHeatNum} onChange={e => setNewHeatNum(parseInt(e.target.value))} />
-                                            <button onClick={handleCreateHeat} className="bg-black text-white px-3 py-1 rounded text-sm font-bold flex-1">Add +</button>
-                                        </div>
-                                    </div>
-                                </div>
+                                    )}
 
-                                {/* ROUND TABS */}
-                                {rounds.length > 0 && (
-                                    <div className="flex overflow-x-auto space-x-1 bg-gray-100 p-1 rounded-lg mb-6">
-                                        {rounds.map(round => (
-                                            <button
-                                                key={round}
-                                                onClick={() => setActiveRound(round)}
-                                                className={`px-4 py-2 text-sm font-bold rounded-md whitespace-nowrap transition-colors ${activeRound === round
-                                                    ? 'bg-white text-black shadow-sm'
-                                                    : 'text-gray-500 hover:text-gray-700'
-                                                    }`}
-                                            >
-                                                {/* HUMAN READABLE ROUND NAME */}
-                                                {getRoundName(parseInt(round))}
-                                            </button>
+                                    {/* HEAT GRID */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
+                                        {displayedHeats.map(heat => (
+                                            <AdminHeatCard key={heat.id} heat={heat} onRefresh={() => loadHeats(selectedEvent.id)} />
                                         ))}
                                     </div>
-                                )}
+                                    {displayedHeats.length === 0 && <div className="text-center py-20 text-gray-300 font-bold">No heats in this round</div>}
 
-                                {/* HEAT GRID */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
-                                    {displayedHeats.map(heat => (
-                                        <AdminHeatCard key={heat.id} heat={heat} onRefresh={() => loadHeats(selectedEvent.id)} />
-                                    ))}
                                 </div>
-                                {displayedHeats.length === 0 && <div className="text-center py-20 text-gray-300 font-bold">No heats in this round</div>}
-
-                            </div>
-                        ) : (
-                            <div className="h-96 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-3xl">
-                                <span className="material-icons-round text-4xl mb-2">event_note</span>
-                                <div className="font-bold">Select an event to begin</div>
-                            </div>
-                        )}
+                            ) : (
+                                <div className="h-96 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-3xl">
+                                    <span className="material-icons-round text-4xl mb-2">event_note</span>
+                                    <div className="font-bold">Select an event to begin</div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </div >
     );
 };
