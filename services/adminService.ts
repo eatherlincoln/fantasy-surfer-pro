@@ -123,7 +123,7 @@ export const getUsers = async () => {
     const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('username', { ascending: true });
 
     if (error) throw error;
     return data;

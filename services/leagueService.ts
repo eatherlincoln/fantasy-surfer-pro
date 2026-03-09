@@ -119,8 +119,7 @@ export const getLeagueLeaderboard = async (leagueId: string) => {
         full_name,
         avatar_url,
         team_name,
-        events_won,
-        events_lost 
+        total_fantasy_points
       )
     `)
         .eq('league_id', leagueId);
@@ -138,8 +137,7 @@ export const getGlobalLeaderboard = async () => {
             full_name,
             team_name,
             avatar_url,
-            events_won,
-            events_lost
+            total_fantasy_points
         `)
         // NOTE: total_points doesn't exist yet, so we just return profiles for now.
         // We will need to calculate points based on their team or add a total_points column later.

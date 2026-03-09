@@ -126,6 +126,11 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
       if (totalSpent + (surfer.value || 0) > TOTAL_BUDGET) return;
 
       setTeam([...team, surfer]);
+
+      // Auto-scroll back to the top to show the updated roster on mobile
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 50);
     }
   };
 

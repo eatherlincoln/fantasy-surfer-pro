@@ -102,7 +102,7 @@ const App: React.FC = () => {
 
   const fetchProfile = async (userId: string) => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
@@ -110,6 +110,29 @@ const App: React.FC = () => {
 
       if (data) {
         setUserProfile(data);
+      } else if (error && error.code === 'PGRST116') {
+        // PGRST116 = No rows returned. The Supabase Trigger failed on Prod! Auto-heal it here:
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const autoUsername = user.user_metadata?.username || user.email?.split('@')[0] || `Surfer_${Math.floor(Math.random() * 1000)}`;
+
+          const { data: newProfile, error: insertErr } = await supabase
+            .from('profiles')
+            .insert([{
+              id: userId,
+              username: autoUsername,
+              team_name: 'My Team',
+              total_fantasy_points: 0
+            }])
+            .select()
+            .single();
+
+          if (newProfile) {
+            setUserProfile(newProfile);
+          } else {
+            console.error('Auto-heal insert failed:', insertErr);
+          }
+        }
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
