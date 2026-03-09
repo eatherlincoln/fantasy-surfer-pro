@@ -133,6 +133,14 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     setExpandedTiers(prev => ({ ...prev, [tier]: !prev[tier] }));
   };
 
+  const handleEmptySlotClick = (tier: Tier) => {
+    if (isLocked) return;
+    setExpandedTiers(prev => ({ ...prev, [tier]: true }));
+    setTimeout(() => {
+      document.getElementById(`tier-${tier}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
+
   const getTierColor = (tier: Tier) => {
     switch (tier) {
       case Tier.A: return 'border-yellow-400';
@@ -221,7 +229,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     const isExpanded = expandedTiers[tier];
 
     return (
-      <div key={tier} className="mb-20 last:mb-0">
+      <div key={tier} id={`tier-${tier}`} className="mb-20 last:mb-0 scroll-mt-24">
         <div className="flex justify-between items-center mb-8 px-1">
           <div className="flex items-center gap-5">
             <div className={`w-2 h-10 md:h-14 rounded-full ${getTierColor(tier).replace('border-', 'bg-')}`}></div>
@@ -342,17 +350,17 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             <div className="grid grid-cols-4 md:grid-cols-5 gap-x-2 gap-y-8 md:gap-x-6 md:gap-y-10">
               {/* Tier A (3 Slots) */}
               {[0, 1, 2].map(i => (
-                <RosterSlot key={`a-${i}`} surfer={team.filter(s => s.tier === Tier.A)[i]} tier={Tier.A} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} />
+                <RosterSlot key={`a-${i}`} surfer={team.filter(s => s.tier === Tier.A)[i]} tier={Tier.A} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
               ))}
 
               {/* Tier B (4 Slots) */}
               {[0, 1, 2, 3].map(i => (
-                <RosterSlot key={`b-${i}`} surfer={team.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} />
+                <RosterSlot key={`b-${i}`} surfer={team.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
               ))}
 
               {/* Tier C (3 Slots) */}
               {[0, 1, 2].map(i => (
-                <RosterSlot key={`c-${i}`} surfer={team.filter(s => s.tier === Tier.C)[i]} tier={Tier.C} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} />
+                <RosterSlot key={`c-${i}`} surfer={team.filter(s => s.tier === Tier.C)[i]} tier={Tier.C} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
               ))}
             </div>
 
@@ -390,14 +398,18 @@ interface RosterSlotProps {
   onToggle: (s: Surfer) => void;
   getTierColor: (t: Tier) => string;
   getAvatarUrl: (s: Surfer) => string;
+  onEmptyClick?: (tier: Tier) => void;
 }
 
-const RosterSlot: React.FC<RosterSlotProps> = ({ surfer, tier, isLocked, onToggle, getTierColor, getAvatarUrl }) => {
+const RosterSlot: React.FC<RosterSlotProps> = ({ surfer, tier, isLocked, onToggle, getTierColor, getAvatarUrl, onEmptyClick }) => {
   const tierColor = getTierColor(tier);
   return (
     <div className="flex flex-col items-center">
       <div className="relative">
-        <div className={`w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${surfer ? `bg-white ${tierColor} shadow-lg scale-105` : 'border-dashed border-gray-200 bg-gray-50/50'}`}>
+        <div
+          onClick={() => !surfer && !isLocked && onEmptyClick && onEmptyClick(tier)}
+          className={`w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${surfer ? `bg-white ${tierColor} shadow-lg scale-105` : 'border-dashed border-gray-200 bg-gray-50/50 cursor-pointer hover:border-gray-300'}`}
+        >
           {surfer ? (
             <div className="w-full h-full rounded-full overflow-hidden shadow-inner border border-gray-50 group relative">
               <img

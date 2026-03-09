@@ -32,7 +32,10 @@ export const generateSurfCommentary = async (surferName: string, score: number, 
 
     } catch (error: any) {
         console.error("Error generating commentary:", error);
-        return `[API Error: ${error.message || "Failed"}] Incredible performance by ${surferName}!`;
+        if (error.message?.includes("429") || error.message?.includes("Quota exceeded")) {
+            return `[AI Rate Limit] Incredible performance by ${surferName}!`;
+        }
+        return `[API Error] Incredible performance by ${surferName}!`;
     }
 };
 
@@ -52,7 +55,10 @@ export const predictHeatOutcome = async (surfers: { name: string, country: strin
         return (response as any).text || "Prediction pending...";
     } catch (error: any) {
         console.error("Error predicting outcome:", error);
-        return `[API Error: ${error.message || "Failed"}] Could not urge prediction.`;
+        if (error.message?.includes("429") || error.message?.includes("Quota exceeded")) {
+            return "[AI Rate Limit] Prediction unavailable at this time.";
+        }
+        return `[API Error] Could not urge prediction.`;
     }
 };
 
@@ -75,6 +81,9 @@ export const generateBriefing = async (team: { name: string, tier: string }[], t
         return (response as any).text || response.candidates?.[0]?.content?.parts?.[0]?.text || "Briefing unavailable.";
     } catch (error: any) {
         console.error("Error generating briefing:", error);
-        return `AI Generation Error: ${error.message || "Invalid API parameters or permissions."}`;
+        if (error.message?.includes("429") || error.message?.includes("Quota exceeded")) {
+            return "AI Strategy Offline: Daily analytical quota has been temporarily exhausted. Trust your instincts!";
+        }
+        return "AI Generation Error: Service currently unavailable.";
     }
 };

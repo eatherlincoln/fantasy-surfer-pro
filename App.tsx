@@ -121,6 +121,22 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Cross-device sync: Hydrate the user roster from Supabase when they log in to a new device
+  useEffect(() => {
+    const hydrateTeamFromCloud = async () => {
+      if (activeEvent && userProfile) {
+        const { getUserTeamFromDB } = await import('./services/teamService');
+        const dbTeam = await getUserTeamFromDB(userProfile.id, activeEvent.id);
+
+        if (dbTeam && dbTeam.length > 0) {
+          setUserTeam(dbTeam);
+          setCurrentView(prev => prev === 'TEAM_BUILDER' ? 'DASHBOARD' : prev);
+        }
+      }
+    };
+    hydrateTeamFromCloud();
+  }, [activeEvent, userProfile]);
+
   useEffect(() => {
     localStorage.setItem('fantasy_surfer_team', JSON.stringify(userTeam));
   }, [userTeam]);

@@ -117,10 +117,10 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
             </div>
           </div>
 
-          <div className="mt-auto pb-1 pl-1">
+          <div className="mt-auto pb-1 pl-1 relative z-10">
             <div className="flex items-baseline gap-1 tracking-tighter">
-              <span className="text-[80px] font-black text-gray-900 leading-[0.85] tracking-tight">1st</span>
-              <span className="text-[28px] font-bold text-gray-300 leading-none ml-[2px] pb-3">/ 12</span>
+              <span className="text-[64px] lg:text-[80px] font-black text-gray-900 leading-[0.85] tracking-tight">1st</span>
+              <span className="text-[24px] lg:text-[28px] font-bold text-gray-300 leading-none ml-[2px] pb-2 lg:pb-3">/ 12</span>
             </div>
             <div className="text-[11px] font-bold text-primary-dark uppercase tracking-[0.2em] mt-2">Friends League</div>
           </div>
@@ -133,17 +133,17 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
               {activeEvent?.swell_status || (eventStatus === 'LIVE' ? 'Live Conditions' : 'Waiting for Swell')}
             </span>
 
-            <div className="text-right absolute -top-3 right-2 flex flex-col items-end">
+            <div className="text-right absolute top-0 lg:-top-3 right-0 lg:right-2 flex flex-col items-end">
               <div className="flex items-baseline tracking-tighter text-white">
-                <span className="text-[104px] font-black leading-[0.85] tracking-tight">{activeEvent?.swell_height?.replace(/ft/i, '') || '6-8'}</span>
-                <span className="text-[28px] font-bold leading-none ml-[2px] opacity-80 pb-3">ft</span>
+                <span className="text-[72px] lg:text-[104px] font-black leading-[0.85] tracking-tight">{activeEvent?.swell_height?.replace(/ft/i, '') || '6-8'}</span>
+                <span className="text-[20px] lg:text-[28px] font-bold leading-none ml-[2px] opacity-80 pb-2 lg:pb-3">ft</span>
               </div>
-              <div className="text-[10px] font-bold opacity-70 uppercase tracking-[0.2em] -mt-1 mr-2">Swell Height</div>
+              <div className="text-[9px] lg:text-[10px] font-bold opacity-70 uppercase tracking-[0.2em] -mt-1 lg:-mt-1 mr-2">Swell Height</div>
             </div>
           </div>
 
           <div className="flex items-end justify-between relative z-10 w-full mt-auto pb-1 pl-1">
-            <div className="pr-12">
+            <div className="pr-4 lg:pr-12">
               <h3 className="text-2xl font-bold tracking-tight mb-1.5">Conditions</h3>
               <p className="text-[13px] text-white/90 leading-[1.65] max-w-[280px] font-medium whitespace-pre-wrap">
                 {activeEvent?.conditions || 'Clean • Light Offshore'}
