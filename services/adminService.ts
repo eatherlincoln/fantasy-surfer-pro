@@ -246,14 +246,24 @@ export const recalculateSurferPoints = async (surferId: string) => {
         totalPoints += heatTotal;
     }
 
-    // 4. Update surfer
+    // 4. Update surfer's global points
     const { error: updateError } = await supabase
         .from('surfers')
-        .update({ points: totalPoints })
+        .update({ current_season_points: totalPoints })
         .eq('id', surferId);
 
     if (updateError) {
         console.error("Error updating surfer points", updateError);
+    }
+
+    // 5. Update surfer's points on ALL users' drafted teams
+    const { error: teamUpdateError } = await supabase
+        .from('user_teams')
+        .update({ points: totalPoints })
+        .eq('surfer_id', surferId);
+
+    if (teamUpdateError) {
+        console.error("Error updating user_teams points", teamUpdateError);
     }
 };
 
