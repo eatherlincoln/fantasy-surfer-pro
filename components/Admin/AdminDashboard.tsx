@@ -171,14 +171,15 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
                                     <div className="text-2xl font-bold font-mono">
                                         {/* LIVE SCORE CALCULATION */}
                                         {(() => {
-                                            const surferScores = scores.filter((s: any) => s.surfer_id === surfer.id).map((s: any) => Number(s.wave_score));
+                                            // BUGFIX: Use loose equality `==` here because Supabase can return bigint `surfer_id` as either a string or number in JSON
+                                            const surferScores = scores.filter((s: any) => s.surfer_id == surfer.id).map((s: any) => Number(s.wave_score));
                                             const top2 = surferScores.sort((a: any, b: any) => b - a).slice(0, 2);
                                             const total = top2.reduce((sum: any, val: any) => sum + val, 0);
                                             return total.toFixed(2);
                                         })()}
                                     </div>
                                     <div className="flex gap-1">
-                                        {scores.filter((s: any) => s.surfer_id === surfer.id).map((score: any, idx: number) => (
+                                        {scores.filter((s: any) => s.surfer_id == surfer.id).map((score: any, idx: number) => (
                                             <div key={idx} className="bg-gray-800 text-white text-xs px-1 rounded">
                                                 {Number(score.wave_score).toFixed(2)}
                                             </div>

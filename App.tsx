@@ -64,7 +64,7 @@ const App: React.FC = () => {
             setUserTeam(prev => {
               const synced = prev.map(s => {
                 const latest = liveSurfers.find(a => a.id == s.id || a.name === s.name);
-                return latest ? { ...s, value: latest.value, tier: latest.tier, image: latest.image } : s;
+                return latest ? { ...s, value: latest.value, tier: latest.tier, image: latest.image, points: latest.current_season_points || latest.points || 0 } : s;
               });
 
               // CRITICAL BUG FIX: Deduplicate to clear the 1000 drafted surfers local cache bug
