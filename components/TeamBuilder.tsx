@@ -49,7 +49,15 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   // 1. Sync local team state with prop updates (e.g. Live Points from App.tsx)
   useEffect(() => {
     if (initialTeam) {
-      setTeam(initialTeam);
+      if (initialTeam.length > 20) {
+        // Deeply corrupted local state detected (>20 duplicated surfers). Nuke and start fresh to unbreak the user's UI.
+        setTeam([]);
+        localStorage.removeItem('fantasy_surfer_team');
+      } else {
+        // Standard deduplication just in case
+        const unique = initialTeam.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+        setTeam(unique.length > 10 ? unique.slice(0, 10) : unique);
+      }
     }
   }, [initialTeam]);
 

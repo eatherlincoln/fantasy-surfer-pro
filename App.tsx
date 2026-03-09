@@ -66,7 +66,12 @@ const App: React.FC = () => {
                 const latest = liveSurfers.find(a => a.id == s.id || a.name === s.name);
                 return latest ? { ...s, value: latest.value, tier: latest.tier, image: latest.image } : s;
               });
-              return JSON.stringify(synced) !== JSON.stringify(prev) ? synced : prev;
+
+              // CRITICAL BUG FIX: Deduplicate to clear the 1000 drafted surfers local cache bug
+              const uniqueSynced = synced.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+              const trimmedSynced = uniqueSynced.length > 10 ? uniqueSynced.slice(0, 10) : uniqueSynced;
+
+              return JSON.stringify(trimmedSynced) !== JSON.stringify(prev) ? trimmedSynced : prev;
             });
           }
         }
@@ -152,7 +157,10 @@ const App: React.FC = () => {
         const dbTeam = await getUserTeamFromDB(userProfile.id, activeEvent.id);
 
         if (dbTeam && dbTeam.length > 0) {
-          setUserTeam(dbTeam);
+          let uniqueDbTeam = dbTeam.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+          if (uniqueDbTeam.length > 10) uniqueDbTeam = uniqueDbTeam.slice(0, 10);
+
+          setUserTeam(uniqueDbTeam);
           setCurrentView(prev => prev === 'TEAM_BUILDER' ? 'DASHBOARD' : prev);
         }
       }
