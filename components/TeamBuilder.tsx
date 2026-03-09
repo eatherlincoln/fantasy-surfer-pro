@@ -63,7 +63,10 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   }, [team]);
 
   const totalSpent = useMemo(() => {
-    return team.reduce((acc, s) => acc + (s.value || 0), 0);
+    return team.reduce((acc, s) => {
+      const val = typeof s.value === 'string' ? parseFloat(s.value) : (s.value || 0);
+      return acc + val;
+    }, 0);
   }, [team]);
 
   const totalPoints = useMemo(() => {
@@ -118,17 +121,23 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     if (isSelected) {
       setTeam(team.filter(s => s.id !== surfer.id));
     } else {
-      // Check Tier Limits
-      const currentTierCount = team.filter(s => s.tier === surfer.tier).length;
-      if (currentTierCount >= TIER_LIMITS[surfer.tier]) return;
+      const effectiveTier = surfer.tier || Tier.C;
 
-      // Check Global Budget
-      if (totalSpent + (surfer.value || 0) > TOTAL_BUDGET) return;
+      // Check Tier Limits
+      const currentTierCount = team.filter(s => (s.tier || Tier.C) === effectiveTier).length;
+      if (currentTierCount >= TIER_LIMITS[effectiveTier]) return;
+
+      // Check Global Budget explicitly as floats
+      const surferValue = typeof surfer.value === 'string' ? parseFloat(surfer.value) : (surfer.value || 0);
+      if (totalSpent + surferValue > TOTAL_BUDGET) return;
+
+      // Hard safety limit
+      if (team.length >= 10) return;
 
       setTeam([...team, surfer]);
 
       // Auto-scroll back to the top ONLY if the user just filled this tier's capacity
-      if (currentTierCount + 1 >= TIER_LIMITS[surfer.tier]) {
+      if (currentTierCount + 1 >= TIER_LIMITS[effectiveTier]) {
         setTimeout(() => {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }, 300); // Slight delay so they can see the checked state before scrolling
@@ -174,10 +183,18 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
   const renderSurferCard = (surfer: Surfer, inGrid: boolean = false) => {
     const isSelected = team.some(s => s.id === surfer.id);
-    const currentTierCount = team.filter(s => s.tier === surfer.tier).length;
-    const isFull = currentTierCount >= TIER_LIMITS[surfer.tier] && !isSelected;
+    const effectiveTier = surfer.tier || Tier.C;
+    const currentTierCount = team.filter(s => (s.tier || Tier.C) === effectiveTier).length;
+
+    // Check if tier is full OR if drafting them would exceed budget or max team size
+    const surferValue = typeof surfer.value === 'string' ? parseFloat(surfer.value) : (surfer.value || 0);
+    const wouldExceedBudget = !isSelected && (totalSpent + surferValue > TOTAL_BUDGET);
+    const wouldExceedTeamSize = !isSelected && (team.length >= 10);
+    const isTierFull = currentTierCount >= TIER_LIMITS[effectiveTier] && !isSelected;
+    const isFull = isTierFull || wouldExceedBudget || wouldExceedTeamSize;
+
     const isEliminated = surfer.status?.toLowerCase() === 'eliminated';
-    const tierColorInfo = getTierColorInfo(surfer.tier);
+    const tierColorInfo = getTierColorInfo(effectiveTier);
 
     return (
       <button
