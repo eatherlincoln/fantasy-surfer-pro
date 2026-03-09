@@ -459,6 +459,7 @@ const AdminDashboard: React.FC = () => {
     const [newEventSlug, setNewEventSlug] = useState('');
     const [newEventImage, setNewEventImage] = useState('');
     const [newEventAiContext, setNewEventAiContext] = useState('');
+    const [newEventLocation, setNewEventLocation] = useState('');
 
     const [newHeatRound, setNewHeatRound] = useState(1);
     const [newHeatNum, setNewHeatNum] = useState(1);
@@ -486,7 +487,7 @@ const AdminDashboard: React.FC = () => {
         const data = await getHeats(eventId);
         setHeats(data);
         // Set default active round to first found (?) or keep current
-        if (data.length > 0 && activeRound === 'Round 1') {
+        if (data.length > 0 && activeRound === '1') { // Changed 'Round 1' to '1' for consistency with rounds array
             // Logic to determine "current" round could go here
         }
     };
@@ -495,8 +496,14 @@ const AdminDashboard: React.FC = () => {
 
     const handleCreateEvent = async () => {
         try {
-            await createEvent(newEventName, newEventSlug, new Date().toISOString(), new Date().toISOString());
-            setNewEventName(''); setNewEventSlug(''); loadEvents();
+            // Hardcode next 14 days for simplicity
+            const start = new Date().toISOString();
+            const end = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+            await createEvent(newEventName, newEventSlug, start, end, newEventLocation);
+            setNewEventName('');
+            setNewEventSlug('');
+            setNewEventLocation('');
+            loadEvents();
         } catch (e) { alert('Error creating event'); }
     };
 
@@ -794,6 +801,7 @@ const AdminDashboard: React.FC = () => {
                                 <h3 className="font-bold text-gray-900 mb-4">Create New Event</h3>
                                 <div className="space-y-3">
                                     <input className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold" placeholder="Event Name (e.g. Pipeline Pro)" value={newEventName} onChange={e => setNewEventName(e.target.value)} />
+                                    <input className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm" placeholder="Location (e.g. Banzai Pipeline, Hawaii)" value={newEventLocation} onChange={e => setNewEventLocation(e.target.value)} />
                                     <input className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-mono text-gray-500" placeholder="Slug (e.g. pipeline-2024)" value={newEventSlug} onChange={e => setNewEventSlug(e.target.value)} />
                                     {/* New Fields */}
                                     <input className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm" placeholder="Header Image URL" value={newEventImage} onChange={e => setNewEventImage(e.target.value)} />

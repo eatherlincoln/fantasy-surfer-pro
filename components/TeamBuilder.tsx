@@ -127,10 +127,12 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
       setTeam([...team, surfer]);
 
-      // Auto-scroll back to the top to show the updated roster on mobile
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 50);
+      // Auto-scroll back to the top ONLY if the user just filled this tier's capacity
+      if (currentTierCount + 1 >= TIER_LIMITS[surfer.tier]) {
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 300); // Slight delay so they can see the checked state before scrolling
+      }
     }
   };
 
@@ -146,12 +148,12 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     }, 50);
   };
 
-  const getTierColor = (tier: Tier) => {
+  const getTierColorInfo = (tier: Tier) => {
     switch (tier) {
-      case Tier.A: return 'border-yellow-400';
-      case Tier.B: return 'border-teal-600';
-      case Tier.C: return 'border-gray-300';
-      default: return 'border-gray-200';
+      case Tier.A: return { border: 'border-yellow-400', bg: 'bg-yellow-50/50', solid: 'bg-yellow-400' };
+      case Tier.B: return { border: 'border-teal-600', bg: 'bg-teal-50/50', solid: 'bg-teal-600' };
+      case Tier.C: return { border: 'border-gray-300', bg: 'bg-gray-50/50', solid: 'bg-gray-300' };
+      default: return { border: 'border-gray-200', bg: 'bg-white', solid: 'bg-gray-200' };
     }
   };
 
@@ -175,17 +177,17 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
     const currentTierCount = team.filter(s => s.tier === surfer.tier).length;
     const isFull = currentTierCount >= TIER_LIMITS[surfer.tier] && !isSelected;
     const isEliminated = surfer.status?.toLowerCase() === 'eliminated';
-    const tierColor = getTierColor(surfer.tier);
+    const tierColorInfo = getTierColorInfo(surfer.tier);
 
     return (
       <button
         key={surfer.id}
         onClick={() => toggleSurfer(surfer)}
         disabled={(isFull || isEliminated || isLocked) && !isSelected}
-        className={`${inGrid ? 'w-full h-full' : 'min-w-[155px] md:min-w-[190px] flex-shrink-0'} bg-white rounded-[40px] p-6 text-center border-2 transition-all duration-300 active:scale-95 snap-start flex flex-col ${isSelected ? `${tierColor} scale-105 z-10 ring-4 ring-offset-2 ring-pop/20` : 'border-transparent apple-shadow hover:border-gray-100'} ${isFull || isEliminated || isLocked ? 'opacity-40 grayscale pointer-events-none shadow-none' : ''}`}
+        className={`${inGrid ? 'w-full h-full' : 'min-w-[155px] md:min-w-[190px] flex-shrink-0'} bg-white rounded-[40px] p-6 text-center border-2 transition-all duration-300 active:scale-95 snap-start flex flex-col ${isSelected ? `${tierColorInfo.border} scale-105 z-10 ring-4 ring-offset-2 ring-pop/20` : 'border-transparent apple-shadow hover:border-gray-100'} ${isFull || isEliminated || isLocked ? 'opacity-40 grayscale pointer-events-none shadow-none' : ''}`}
       >
         <div className="relative mb-5">
-          <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto bg-gray-50 overflow-hidden border-2 ${isSelected ? tierColor : 'border-background'} shadow-sm`}>
+          <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto bg-gray-50 overflow-hidden border-2 ${isSelected ? tierColorInfo.border : 'border-background'} shadow-sm`}>
             {/* Added fallback for broken images if any */}
             <img
               src={getAvatarUrl(surfer)}
@@ -200,7 +202,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             />
           </div>
           {isSelected && (
-            <div className={`absolute top-0 right-1 md:right-4 w-8 h-8 ${tierColor.replace('border-', 'bg-')} rounded-full flex items-center justify-center text-white border-4 border-white shadow-md animate-in zoom-in`}>
+            <div className={`absolute top-0 right-1 md:right-4 w-8 h-8 ${tierColorInfo.solid} rounded-full flex items-center justify-center text-white border-4 border-white shadow-md animate-in zoom-in`}>
               <span className="material-icons-round text-lg font-black">check</span>
             </div>
           )}
@@ -210,7 +212,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
           <span className="text-xs">{surfer.flag}</span>
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{surfer.country}</p>
         </div>
-        <div className={`rounded-full py-2.5 px-4 transition-colors ${isSelected ? tierColor.replace('border-', 'bg-').replace('-400', '-500') + ' text-white' : 'bg-background text-primary-dark'}`}>
+        <div className={`rounded-full py-2.5 px-4 transition-colors ${isSelected ? tierColorInfo.solid + ' text-white' : 'bg-background text-primary-dark'}`}>
           <span className="text-xs md:text-sm font-black tracking-tight">${(surfer.value || 0).toFixed(1)}M</span>
         </div>
       </button>
@@ -232,12 +234,13 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
       });
 
     const isExpanded = expandedTiers[tier];
+    const tierColorInfo = getTierColorInfo(tier);
 
     return (
-      <div key={tier} id={`tier-${tier}`} className="mb-20 last:mb-0 scroll-mt-24">
-        <div className="flex justify-between items-center mb-8 px-1">
+      <div key={tier} id={`tier-${tier}`} className={`mb-20 last:mb-0 scroll-mt-24 p-2 md:p-6 rounded-[3rem] ${tierColorInfo.bg}`}>
+        <div className="flex justify-between items-center mb-8 px-2 md:px-0">
           <div className="flex items-center gap-5">
-            <div className={`w-2 h-10 md:h-14 rounded-full ${getTierColor(tier).replace('border-', 'bg-')}`}></div>
+            <div className={`w-2 h-10 md:h-14 rounded-full ${tierColorInfo.solid}`}></div>
             <div>
               <h3 className="text-3xl md:text-4xl font-black tracking-tight text-gray-900">Tier {tier}</h3>
               <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</p>
@@ -355,17 +358,17 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             <div className="grid grid-cols-4 md:grid-cols-5 gap-x-2 gap-y-8 md:gap-x-6 md:gap-y-10">
               {/* Tier A (3 Slots) */}
               {[0, 1, 2].map(i => (
-                <RosterSlot key={`a-${i}`} surfer={team.filter(s => s.tier === Tier.A)[i]} tier={Tier.A} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
+                <RosterSlot key={`a-${i}`} surfer={team.filter(s => s.tier === Tier.A)[i]} tier={Tier.A} isLocked={isLocked} onToggle={toggleSurfer} getTierColorInfo={getTierColorInfo} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
               ))}
 
               {/* Tier B (4 Slots) */}
               {[0, 1, 2, 3].map(i => (
-                <RosterSlot key={`b-${i}`} surfer={team.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
+                <RosterSlot key={`b-${i}`} surfer={team.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} isLocked={isLocked} onToggle={toggleSurfer} getTierColorInfo={getTierColorInfo} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
               ))}
 
               {/* Tier C (3 Slots) */}
               {[0, 1, 2].map(i => (
-                <RosterSlot key={`c-${i}`} surfer={team.filter(s => s.tier === Tier.C)[i]} tier={Tier.C} isLocked={isLocked} onToggle={toggleSurfer} getTierColor={getTierColor} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
+                <RosterSlot key={`c-${i}`} surfer={team.filter(s => s.tier === Tier.C)[i]} tier={Tier.C} isLocked={isLocked} onToggle={toggleSurfer} getTierColorInfo={getTierColorInfo} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
               ))}
             </div>
 
@@ -383,12 +386,35 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
         </div>
 
         {/* 2. Tier Selection (Bottom) */}
-        <div className="w-full space-y-20 mt-10">
+        <div className="w-full space-y-20 mt-10 pb-24 md:pb-0">
           {renderTier(Tier.A, "Top Seed Powerhouses")}
           {renderTier(Tier.B, "The Competitive Core")}
           {renderTier(Tier.C, "Value Picks & Underdogs")}
         </div>
 
+      </div>
+
+      {/* 3. Sticky Mobile Budget Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 p-4 pb-safe z-50 apple-shadow transform transition-transform">
+        <div className="max-w-7xl mx-auto flex justify-between items-center px-2">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">Remaining Budget</p>
+            <p className={`text-xl font-black tracking-tighter ${TOTAL_BUDGET - totalSpent < 0 ? 'text-red-500' : 'text-primary-dark'}`}>
+              ${(TOTAL_BUDGET - totalSpent).toFixed(1)}M <span className="text-sm text-gray-300 font-bold ml-1">/ ${TOTAL_BUDGET.toFixed(1)}M</span>
+            </p>
+          </div>
+          <div className="flex flex-col items-end">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">Roster</p>
+            <p className="text-xl font-black tracking-tighter text-primary-dark">{team.length}<span className="text-sm text-gray-300 font-bold ml-0.5">/10</span></p>
+          </div>
+        </div>
+        {/* Progress Bar */}
+        <div className="absolute top-0 left-0 h-1 bg-gray-100 w-full">
+          <div
+            className={`h-full transition-all duration-500 ${TOTAL_BUDGET - totalSpent < 0 ? 'bg-red-500' : 'bg-primary'}`}
+            style={{ width: `${Math.min((totalSpent / TOTAL_BUDGET) * 100, 100)}%` }}
+          ></div>
+        </div>
       </div>
     </div>
   );
@@ -396,24 +422,33 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
 
 export default TeamBuilder;
 
-interface RosterSlotProps {
+// --- Sub-Components ---
+const RosterSlot = ({
+  surfer,
+  tier,
+  isLocked,
+  onToggle,
+  getTierColorInfo,
+  getAvatarUrl,
+  onEmptyClick
+}: {
+  key?: string;
   surfer?: Surfer;
   tier: Tier;
   isLocked: boolean;
   onToggle: (s: Surfer) => void;
-  getTierColor: (t: Tier) => string;
+  getTierColorInfo: (t: Tier) => { border: string, bg: string, solid: string };
   getAvatarUrl: (s: Surfer) => string;
   onEmptyClick?: (tier: Tier) => void;
-}
+}) => {
+  const tierColorInfo = getTierColorInfo(tier);
 
-const RosterSlot: React.FC<RosterSlotProps> = ({ surfer, tier, isLocked, onToggle, getTierColor, getAvatarUrl, onEmptyClick }) => {
-  const tierColor = getTierColor(tier);
   return (
     <div className="flex flex-col items-center">
       <div className="relative">
         <div
           onClick={() => !surfer && !isLocked && onEmptyClick && onEmptyClick(tier)}
-          className={`w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${surfer ? `bg-white ${tierColor} shadow-lg scale-105` : 'border-dashed border-gray-200 bg-gray-50/50 cursor-pointer hover:border-gray-300'}`}
+          className={`w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${surfer ? `bg-white ${tierColorInfo.border} shadow-lg scale-105` : `border-dashed border-gray-200 ${tierColorInfo.bg} cursor-pointer hover:border-gray-300`}`}
         >
           {surfer ? (
             <div className="w-full h-full rounded-full overflow-hidden shadow-inner border border-gray-50 group relative">
@@ -439,7 +474,7 @@ const RosterSlot: React.FC<RosterSlotProps> = ({ surfer, tier, isLocked, onToggl
               )}
             </div>
           ) : (
-            <span className="text-lg md:text-xl text-gray-200 font-black uppercase tracking-tighter opacity-50">{tier}</span>
+            <span className="text-lg md:text-xl text-gray-400 font-black uppercase tracking-tighter opacity-50">{tier}</span>
           )}
         </div>
       </div>
@@ -455,7 +490,6 @@ const RosterSlot: React.FC<RosterSlotProps> = ({ surfer, tier, isLocked, onToggl
             <div className="flex items-center gap-1 mt-1 justify-center">
               <span className="text-xs font-black text-primary-dark">{(surfer.points || 0).toFixed(2)}</span>
             </div>
-
             <div className="flex items-center gap-1 mt-0.5 opacity-70">
               <span className="text-[10px] md:text-[11px]">{surfer.flag}</span>
               <span className="text-[8px] md:text-[9px] font-bold text-gray-500 uppercase tracking-widest">{(surfer.stance || 'R')[0]}</span>

@@ -162,21 +162,44 @@ const App: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem('fantasy_surfer_team', JSON.stringify(userTeam));
-  }, [userTeam]);
+
+    // Auto-Save Partial Drafts to DB (Debounced)
+    const timeoutId = setTimeout(async () => {
+      if (userProfile && activeEvent && currentView === 'TEAM_BUILDER' && userTeam.length > 0) {
+        try {
+          // Sync current snapshot silently in background
+          const { syncUserTeamToDB } = await import('./services/teamService');
+          await syncUserTeamToDB(userProfile.id, activeEvent.id, userTeam);
+        } catch (e) {
+          console.error("Auto-save failed", e);
+        }
+      }
+    }, 1500); // 1.5s debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [userTeam, userProfile, activeEvent, currentView]);
 
   const handleLogin = () => {
+    if (userProfile && (userProfile.username?.startsWith('Surfer_') || userProfile.team_name === 'My Team')) {
+      setCurrentView('PROFILE');
+      return;
+    }
+
     const hasTeam = userTeam.length > 0;
     setCurrentView(hasTeam ? 'DASHBOARD' : 'TEAM_BUILDER');
   };
 
   const handleSaveTeam = async (team: Surfer[]) => {
-    // When saving, we reset points and ensure they are ready for simulation
-    const initializedTeam = team.map(s => ({ ...s, points: 0, status: 'Waiting' as const }));
-    setUserTeam(initializedTeam);
+    // Check if team is fully populated (max 10)
+    if (team.length < 10) {
+      alert("You must draft exactly 10 surfers to lock in your roster!");
+      return;
+    }
 
-    // Sync to DB
+    // Force an immediate synchronous save over the debounce
     if (userProfile && activeEvent) {
-      await syncUserTeamToDB(userProfile.id, activeEvent.id, initializedTeam);
+      const { syncUserTeamToDB } = await import('./services/teamService');
+      await syncUserTeamToDB(userProfile.id, activeEvent.id, team);
     }
 
     setCurrentView('DASHBOARD');

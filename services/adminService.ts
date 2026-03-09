@@ -14,6 +14,7 @@ export interface Event {
     swell_height?: string;
     conditions?: string;
     swell_status?: string;
+    location?: string;
 }
 
 export const setEventAsCurrent = async (eventId: string) => {
@@ -72,10 +73,10 @@ export interface Score {
 
 // --- Event Management ---
 
-export const createEvent = async (name: string, slug: string, start_date: string, end_date: string) => {
+export const createEvent = async (name: string, slug: string, start_date: string, end_date: string, location?: string) => {
     const { data, error } = await supabase
         .from('events')
-        .insert({ name, slug, start_date, end_date })
+        .insert({ name, slug, start_date, end_date, location })
         .select()
         .single();
 
