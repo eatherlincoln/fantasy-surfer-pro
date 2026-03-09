@@ -624,18 +624,16 @@ const AdminDashboard: React.FC = () => {
                                     console.error('Assign Error:', assignErr);
                                 }
 
-                                // Scores?
-                                // User Format: Heat (0) | Name (1) | Country (2) | Total (3) | Wave 1 (4) | Wave 2 (5) | Status (6)
-                                if (row[4]) {
-                                    const w1 = parseFloat(row[4]);
-                                    if (!isNaN(w1)) await submitWaveScore(heatId, surfer.id, w1);
-                                }
-                                if (row[5]) {
-                                    const w2 = parseFloat(row[5]);
-                                    if (!isNaN(w2)) await submitWaveScore(heatId, surfer.id, w2);
+                                // Scores: Usually User Format: Heat (0) | Name (1) | Country (2) | Total Score / Points (3)
+                                if (row[3]) {
+                                    const score = parseFloat(row[3]);
+                                    if (!isNaN(score)) {
+                                        // Bulk import the total as a single "Wave" score for simplicity since the App just sums the two highest waves anyway
+                                        await submitWaveScore(heatId, surfer.id, score);
+                                    }
                                 }
 
-                                const status = row[6]?.toString().toUpperCase() || '';
+                                const status = row[4]?.toString().toUpperCase() || '';
                                 if (status.includes('ELIMINATED')) await eliminateSurfer(surfer.id);
                                 else if (status.includes('ADV')) await advanceSurfer(surfer.id);
                             } else {
