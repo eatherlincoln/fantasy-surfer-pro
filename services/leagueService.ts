@@ -148,3 +148,24 @@ export const getGlobalLeaderboard = async () => {
     if (error) throw error;
     return data;
 };
+
+export const leaveLeague = async (leagueId: string, userId: string) => {
+    // 1. Delete the membership
+    const { error } = await supabase
+        .from('league_members')
+        .delete()
+        .eq('league_id', leagueId)
+        .eq('user_id', userId);
+
+    if (error) throw error;
+
+    // 2. Check if league is empty now, if so, delete the league entirely
+    const { count } = await supabase
+        .from('league_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('league_id', leagueId);
+
+    if (count === 0) {
+        await supabase.from('leagues').delete().eq('id', leagueId);
+    }
+};

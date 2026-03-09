@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Surfer, Tier, UserProfile } from '../types';
-import { createLeague, joinLeague, getUserLeagues, getLeagueLeaderboard, getGlobalLeaderboard, League, LeagueMember } from '../services/leagueService';
+import { createLeague, joinLeague, getUserLeagues, getLeagueLeaderboard, getGlobalLeaderboard, leaveLeague, League, LeagueMember } from '../services/leagueService';
 import { supabase } from '../services/supabase';
+import { Event } from '../services/adminService';
+import { getUserTeamFromDB } from '../services/teamService';
 
 interface LeaguesProps {
   userTeam: Surfer[];
   userProfile: UserProfile | null;
+  activeEvent?: Event | null;
 }
 
-const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
+const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent }) => {
   const [expandedId, setExpandedId] = useState<string | null>('1');
   const [teamName, setTeamName] = useState(userProfile?.team_name || "Jane Doe");
   const [isEditingName, setIsEditingName] = useState(false);
@@ -19,6 +22,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null);
   const [leagueMembers, setLeagueMembers] = useState<any[]>([]);
   const [globalMembers, setGlobalMembers] = useState<any[]>([]);
+  const [memberTeams, setMemberTeams] = useState<Record<string, any>>({});
   const [showLeagueModal, setShowLeagueModal] = useState<'CREATE' | 'JOIN' | null>(null);
   const [leagueInput, setLeagueInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +53,27 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
       setLeagueMembers([]);
     }
   }, [selectedLeague]);
+
+  // Fetch Member Teams specifically when expanded
+  useEffect(() => {
+    if (expandedId && activeEvent) {
+      const isStarted = activeEvent.status === 'LIVE' || activeEvent.status === 'COMPLETED';
+      if (isStarted && !memberTeams[expandedId]) {
+        getUserTeamFromDB(expandedId, activeEvent.id).then(team => {
+          // Map surfer status to league UI status just like userStats lineup does
+          const mappedLineup = team.map(s => ({
+            name: s.name.split(' ').pop() || '',
+            image: s.image,
+            status: s.status === 'In Water Now' ? 'IN HEAT' : s.status === 'Eliminated' ? 'OUT' : 'NEXT' as any,
+            value: s.value,
+            tier: s.tier
+          }));
+
+          setMemberTeams(prev => ({ ...prev, [expandedId]: mappedLineup }));
+        }).catch(console.error);
+      }
+    }
+  }, [expandedId, activeEvent, memberTeams]);
 
   const fetchGlobalLeaderboard = async () => {
     try {
@@ -155,6 +180,25 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
     }
   };
 
+  const handleLeaveCurrentLeague = async () => {
+    if (!selectedLeague || !userProfile) return;
+    if (!window.confirm("Are you sure you want to leave this league?")) return;
+
+    setIsLoading(true);
+    try {
+      await leaveLeague(selectedLeague.id, userProfile.id);
+
+      setUserLeagues(userLeagues.filter(l => l.id !== selectedLeague.id));
+      setSelectedLeague(null);
+      setSuccessMsg(`Successfully left "${selectedLeague.name}"`);
+    } catch (err: any) {
+      console.error(err);
+      setError("Failed to leave league.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getTierColor = (tier: Tier) => {
     switch (tier) {
       case Tier.A: return 'border-yellow-400';
@@ -247,11 +291,49 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
         </span>
       </button>
 
-      {/* Detail view logic ... */}
-      {/* For brevity, using same detail logic as before if lineup data exists */}
-      {expandedId === member.id && member.lineup && (
+      {/* Detail view logic for the lineup maps dynamically handling both local and fetched rosters */}
+      {expandedId === member.id && (
         <div className="bg-gray-50/50 px-4 pb-4 border-t border-gray-50 animate-in slide-in-from-top duration-300">
-          {/* ... same lineup rendering code ... */}
+          {(() => {
+            const isStarted = activeEvent?.status === 'LIVE' || activeEvent?.status === 'COMPLETED';
+            if (!isStarted && !member.isUser) {
+              return (
+                <div className="py-8 text-center text-sm text-gray-500 font-medium bg-gray-100/50 rounded-2xl border border-dashed border-gray-200 mt-2 flex flex-col items-center justify-center">
+                  <span className="material-icons-round text-3xl text-gray-300 mb-2 opacity-50">lock</span>
+                  Opponent's team hidden until event begins.
+                </div>
+              );
+            }
+
+            const lineupToRender = member.isUser ? member.lineup : memberTeams[member.id];
+            if (!lineupToRender) {
+              return <div className="py-8 text-center text-sm text-gray-400 font-medium animate-pulse">Scouting roster...</div>;
+            }
+
+            return (
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                {lineupToRender.map((surfer: any, idx: number) => (
+                  <div key={idx} className={`bg-white rounded-xl p-2 flex items-center gap-3 border shadow-sm ${getTierColor(surfer.tier)} border-l-4`}>
+                    <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
+                      {surfer.image ? (
+                        <img src={surfer.image} alt={surfer.name} className="w-full h-full object-cover object-top" />
+                      ) : (
+                        <span className="material-icons-round text-gray-400 text-xl w-full h-full flex items-center justify-center">person</span>
+                      )}
+                    </div>
+                    <div className="flex-grow min-w-0">
+                      <div className="font-bold text-xs text-gray-900 truncate">{surfer.name}</div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[9px] font-bold text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded">{surfer.value}M</span>
+                        {surfer.status === 'IN HEAT' && <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>}
+                        {surfer.status === 'OUT' && <span className="material-icons-round text-[10px] text-gray-400">close</span>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>
@@ -380,6 +462,14 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile }) => {
                           title="Copy Share Text"
                         >
                           <span className="material-icons-round text-sm">share</span>
+                        </button>
+                        <button
+                          disabled={isLoading}
+                          onClick={handleLeaveCurrentLeague}
+                          className="ml-2 bg-red-500/80 hover:bg-red-500 text-white rounded px-2 py-1 transition flex items-center justify-center pointer-events-auto relative z-20"
+                          title="Leave League"
+                        >
+                          <span className="material-icons-round text-sm">logout</span>
                         </button>
                       </div>
                     </div>

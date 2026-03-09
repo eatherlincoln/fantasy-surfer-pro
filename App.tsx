@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Surfer, EventStatus, UserProfile } from './types';
 import { Event } from './services/adminService';
 import { generateSurfCommentary } from './services/aiService';
+import { syncUserTeamToDB } from './services/teamService';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import TeamBuilder from './components/TeamBuilder';
@@ -129,10 +130,16 @@ const App: React.FC = () => {
     setCurrentView(hasTeam ? 'DASHBOARD' : 'TEAM_BUILDER');
   };
 
-  const handleSaveTeam = (team: Surfer[]) => {
+  const handleSaveTeam = async (team: Surfer[]) => {
     // When saving, we reset points and ensure they are ready for simulation
-    const initializedTeam = team.map(s => ({ ...s, points: 0, status: 'Waiting' }));
+    const initializedTeam = team.map(s => ({ ...s, points: 0, status: 'Waiting' as const }));
     setUserTeam(initializedTeam);
+
+    // Sync to DB
+    if (userProfile && activeEvent) {
+      await syncUserTeamToDB(userProfile.id, activeEvent.id, initializedTeam);
+    }
+
     setCurrentView('DASHBOARD');
   };
 
@@ -220,7 +227,7 @@ const App: React.FC = () => {
 
           {currentView === 'LEAGUES' && (
             <div className="max-w-4xl mx-auto">
-              <Leagues userTeam={userTeam} userProfile={userProfile} />
+              <Leagues userTeam={userTeam} userProfile={userProfile} activeEvent={activeEvent} />
             </div>
           )}
 
