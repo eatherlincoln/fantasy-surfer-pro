@@ -304,6 +304,12 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
                             </span>
                           </div>
                         </div>
+                        <div className="text-right">
+                          <div className="font-black text-lg text-gray-900 tracking-tighter">
+                            {assignment.heat_score?.toFixed(2) || '0.00'}
+                          </div>
+                          <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none">Pts</div>
+                        </div>
                       </div>
                     );
                   })}

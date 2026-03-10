@@ -84,7 +84,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
         rank: idx + 1, // Order of rows
         name: profile.team_name || profile.username || profile.full_name || 'Unknown',
         initial: (profile.team_name || profile.username || '?')[0].toUpperCase(),
-        points: profile.events_won || 0, // Placeholder until scoring engine is wired
+        points: profile.total_fantasy_points || 0,
         surfersLeft: 4,
         trend: 'neutral',
         isUser: profile.id === userProfile?.id,
@@ -125,7 +125,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
         rank: idx + 1, // Basic ranking logic (should be sorted by DB or here)
         name: m.profiles.team_name || m.profiles.full_name || m.profiles.username || 'Unknown',
         initial: (m.profiles.username || '?')[0].toUpperCase(),
-        points: 0, // Need to implement actual score aggregation later
+        points: m.profiles.total_fantasy_points || 0,
         surfersLeft: 0, // Need to implement
         trend: 'neutral',
         avatar: m.profiles.avatar_url,

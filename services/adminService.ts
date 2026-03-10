@@ -171,6 +171,7 @@ export const getHeats = async (eventId: string) => {
             *,
             heat_assignments (
                 surfer_id,
+                heat_score,
                 surfers (
                     id,
                     name,
