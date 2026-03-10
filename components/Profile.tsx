@@ -10,6 +10,7 @@ interface UserProfile {
   is_paid?: boolean;
   events_won?: number;
   events_lost?: number;
+  total_fantasy_points?: number;
 }
 
 interface ProfileProps {
@@ -692,7 +693,7 @@ const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
           <div className="bg-white p-5 rounded-2xl apple-shadow border border-gray-100 flex flex-col h-32">
             <span className="material-icons-round text-pop-DEFAULT mb-2 text-2xl">emoji_events</span>
             <div className="mt-auto">
-              <p className="text-2xl font-black tracking-tighter text-gray-900">0.0</p>
+              <p className="text-2xl font-black tracking-tighter text-gray-900">{profile?.total_fantasy_points?.toFixed(1) || '0.0'}</p>
               <p className="text-[10px] font-bold text-gray-400 uppercase">Total Points</p>
             </div>
           </div>

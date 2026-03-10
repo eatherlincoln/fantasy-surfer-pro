@@ -23,7 +23,7 @@ export const generateSurfCommentary = async (surferName: string, score: number, 
         const prompt = `Write a short, enthusiastic, 1-sentence commentator reaction for a professional surfer named ${surferName} who just scored ${score} points and is currently ${status}. Use surf terminology.`;
 
         const response = await aiClient.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             contents: prompt,
         });
 
@@ -48,7 +48,7 @@ export const predictHeatOutcome = async (surfers: { name: string, country: strin
 
     try {
         const response = await aiClient.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             contents: prompt,
         });
 
@@ -75,7 +75,7 @@ export const generateBriefing = async (team: { name: string, tier: string }[], t
 
     try {
         const response = await aiClient.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             contents: prompt,
         });
         return (response as any).text || response.candidates?.[0]?.content?.parts?.[0]?.text || "Briefing unavailable.";

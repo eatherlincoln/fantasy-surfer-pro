@@ -4,6 +4,7 @@ import { Surfer, EventStatus, Tier, UserProfile } from '../types';
 import { generateBriefing } from '../services/aiService';
 
 import { Event, Heat, getHeats } from '../services/adminService';
+import { getUserGlobalRank, getUserLeagueRank, getUserLeagues } from '../services/leagueService';
 
 const getInitials = (name: string) => {
   const parts = name.trim().split(' ');
@@ -33,6 +34,10 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
   const [aiBriefing, setAiBriefing] = useState<string | null>(null);
   const [isBriefingLoading, setIsBriefingLoading] = useState(false);
   const [currentHeats, setCurrentHeats] = useState<Heat[]>([]);
+  const [globalRank, setGlobalRank] = useState<number | null>(null);
+  const [leagueRank, setLeagueRank] = useState<{ rank: number, totalMembers: number } | null>(null);
+  const [leagueName, setLeagueName] = useState<string>("Friends League");
+
   const displayTeam = userTeam.length > 0 ? userTeam : MOCK_SURFERS.slice(0, 3);
 
   const totalPoints = userTeam.reduce((acc, s) => acc + (s.points || 0), 0);
@@ -49,6 +54,26 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
     };
     fetchHeats();
   }, [activeEvent]);
+
+  useEffect(() => {
+    const fetchRanks = async () => {
+      if (!userProfile) return;
+      try {
+        const gRank = await getUserGlobalRank(userProfile.id);
+        setGlobalRank(gRank);
+
+        const leagues = await getUserLeagues(userProfile.id);
+        if (leagues && leagues.length > 0) {
+          const lRank = await getUserLeagueRank(userProfile.id, leagues[0].id);
+          setLeagueRank(lRank);
+          setLeagueName(leagues[0].name);
+        }
+      } catch (e) {
+        console.error('Failed to fetch ranks:', e);
+      }
+    };
+    fetchRanks();
+  }, [userProfile]);
 
   useEffect(() => {
     const fetchBriefing = async () => {
@@ -113,16 +138,16 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
             <div className="text-right flex flex-col items-end">
               <div className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1 mr-1">Total Points</div>
               <div className="text-[56px] font-black text-primary-dark tracking-[-0.05em] leading-[0.85]">{totalPoints.toFixed(2)}</div>
-              <div className="text-[10px] text-gray-400 font-bold uppercase mt-2 tracking-widest mr-1">Ranked #132 Global</div>
+              <div className="text-[10px] text-gray-400 font-bold uppercase mt-2 tracking-widest mr-1">Ranked #{globalRank || '---'} Global</div>
             </div>
           </div>
 
           <div className="mt-auto pb-1 pl-1 relative z-10">
             <div className="flex items-baseline gap-1 tracking-tighter">
-              <span className="text-[64px] lg:text-[80px] font-black text-gray-900 leading-[0.85] tracking-tight">1st</span>
-              <span className="text-[24px] lg:text-[28px] font-bold text-gray-300 leading-none ml-[2px] pb-2 lg:pb-3">/ 12</span>
+              <span className="text-[64px] lg:text-[80px] font-black text-gray-900 leading-[0.85] tracking-tight">{leagueRank ? `${leagueRank.rank}${['st', 'nd', 'rd'][(leagueRank.rank % 10) - 1] || 'th'}` : '---'}</span>
+              <span className="text-[24px] lg:text-[28px] font-bold text-gray-300 leading-none ml-[2px] pb-2 lg:pb-3">/ {leagueRank?.totalMembers || '---'}</span>
             </div>
-            <div className="text-[11px] font-bold text-primary-dark uppercase tracking-[0.2em] mt-2">Friends League</div>
+            <div className="text-[11px] font-bold text-primary-dark uppercase tracking-[0.2em] mt-2">{leagueName}</div>
           </div>
         </div>
 

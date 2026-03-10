@@ -167,3 +167,56 @@ export const leaveLeague = async (leagueId: string, userId: string) => {
         await supabase.from('leagues').delete().eq('id', leagueId);
     }
 };
+
+export const getUserGlobalRank = async (userId: string) => {
+    // 1. Get current user's points
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('total_fantasy_points')
+        .eq('id', userId)
+        .single();
+
+    if (!profile) return null;
+
+    // 2. Count users with more points
+    const { count } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .gt('total_fantasy_points', profile.total_fantasy_points || 0);
+
+    return (count || 0) + 1;
+};
+
+export const getUserLeagueRank = async (userId: string, leagueId: string) => {
+    // 1. Get current user's points
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('total_fantasy_points')
+        .eq('id', userId)
+        .single();
+
+    if (!profile) return null;
+
+    // 2. Get all members of the league with their profiles
+    const { data: members, error } = await supabase
+        .from('league_members')
+        .select(`
+            user_id,
+            profiles (
+                total_fantasy_points
+            )
+        `)
+        .eq('league_id', leagueId);
+
+    if (error || !members) return null;
+
+    // 3. Count members with more points
+    const betterMembers = members.filter((m: any) =>
+        (m.profiles?.total_fantasy_points || 0) > (profile.total_fantasy_points || 0)
+    );
+
+    return {
+        rank: betterMembers.length + 1,
+        totalMembers: members.length
+    };
+};
