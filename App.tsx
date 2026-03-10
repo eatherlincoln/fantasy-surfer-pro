@@ -56,18 +56,37 @@ const App: React.FC = () => {
           }
         }
 
-        // Auto-sync stale localStorage teams (0 budget values, wrong tiers) with DB
+        // Auto-sync stale localStorage teams with DB
         if (ev && userTeam.length > 0) {
           const { getEventSurfers } = await import('./services/adminService');
+          const { getUserTeamFromDB } = await import('./services/teamService');
           const liveSurfers = await getEventSurfers(ev.id);
+
+          let dbPicks: Surfer[] = [];
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            dbPicks = await getUserTeamFromDB(session.user.id, ev.id);
+          }
+
           if (liveSurfers) {
             setUserTeam(prev => {
               const synced = prev.map(s => {
                 const latest = liveSurfers.find(a => a.id == s.id || a.name === s.name);
-                return latest ? { ...s, value: latest.value, tier: latest.tier, image: latest.image, points: latest.current_season_points || latest.points || 0 } : s;
+                const dbPick = dbPicks.find(p => p.id == s.id || p.name === s.name);
+
+                // Priority: 1. Points from this event in DB, 2. Global points, 3. Previous points
+                const points = dbPick ? dbPick.points : (latest?.current_season_points || latest?.points || s.points || 0);
+
+                return latest ? {
+                  ...s,
+                  value: latest.value,
+                  tier: latest.tier,
+                  image: latest.image,
+                  points: points
+                } : { ...s, points };
               });
 
-              // CRITICAL BUG FIX: Deduplicate to clear the 1000 drafted surfers local cache bug
+              // CRITICAL BUG FIX: Deduplicate and trim
               const uniqueSynced = synced.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
               const trimmedSynced = uniqueSynced.length > 10 ? uniqueSynced.slice(0, 10) : uniqueSynced;
 

@@ -218,7 +218,7 @@ export const endHeat = async (heatId: string) => {
 
 // --- Scoring & Surfer Management ---
 
-export const recalculateSurferPoints = async (surferId: string) => {
+export const recalculateSurferPoints = async (surferId: string, eventId?: string) => {
     // 1. Fetch all scores for this surfer
     const { data: scores, error } = await supabase
         .from('scores')
@@ -256,18 +256,31 @@ export const recalculateSurferPoints = async (surferId: string) => {
         console.error("Error updating surfer points", updateError);
     }
 
-    // 5. Update surfer's points on ALL users' drafted teams
-    const { error: teamUpdateError } = await supabase
-        .from('user_teams')
-        .update({ points: totalPoints })
-        .eq('surfer_id', surferId);
+    // 5. Update surfer's points on active user teams for CURRENT event if provided
+    if (eventId) {
+        const { error: teamUpdateError } = await supabase
+            .from('user_teams')
+            .update({ points: totalPoints })
+            .eq('surfer_id', surferId)
+            .eq('event_id', eventId);
 
-    if (teamUpdateError) {
-        console.error("Error updating user_teams points", teamUpdateError);
+        if (teamUpdateError) {
+            console.error("Error updating user_teams points", teamUpdateError);
+        }
+    } else {
+        // Fallback for non-event specific (legacy)
+        const { error: teamUpdateError } = await supabase
+            .from('user_teams')
+            .update({ points: totalPoints })
+            .eq('surfer_id', surferId);
+
+        if (teamUpdateError) {
+            console.error("Error updating user_teams points fallback", teamUpdateError);
+        }
     }
 };
 
-export const submitWaveScore = async (heatId: string, surferId: string, score: number) => {
+export const submitWaveScore = async (heatId: string, surferId: string, score: number, eventId?: string) => {
     // 1. Insert Score
     const { data: scoreData, error: scoreError } = await supabase
         .from('scores')
@@ -278,7 +291,7 @@ export const submitWaveScore = async (heatId: string, surferId: string, score: n
     if (scoreError) throw scoreError;
 
     // 2. Automatically recalculate their entire event total (Sum of Best 2 waves per heat)
-    await recalculateSurferPoints(surferId);
+    await recalculateSurferPoints(surferId, eventId);
 
     return scoreData;
 };
@@ -511,6 +524,7 @@ export const finalizeHeat = async (heatId: string) => {
         .from('heats')
         .select(`
             id, 
+            event_id,
             heat_assignments (
                 surfer_id
             )
@@ -547,15 +561,14 @@ export const finalizeHeat = async (heatId: string) => {
 
         if (userTeams) {
             for (const team of userTeams) {
-                // Add points to the specific pick
+                // Add points to the specific pick for this event
                 await supabase
                     .from('user_teams')
                     .update({ points: (team.points || 0) + heatTotal })
-                    .eq('id', team.id);
+                    .eq('id', team.id)
+                    .eq('event_id', heat.event_id);
 
                 // Add points to User's Global Total
-                // We do this by RPC or direct fetch-update to avoid race conditions ideally, 
-                // but for MVP direct update is fine.
                 const { data: profile } = await supabase
                     .from('profiles')
                     .select('id, total_fantasy_points')
