@@ -53,21 +53,26 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
 
   useEffect(() => {
     if (selectedLeague) {
+      console.log(`[Leagues] Fetching leaderboard for league: ${selectedLeague.id}`);
       fetchLeagueLeaderboard(selectedLeague.id);
     } else {
-      // Reset to Global/Mock when no league selected
       setLeagueMembers([]);
     }
-  }, [selectedLeague]);
+  }, [selectedLeague, activeEvent?.id]);
 
   // Fetch Member Teams specifically when expanded
   useEffect(() => {
     if (expandedId && activeEvent) {
-      const isStarted = activeEvent.status === 'LIVE' || activeEvent.status === 'COMPLETED';
-      if (isStarted && !memberTeams[expandedId]) {
+      console.log(`[Leagues] Expansion Check: ${expandedId}. Event Status: ${activeEvent.status}`);
+      
+      // TEMPORARY: Remove isStarted check to verify data fetching
+      if (!memberTeams[expandedId]) {
         console.log(`[Leagues] Scouting roster for user: ${expandedId}, event: ${activeEvent.id}`);
         getUserTeamFromDB(expandedId, activeEvent.id).then(team => {
-          console.log(`[Leagues] Found ${team.length} surfers for ${expandedId}`);
+          console.log(`[Leagues] Found ${team?.length || 0} surfers for ${expandedId}`);
+          if (!team || team.length === 0) {
+            console.warn(`[Leagues] No team data returned for ${expandedId}`);
+          }
           // Map surfer status to league UI status just like userStats lineup does
           const mappedLineup = team.map(s => ({
             name: s.name.split(' ').pop() || '',
