@@ -1,4 +1,5 @@
 
+// Final points and round advancement system - v2.0.1 (Vercel Build Trigger)
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Surfer, EventStatus, UserProfile } from './types';
 import { Event } from './services/adminService';
@@ -302,7 +303,7 @@ const App: React.FC = () => {
           {currentView === 'TEAM_BUILDER' && (
             <TeamBuilder
               initialTeam={userTeam}
-              isLocked={activeEvent?.status === 'LIVE' || activeEvent?.status === 'COMPLETED' || eventStatus === 'LIVE'}
+              isLocked={activeEvent?.status === 'LIVE' || activeEvent?.status === 'COMPLETED' || activeEvent?.status === 'PAUSED' || eventStatus === 'LIVE'}
               onSave={handleSaveTeam}
               onBack={handleBackFromTeamBuilder}
               userProfile={userProfile}

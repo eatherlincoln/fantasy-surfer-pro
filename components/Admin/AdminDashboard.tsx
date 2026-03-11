@@ -125,7 +125,8 @@ const AdminHeatCard: React.FC<{ heat: Heat, onRefresh: () => void }> = ({ heat, 
             <div className="bg-gray-50 px-4 py-2 border-b border-gray-100 flex justify-between items-center">
                 <span className="font-bold text-gray-700">Heat {heat.heat_number}</span>
                 <span className={`text-xs font-bold px-2 py-1 rounded ${heat.status === 'LIVE' ? 'bg-green-100 text-green-700' :
-                    heat.status === 'COMPLETED' ? 'bg-gray-100 text-gray-500' : 'bg-blue-50 text-blue-600'
+                    heat.status === 'COMPLETED' ? 'bg-gray-100 text-gray-500' :
+                        heat.status === 'PAUSED' ? 'bg-orange-100 text-orange-700' : 'bg-blue-50 text-blue-600'
                     }`}>
                     {heat.status}
                 </span>
@@ -820,7 +821,7 @@ const AdminDashboard: React.FC = () => {
                                     >
                                         <div className="font-bold text-gray-900">{event.name}</div>
                                         <div className="flex justify-between items-center mt-2">
-                                            <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase ${event.status === 'LIVE' ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 text-gray-500'}`}>{event.status}</span>
+                                            <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase ${event.status === 'LIVE' ? 'bg-red-500 text-white animate-pulse' : event.status === 'PAUSED' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-500'}`}>{event.status}</span>
                                             <span className="text-xs text-gray-400 font-mono">{event.start_date.split('T')[0]}</span>
                                         </div>
                                         <button
@@ -868,10 +869,23 @@ const AdminDashboard: React.FC = () => {
                                                 <h2 className="text-2xl font-black">{selectedEvent.name}</h2>
                                                 <p className="text-gray-400 text-xs font-mono mt-1">{selectedEvent.id}</p>
                                             </div>
-                                            <div className="space-x-3">
-                                                <button onClick={() => updateEventStatus(selectedEvent.id, 'LIVE').then(loadEvents)} className={`px-4 py-2 rounded-lg font-bold text-sm text-white ${selectedEvent.status === 'LIVE' ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}>
-                                                    {selectedEvent.status === 'LIVE' ? 'LIVE NOW' : 'GO LIVE'}
-                                                </button>
+                                            <div className="flex gap-2">
+                                                {selectedEvent.status === 'PAUSED' ? (
+                                                    <button onClick={() => updateEventStatus(selectedEvent.id, 'LIVE').then(loadEvents)} className="px-4 py-2 rounded-lg font-bold text-sm text-white bg-orange-500 hover:bg-orange-600">
+                                                        RESUME
+                                                    </button>
+                                                ) : (
+                                                    <button onClick={() => updateEventStatus(selectedEvent.id, 'LIVE').then(loadEvents)} className={`px-4 py-2 rounded-lg font-bold text-sm text-white ${selectedEvent.status === 'LIVE' ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}>
+                                                        {selectedEvent.status === 'LIVE' ? 'LIVE NOW' : 'GO LIVE'}
+                                                    </button>
+                                                )}
+
+                                                {selectedEvent.status === 'LIVE' && (
+                                                    <button onClick={() => updateEventStatus(selectedEvent.id, 'PAUSED').then(loadEvents)} className="px-4 py-2 rounded-lg font-bold text-sm text-white bg-orange-500 hover:bg-orange-600">
+                                                        PAUSE
+                                                    </button>
+                                                )}
+
                                                 <button onClick={() => updateEventStatus(selectedEvent.id, 'COMPLETED').then(loadEvents)} className="bg-gray-900 text-white px-4 py-2 rounded-lg font-bold text-sm">
                                                     END
                                                 </button>

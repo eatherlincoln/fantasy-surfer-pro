@@ -5,7 +5,7 @@ export interface Event {
     id: string;
     name: string;
     slug: string;
-    status: 'UPCOMING' | 'LIVE' | 'COMPLETED';
+    status: 'UPCOMING' | 'LIVE' | 'COMPLETED' | 'PAUSED';
     start_date: string;
     end_date: string;
     header_image?: string;
@@ -46,7 +46,7 @@ export interface Heat {
     event_id: string;
     round_number: number;
     heat_number: number;
-    status: 'UPCOMING' | 'LIVE' | 'COMPLETED';
+    status: 'UPCOMING' | 'LIVE' | 'COMPLETED' | 'PAUSED';
     heat_assignments?: {
         surfer_id: string;
         surfers: {
@@ -94,7 +94,7 @@ export const getEvents = async () => {
     return data;
 };
 
-export const updateEventStatus = async (eventId: string, status: 'UPCOMING' | 'LIVE' | 'COMPLETED') => {
+export const updateEventStatus = async (eventId: string, status: 'UPCOMING' | 'LIVE' | 'COMPLETED' | 'PAUSED' | 'PAUSED') => {
     const { data, error } = await supabase
         .from('events')
         .update({ status })

@@ -5,7 +5,7 @@ export enum Tier {
   C = 'C'
 }
 
-export type EventStatus = 'DRAFTING' | 'LIVE' | 'COMPLETED';
+export type EventStatus = 'DRAFTING' | 'LIVE' | 'COMPLETED' | 'PAUSED';
 
 export interface Surfer {
   id: string;
