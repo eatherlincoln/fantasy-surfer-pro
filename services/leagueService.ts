@@ -118,7 +118,7 @@ export const getLeagueLeaderboard = async (leagueId: string, eventId?: string) =
         avatar_url,
         team_name,
         total_fantasy_points
-        ${eventId ? `, user_teams(count)` : ''}
+        ${eventId ? `, user_teams(count).filter(event_id.eq.${eventId})` : ''}
       )
     `;
 
@@ -126,10 +126,6 @@ export const getLeagueLeaderboard = async (leagueId: string, eventId?: string) =
         .from('league_members')
         .select(select)
         .eq('league_id', leagueId);
-
-    if (eventId) {
-        query = query.eq('profiles.user_teams.event_id', eventId);
-    }
 
     const { data, error } = await query;
 
@@ -145,16 +141,12 @@ export const getGlobalLeaderboard = async (eventId?: string) => {
         team_name,
         avatar_url,
         total_fantasy_points
-        ${eventId ? `, user_teams(count)` : ''}
+        ${eventId ? `, user_teams(count).filter(event_id.eq.${eventId})` : ''}
     `;
 
     let query = supabase
         .from('profiles')
         .select(select);
-
-    if (eventId) {
-        query = query.eq('user_teams.event_id', eventId);
-    }
 
     const { data, error } = await query
         .order('total_fantasy_points', { ascending: false })

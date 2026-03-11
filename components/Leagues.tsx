@@ -43,7 +43,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
       // Clean up the URL so it doesn't trigger again on reload
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [userProfile]);
+  }, [userProfile, activeEvent]);
 
   useEffect(() => {
     if (selectedLeague) {
@@ -264,7 +264,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
       // If viewing a custom league
       return leagueMembers.length > 0 ? leagueMembers : [];
     }
-  }, [userStats, teamName, userProfile, activeTab, leagueMembers]);
+  }, [userStats, teamName, userProfile, activeTab, leagueMembers, globalMembers, activeEvent]);
 
   const renderMemberRow = (member: any, isPinned = false) => (
     <div key={member.id} className={`flex flex-col ${isPinned ? 'bg-primary/5 border-b-2 border-primary/10' : ''}`}>
