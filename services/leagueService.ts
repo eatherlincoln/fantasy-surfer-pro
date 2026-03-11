@@ -109,10 +109,8 @@ export const getUserLeagues = async (userId: string) => {
     return data.map((item: any) => item.leagues);
 };
 
-export const getLeagueLeaderboard = async (leagueId: string) => {
-    const { data, error } = await supabase
-        .from('league_members')
-        .select(`
+export const getLeagueLeaderboard = async (leagueId: string, eventId?: string) => {
+    let select = `
       *,
       profiles (
         username,
@@ -120,27 +118,46 @@ export const getLeagueLeaderboard = async (leagueId: string) => {
         avatar_url,
         team_name,
         total_fantasy_points
+        ${eventId ? `, user_teams(count)` : ''}
       )
-    `)
+    `;
+
+    let query = supabase
+        .from('league_members')
+        .select(select)
         .eq('league_id', leagueId);
+
+    if (eventId) {
+        query = query.eq('profiles.user_teams.event_id', eventId);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
     return data;
 };
 
-export const getGlobalLeaderboard = async () => {
-    const { data, error } = await supabase
+export const getGlobalLeaderboard = async (eventId?: string) => {
+    let select = `
+        id,
+        username,
+        full_name,
+        team_name,
+        avatar_url,
+        total_fantasy_points
+        ${eventId ? `, user_teams(count)` : ''}
+    `;
+
+    let query = supabase
         .from('profiles')
-        .select(`
-            id,
-            username,
-            full_name,
-            team_name,
-            avatar_url,
-            total_fantasy_points
-        `)
-        // NOTE: total_points doesn't exist yet, so we just return profiles for now.
-        // We will need to calculate points based on their team or add a total_points column later.
+        .select(select);
+
+    if (eventId) {
+        query = query.eq('user_teams.event_id', eventId);
+    }
+
+    const { data, error } = await query
+        .order('total_fantasy_points', { ascending: false })
         .limit(100);
 
     if (error) throw error;

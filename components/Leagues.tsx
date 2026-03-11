@@ -77,21 +77,27 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
 
   const fetchGlobalLeaderboard = async () => {
     try {
-      const data = await getGlobalLeaderboard();
-      // Temporary: Since total_points isn't accurately tracking yet via triggers, we map what we have.
-      const transformedGlobal = data.map((profile: any, idx: number) => ({
-        id: profile.id,
-        rank: idx + 1, // Order of rows
-        name: profile.team_name || profile.username || profile.full_name || 'Unknown',
-        initial: (profile.team_name || profile.username || '?')[0].toUpperCase(),
-        points: profile.total_fantasy_points || 0,
-        surfersLeft: 4,
-        trend: 'neutral',
-        isUser: profile.id === userProfile?.id,
-        avatar: profile.avatar_url
-      }));
+      const data = await getGlobalLeaderboard(activeEvent?.id);
+      // Map profiles to UI format
+      const transformedGlobal = data.map((profile: any, idx: number) => {
+        // Handle names: Priority Team Name > Username > Full Name
+        const name = profile.team_name || profile.username || profile.full_name || 'Unknown';
+        const initial = (profile.team_name || profile.username || profile.full_name || '?')[0].toUpperCase();
 
-      // Sort by whatever placeholder metric we use (events_won right now)
+        return {
+          id: profile.id,
+          rank: idx + 1,
+          name: name,
+          initial: initial,
+          points: profile.total_fantasy_points || 0,
+          surfersLeft: profile.user_teams?.[0]?.count || 0,
+          trend: 'neutral',
+          isUser: profile.id === userProfile?.id,
+          avatar: profile.avatar_url
+        };
+      });
+
+      // Sort by points
       transformedGlobal.sort((a, b) => b.points - a.points);
 
       // Update ranks post-sort
@@ -117,20 +123,26 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
   const fetchLeagueLeaderboard = async (leagueId: string) => {
     setIsLoading(true);
     try {
-      const members = await getLeagueLeaderboard(leagueId);
+      const members = await getLeagueLeaderboard(leagueId, activeEvent?.id);
 
       // Transform DB data to UI format
-      const transformedMembers = members.map((m: any, idx: number) => ({
-        id: m.user_id,
-        rank: idx + 1, // Basic ranking logic (should be sorted by DB or here)
-        name: m.profiles.team_name || m.profiles.full_name || m.profiles.username || 'Unknown',
-        initial: (m.profiles.username || '?')[0].toUpperCase(),
-        points: m.profiles.total_fantasy_points || 0,
-        surfersLeft: 0, // Need to implement
-        trend: 'neutral',
-        avatar: m.profiles.avatar_url,
-        isUser: m.user_id === userProfile?.id || false
-      }));
+      const transformedMembers = members.map((m: any, idx: number) => {
+        const p = m.profiles;
+        const name = p.team_name || p.username || p.full_name || 'Unknown';
+        const initial = (p.team_name || p.username || p.full_name || '?')[0].toUpperCase();
+
+        return {
+          id: m.user_id,
+          rank: idx + 1,
+          name: name,
+          initial: initial,
+          points: p.total_fantasy_points || 0,
+          surfersLeft: p.user_teams?.[0]?.count || 0,
+          trend: 'neutral',
+          avatar: p.avatar_url,
+          isUser: m.user_id === userProfile?.id || false
+        };
+      });
 
       setLeagueMembers(transformedMembers);
     } catch (error) {
@@ -222,8 +234,8 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
     }));
 
     return {
-      points: totalPoints > 0 ? totalPoints : 127.5,
-      surfersLeft: userTeam.length > 0 ? activeSurfers : 4,
+      points: totalPoints,
+      surfersLeft: activeSurfers,
       lineup: userTeam.length > 0 ? lineup : undefined
     };
   }, [userTeam]);

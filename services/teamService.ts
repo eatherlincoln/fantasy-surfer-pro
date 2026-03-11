@@ -48,7 +48,8 @@ export const getUserTeamFromDB = async (userId: string, eventId: string): Promis
         name,
         tier,
         value,
-        country
+        country,
+        image
       )
     `)
         .eq('user_id', userId)
@@ -68,6 +69,6 @@ export const getUserTeamFromDB = async (userId: string, eventId: string): Promis
         country: row.surfers.country,
         points: row.points,
         status: 'Waiting', // Default status for viewing other teams
-        image: '', // Can be fetched separately or we omit image in small leaderboard views
+        image: row.surfers.image,
     })) as Surfer[];
 };
