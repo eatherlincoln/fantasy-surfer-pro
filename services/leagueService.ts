@@ -113,24 +113,45 @@ export const getLeagueLeaderboard = async (leagueId: string, eventId?: string) =
     let select = `
       *,
       profiles (
+        id,
         username,
         full_name,
         avatar_url,
         team_name,
         total_fantasy_points
-        ${eventId ? `, user_teams(count).filter(event_id.eq."${eventId}")` : ''}
       )
     `;
 
-    let query = supabase
+    const { data: members, error } = await supabase
         .from('league_members')
         .select(select)
         .eq('league_id', leagueId);
 
-    const { data, error } = await query;
-
     if (error) throw error;
-    return data;
+
+    // If eventId provided, augment with counts
+    if (eventId && members.length > 0) {
+        const userIds = members.map(m => m.user_id);
+        const { data: teams } = await supabase
+            .from('user_teams')
+            .select('user_id')
+            .eq('event_id', eventId)
+            .in('user_id', userIds);
+
+        if (teams) {
+            const countsMap: Record<string, number> = {};
+            teams.forEach(t => {
+                countsMap[t.user_id] = (countsMap[t.user_id] || 0) + 1;
+            });
+            members.forEach((m: any) => {
+                if (m.profiles) {
+                    m.profiles.user_team_count = countsMap[m.user_id] || 0;
+                }
+            });
+        }
+    }
+
+    return members;
 };
 
 export const getGlobalLeaderboard = async (eventId?: string) => {
@@ -141,19 +162,37 @@ export const getGlobalLeaderboard = async (eventId?: string) => {
         team_name,
         avatar_url,
         total_fantasy_points
-        ${eventId ? `, user_teams(count).filter(event_id.eq.${eventId})` : ''}
     `;
 
-    let query = supabase
+    const { data: profiles, error } = await supabase
         .from('profiles')
-        .select(select);
-
-    const { data, error } = await query
+        .select(select)
         .order('total_fantasy_points', { ascending: false })
         .limit(100);
 
     if (error) throw error;
-    return data;
+
+    // If eventId provided, augment with counts
+    if (eventId && profiles.length > 0) {
+        const userIds = profiles.map(p => p.id);
+        const { data: teams } = await supabase
+            .from('user_teams')
+            .select('user_id')
+            .eq('event_id', eventId)
+            .in('user_id', userIds);
+
+        if (teams) {
+            const countsMap: Record<string, number> = {};
+            teams.forEach(t => {
+                countsMap[t.user_id] = (countsMap[t.user_id] || 0) + 1;
+            });
+            profiles.forEach((p: any) => {
+                p.user_team_count = countsMap[p.id] || 0;
+            });
+        }
+    }
+
+    return profiles;
 };
 
 export const leaveLeague = async (leagueId: string, userId: string) => {

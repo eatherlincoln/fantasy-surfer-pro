@@ -59,7 +59,9 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
     if (expandedId && activeEvent) {
       const isStarted = activeEvent.status === 'LIVE' || activeEvent.status === 'COMPLETED';
       if (isStarted && !memberTeams[expandedId]) {
+        console.log(`[Leagues] Scouting roster for user: ${expandedId}, event: ${activeEvent.id}`);
         getUserTeamFromDB(expandedId, activeEvent.id).then(team => {
+          console.log(`[Leagues] Found ${team.length} surfers for ${expandedId}`);
           // Map surfer status to league UI status just like userStats lineup does
           const mappedLineup = team.map(s => ({
             name: s.name.split(' ').pop() || '',
@@ -70,7 +72,10 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
           }));
 
           setMemberTeams(prev => ({ ...prev, [expandedId]: mappedLineup }));
-        }).catch(console.error);
+        }).catch(err => {
+          console.error(`[Leagues] Failed to scout roster for ${expandedId}:`, err);
+          setMemberTeams(prev => ({ ...prev, [expandedId]: [] })); // Stop loading state
+        });
       }
     }
   }, [expandedId, activeEvent, memberTeams]);
@@ -90,7 +95,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
           name: name,
           initial: initial,
           points: profile.total_fantasy_points || 0,
-          surfersLeft: profile.user_teams?.[0]?.count || 0,
+          surfersLeft: profile.user_team_count || 0,
           trend: 'neutral',
           isUser: profile.id === userProfile?.id,
           avatar: profile.avatar_url
@@ -137,7 +142,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
           name: name,
           initial: initial,
           points: p.total_fantasy_points || 0,
-          surfersLeft: p.user_teams?.[0]?.count || 0,
+          surfersLeft: p.user_team_count || 0,
           trend: 'neutral',
           avatar: p.avatar_url,
           isUser: m.user_id === userProfile?.id || false
