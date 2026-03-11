@@ -12,7 +12,7 @@ interface LeaguesProps {
 }
 
 const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent }) => {
-  const [expandedId, setExpandedId] = useState<string | null>('1');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [teamName, setTeamName] = useState(userProfile?.team_name || "Jane Doe");
   const [isEditingName, setIsEditingName] = useState(false);
 
