@@ -84,7 +84,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
   const counts = useMemo(() => ({
     [Tier.A]: team.filter(s => s.tier === Tier.A).length,
     [Tier.B]: team.filter(s => s.tier === Tier.B).length,
-    [Tier.C]: team.filter(s => s.tier === Tier.C).length,
+    [Tier.C]: team.filter(s => s.tier === Tier.C || !s.tier).length,
   }), [team]);
 
   // New single team completion check
@@ -382,18 +382,18 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             {/* Single Grid for All 10 Slots */}
             <div className="grid grid-cols-4 md:grid-cols-5 gap-x-2 gap-y-8 md:gap-x-6 md:gap-y-10">
               {/* Tier A (3 Slots) */}
-              {[0, 1, 2].map(i => (
+              {[...Array(Math.max(TIER_LIMITS[Tier.A], team.filter(s => s.tier === Tier.A).length))].map((_, i) => (
                 <RosterSlot key={`a-${i}`} surfer={team.filter(s => s.tier === Tier.A)[i]} tier={Tier.A} isLocked={isLocked} onToggle={toggleSurfer} getTierColorInfo={getTierColorInfo} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
               ))}
 
               {/* Tier B (4 Slots) */}
-              {[0, 1, 2, 3].map(i => (
+              {[...Array(Math.max(TIER_LIMITS[Tier.B], team.filter(s => s.tier === Tier.B).length))].map((_, i) => (
                 <RosterSlot key={`b-${i}`} surfer={team.filter(s => s.tier === Tier.B)[i]} tier={Tier.B} isLocked={isLocked} onToggle={toggleSurfer} getTierColorInfo={getTierColorInfo} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
               ))}
 
               {/* Tier C (3 Slots) */}
-              {[0, 1, 2].map(i => (
-                <RosterSlot key={`c-${i}`} surfer={team.filter(s => s.tier === Tier.C)[i]} tier={Tier.C} isLocked={isLocked} onToggle={toggleSurfer} getTierColorInfo={getTierColorInfo} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
+              {[...Array(Math.max(TIER_LIMITS[Tier.C], team.filter(s => s.tier === Tier.C || !s.tier).length))].map((_, i) => (
+                <RosterSlot key={`c-${i}`} surfer={team.filter(s => s.tier === Tier.C || !s.tier)[i]} tier={Tier.C} isLocked={isLocked} onToggle={toggleSurfer} getTierColorInfo={getTierColorInfo} getAvatarUrl={getAvatarUrl} onEmptyClick={handleEmptySlotClick} />
               ))}
             </div>
 
