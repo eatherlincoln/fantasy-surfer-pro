@@ -81,8 +81,8 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
       // Map profiles to UI format
       const transformedGlobal = data.map((profile: any, idx: number) => {
         // Handle names: Priority Team Name > Username > Full Name
-        const name = profile.team_name || profile.username || profile.full_name || 'Unknown';
-        const initial = (profile.team_name || profile.username || profile.full_name || '?')[0].toUpperCase();
+        const name = profile.team_name || profile.username || profile.full_name || 'New Team';
+        const initial = (profile.team_name || profile.username || profile.full_name || 'N')[0].toUpperCase();
 
         return {
           id: profile.id,
@@ -128,8 +128,8 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
       // Transform DB data to UI format
       const transformedMembers = members.map((m: any, idx: number) => {
         const p = m.profiles;
-        const name = p.team_name || p.username || p.full_name || 'Unknown';
-        const initial = (p.team_name || p.username || p.full_name || '?')[0].toUpperCase();
+        const name = p.team_name || p.username || p.full_name || 'New Team';
+        const initial = (p.team_name || p.username || p.full_name || 'N')[0].toUpperCase();
 
         return {
           id: m.user_id,

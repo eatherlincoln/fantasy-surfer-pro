@@ -1,8 +1,14 @@
 
+import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 
-const PROD_URL = 'https://irtlqpjyohydkcwbcgny.supabase.co';
-const PROD_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlydGxxcGp5b2h5ZGtjd2JjZ255Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzA3MDM4NSwiZXhwIjoyMDgyNjQ2Mzg1fQ.bX0V6vbBQMucHPPZWNDx9Td8Pwt0_Zs0YrgVO6jDl80';
+const PROD_URL = process.env.SUPABASE_URL;
+const PROD_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!PROD_URL || !PROD_KEY) {
+    throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in environment');
+}
+
 const supabase = createClient(PROD_URL, PROD_KEY);
 
 const EVENT_ID = '81bcf839-162d-4d7a-a4c1-3b0edf30e68b';

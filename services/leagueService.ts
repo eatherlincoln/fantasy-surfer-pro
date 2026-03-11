@@ -118,7 +118,7 @@ export const getLeagueLeaderboard = async (leagueId: string, eventId?: string) =
         avatar_url,
         team_name,
         total_fantasy_points
-        ${eventId ? `, user_teams(count).filter(event_id.eq.${eventId})` : ''}
+        ${eventId ? `, user_teams(count).filter(event_id.eq."${eventId}")` : ''}
       )
     `;
 
