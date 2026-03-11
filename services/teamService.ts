@@ -38,15 +38,15 @@ export const syncUserTeamToDB = async (userId: string, eventId: string, team: Su
  * Retrieves another user's drafted team for a specific event to display on leaderboards.
  */
 export const getUserTeamFromDB = async (userId: string, eventId: string): Promise<Surfer[]> => {
-    // 1. Fetch the user_teams records
     const { data: teamRows, error: teamError } = await supabase
         .from('user_teams')
-        .select('*')
+        .select('user_id, surfer_id, points, event_id')
         .eq('user_id', userId)
         .eq('event_id', eventId);
 
     if (teamError) {
         console.error("Error fetching user team rows:", teamError);
+        console.log("Error details:", JSON.stringify(teamError, null, 2));
         return [];
     }
 

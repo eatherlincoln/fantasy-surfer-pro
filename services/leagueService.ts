@@ -145,11 +145,13 @@ export const getLeagueLeaderboard = async (leagueId: string, eventId?: string) =
             console.log(`[getLeagueLeaderboard] Fetched ${teams.length} user_teams rows for ${userIds.length} users.`);
             const countsMap: Record<string, number> = {};
             (teams as any[]).forEach(t => {
-                countsMap[t.user_id] = (countsMap[t.user_id] || 0) + 1;
+                const uid = String(t.user_id).toLowerCase();
+                countsMap[uid] = (countsMap[uid] || 0) + 1;
             });
             castMembers.forEach((m: any) => {
                 if (m.profiles) {
-                    m.profiles.user_team_count = countsMap[m.user_id] || 0;
+                    const pid = String(m.user_id).toLowerCase();
+                    m.profiles.user_team_count = countsMap[pid] || 0;
                 }
             });
         }
@@ -192,10 +194,15 @@ export const getGlobalLeaderboard = async (eventId?: string) => {
             console.log(`[getGlobalLeaderboard] Fetched ${teams.length} user_teams rows for ${userIds.length} profiles.`);
             const countsMap: Record<string, number> = {};
             (teams as any[]).forEach(t => {
-                countsMap[t.user_id] = (countsMap[t.user_id] || 0) + 1;
+                const uid = String(t.user_id).toLowerCase();
+                countsMap[uid] = (countsMap[uid] || 0) + 1;
             });
+            
+            console.log("[getGlobalLeaderboard] Sample countsMap keys:", Object.keys(countsMap).slice(0, 3));
+            
             castProfiles.forEach((p: any) => {
-                p.user_team_count = countsMap[p.id] || 0;
+                const pid = String(p.id).toLowerCase();
+                p.user_team_count = countsMap[pid] || 0;
             });
         }
     }
