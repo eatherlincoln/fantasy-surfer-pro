@@ -130,20 +130,24 @@ export const getLeagueLeaderboard = async (leagueId: string, eventId?: string) =
     if (error) throw error;
 
     // If eventId provided, augment with counts
-    if (eventId && members.length > 0) {
-        const userIds = members.map(m => m.user_id);
-        const { data: teams } = await supabase
+    if (eventId && members && members.length > 0) {
+        const castMembers = members as any[];
+        const userIds = castMembers.map(m => m.user_id);
+        const { data: teams, error: tErr } = await supabase
             .from('user_teams')
             .select('user_id')
             .eq('event_id', eventId)
             .in('user_id', userIds);
 
-        if (teams) {
+        if (tErr) {
+            console.error(`[getLeagueLeaderboard] Error fetching team counts:`, tErr);
+        } else if (teams) {
+            console.log(`[getLeagueLeaderboard] Fetched ${teams.length} user_teams rows for ${userIds.length} users.`);
             const countsMap: Record<string, number> = {};
-            teams.forEach(t => {
+            (teams as any[]).forEach(t => {
                 countsMap[t.user_id] = (countsMap[t.user_id] || 0) + 1;
             });
-            members.forEach((m: any) => {
+            castMembers.forEach((m: any) => {
                 if (m.profiles) {
                     m.profiles.user_team_count = countsMap[m.user_id] || 0;
                 }
@@ -173,20 +177,24 @@ export const getGlobalLeaderboard = async (eventId?: string) => {
     if (error) throw error;
 
     // If eventId provided, augment with counts
-    if (eventId && profiles.length > 0) {
-        const userIds = profiles.map(p => p.id);
-        const { data: teams } = await supabase
+    if (eventId && profiles && profiles.length > 0) {
+        const castProfiles = profiles as any[];
+        const userIds = castProfiles.map(p => p.id);
+        const { data: teams, error: tErr } = await supabase
             .from('user_teams')
             .select('user_id')
             .eq('event_id', eventId)
             .in('user_id', userIds);
 
-        if (teams) {
+        if (tErr) {
+            console.error(`[getGlobalLeaderboard] Error fetching team counts:`, tErr);
+        } else if (teams) {
+            console.log(`[getGlobalLeaderboard] Fetched ${teams.length} user_teams rows for ${userIds.length} profiles.`);
             const countsMap: Record<string, number> = {};
-            teams.forEach(t => {
+            (teams as any[]).forEach(t => {
                 countsMap[t.user_id] = (countsMap[t.user_id] || 0) + 1;
             });
-            profiles.forEach((p: any) => {
+            castProfiles.forEach((p: any) => {
                 p.user_team_count = countsMap[p.id] || 0;
             });
         }

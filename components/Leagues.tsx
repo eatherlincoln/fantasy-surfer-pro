@@ -34,6 +34,12 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
     fetchUserLeagues();
     fetchGlobalLeaderboard();
 
+    // RLS Access Check for Debugging
+    supabase.from('profiles').select('id').limit(1).then(({ data, error }) => {
+      if (error) console.error('[RLS Check] Profiles error:', error);
+      else console.log('[RLS Check] Profiles accessible:', !!data);
+    });
+
     // Check for Deep Link on mount
     const params = new URLSearchParams(window.location.search);
     const joinCode = params.get('join');
