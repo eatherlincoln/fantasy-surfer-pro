@@ -48,12 +48,14 @@ const App: React.FC = () => {
         if (current) {
           setActiveEvent(current);
           ev = current;
+          setEventStatus(current.status === 'UPCOMING' ? 'DRAFTING' : current.status as EventStatus);
         } else {
           // 2. Fallback: Latest upcoming or acting event
           const { data } = await supabase.from('events').select('*').order('start_date', { ascending: false }).limit(1).single();
           if (data) {
             setActiveEvent(data);
             ev = data;
+            setEventStatus(data.status === 'UPCOMING' ? 'DRAFTING' : data.status as EventStatus);
           }
         }
 
@@ -303,7 +305,7 @@ const App: React.FC = () => {
           {currentView === 'TEAM_BUILDER' && (
             <TeamBuilder
               initialTeam={userTeam}
-              isLocked={activeEvent?.status === 'LIVE' || activeEvent?.status === 'COMPLETED' || activeEvent?.status === 'PAUSED' || eventStatus === 'LIVE'}
+              isLocked={activeEvent?.status === 'LIVE' || activeEvent?.status === 'COMPLETED' || eventStatus === 'LIVE'}
               onSave={handleSaveTeam}
               onBack={handleBackFromTeamBuilder}
               userProfile={userProfile}

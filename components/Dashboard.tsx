@@ -246,15 +246,15 @@ const Dashboard: React.FC<DashboardProps> = ({ userTeam, eventStatus, onManageTe
         </div>
 
         <button
-          disabled={eventStatus === 'LIVE'}
+          disabled={eventStatus === 'LIVE' || eventStatus === 'COMPLETED'}
           onClick={onManageTeam}
-          className={`w-full py-5 rounded-[32px] border-2 border-dashed font-black text-sm flex items-center justify-center gap-3 transition active:scale-95 ${eventStatus === 'LIVE'
-            ? 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
-            : 'border-primary/40 text-primary-dark hover:bg-white hover:border-primary/60'
+          className={`w-full py-5 rounded-[32px] border-2 border-dashed font-black text-sm flex items-center justify-center gap-3 transition active:scale-95 ${(eventStatus === 'LIVE' || eventStatus === 'COMPLETED')
+              ? 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
+              : 'border-primary/40 text-primary-dark hover:bg-white hover:border-primary/60'
             }`}
         >
-          <span className="material-icons-round text-xl">{eventStatus === 'LIVE' ? 'lock' : 'swap_horiz'}</span>
-          {eventStatus === 'LIVE' ? 'Roster Locked' : 'Manage My Team'}
+          <span className="material-icons-round text-xl">{(eventStatus === 'LIVE' || eventStatus === 'COMPLETED') ? 'lock' : 'swap_horiz'}</span>
+          {(eventStatus === 'LIVE' || eventStatus === 'COMPLETED') ? 'Roster Locked' : 'Manage My Team'}
         </button>
       </section>
 
