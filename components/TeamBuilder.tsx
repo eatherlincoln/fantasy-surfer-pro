@@ -227,8 +227,8 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
             />
           </div>
           {isEliminated && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-              <span className="material-icons-round text-red-500 text-5xl font-black drop-shadow-lg">close</span>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 transition-all duration-700 animate-in zoom-in spin-in-12">
+              <img src="/out-stamp.png" alt="OUT" className="w-24 h-auto rotate-[-15deg] drop-shadow-2xl" />
             </div>
           )}
           {isSelected && (
@@ -493,8 +493,8 @@ const RosterSlot = ({
                 }}
               />
               {surfer.status?.toLowerCase() === 'eliminated' && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
-                  <span className="material-icons-round text-red-500 text-4xl font-black drop-shadow-md">close</span>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none transition-all duration-700 animate-in zoom-in spin-in-12">
+                  <img src="/out-stamp.png" alt="OUT" className="w-16 h-auto rotate-[-15deg] drop-shadow-lg" />
                 </div>
               )}
               {!isLocked && (

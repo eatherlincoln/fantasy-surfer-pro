@@ -335,16 +335,21 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
                       ) : (
                         <span className="material-icons-round text-gray-400 text-xl w-full h-full flex items-center justify-center">person</span>
                       )}
+                      {(surfer.status === 'OUT' || surfer.status === 'Eliminated') && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 transition-all duration-700 animate-in zoom-in spin-in-12 bg-white/10">
+                          <img src="/out-stamp.png" alt="OUT" className="w-10 h-auto rotate-[-15deg] drop-shadow-md" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex-grow min-w-0">
                       <div className="font-bold text-xs text-gray-900 truncate">{surfer.name}</div>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[9px] font-bold text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded">{surfer.value}M</span>
                         {surfer.status === 'IN HEAT' && <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>}
-                        {surfer.status === 'OUT' && (
+                        {(surfer.status === 'OUT' || surfer.status === 'Eliminated') && (
                           <div className="flex items-center gap-1 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">
                             <span className="material-icons-round text-[10px] text-red-500 font-bold">close</span>
-                            <span className="text-[8px] font-black text-red-500 uppercase">Out</span>
+                            <span className="text-[8px] font-black text-red-500 uppercase">Eliminated</span>
                           </div>
                         )}
                       </div>

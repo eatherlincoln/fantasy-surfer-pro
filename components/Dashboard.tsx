@@ -342,8 +342,8 @@ const SurferRow: React.FC<{ surfer: Surfer }> = ({ surfer }) => {
       <div className="relative">
         <img src={getAvatarUrl(surfer.image, surfer.name)} alt={surfer.name} className={`h-16 w-16 rounded-2xl object-cover object-top ${isEliminated ? 'grayscale opacity-60' : ''} ${isInWater ? 'ring-2 ring-primary ring-offset-2' : ''}`} onError={(e) => { (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${getInitials(surfer.name)}&background=random&color=fff&size=128`; }} />
         {isEliminated && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="material-icons-round text-red-500 text-3xl font-black drop-shadow-md">close</span>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 transition-all duration-700 animate-in zoom-in spin-in-12">
+            <img src="/out-stamp.png" alt="OUT" className="w-14 h-auto rotate-[-15deg] drop-shadow-lg opacity-90" />
           </div>
         )}
         {!isEliminated && (
