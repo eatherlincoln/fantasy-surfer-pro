@@ -341,7 +341,12 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[9px] font-bold text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded">{surfer.value}M</span>
                         {surfer.status === 'IN HEAT' && <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>}
-                        {surfer.status === 'OUT' && <span className="material-icons-round text-[10px] text-gray-400">close</span>}
+                        {surfer.status === 'OUT' && (
+                          <div className="flex items-center gap-1 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">
+                            <span className="material-icons-round text-[10px] text-red-500 font-bold">close</span>
+                            <span className="text-[8px] font-black text-red-500 uppercase">Out</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

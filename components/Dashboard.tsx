@@ -341,14 +341,19 @@ const SurferRow: React.FC<{ surfer: Surfer }> = ({ surfer }) => {
     <div className={`flex items-center p-5 border-b border-gray-50 last:border-0 transition-all ${isInWater ? 'bg-primary/5' : 'hover:bg-gray-50/50'}`}>
       <div className="relative">
         <img src={getAvatarUrl(surfer.image, surfer.name)} alt={surfer.name} className={`h-16 w-16 rounded-2xl object-cover object-top ${isEliminated ? 'grayscale opacity-60' : ''} ${isInWater ? 'ring-2 ring-primary ring-offset-2' : ''}`} onError={(e) => { (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${getInitials(surfer.name)}&background=random&color=fff&size=128`; }} />
+        {isEliminated && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="material-icons-round text-red-500 text-3xl font-black drop-shadow-md">close</span>
+          </div>
+        )}
         {!isEliminated && (
           <div className={`absolute -bottom-1.5 -right-1.5 ${getTierBadgeColor(surfer.tier)} text-[10px] font-black px-2 py-1 rounded-full border-4 border-white shadow-sm`}>{surfer.tier}</div>
         )}
       </div>
       <div className={`ml-5 flex-1 ${isEliminated ? 'opacity-50' : ''}`}>
         <h4 className="font-bold text-lg leading-tight">{surfer.name}</h4>
-        <p className={`text-[10px] font-black mt-1 uppercase tracking-widest ${isInWater ? 'text-primary animate-pulse' : 'text-gray-400'}`}>
-          {surfer.status === 'In Water Now' ? 'Scoring Heat...' : surfer.status}
+        <p className={`text-[10px] font-black mt-1 uppercase tracking-widest ${isEliminated ? 'text-red-500' : isInWater ? 'text-primary animate-pulse' : 'text-gray-400'}`}>
+          {surfer.status === 'In Water Now' ? 'Scoring Heat...' : isEliminated ? 'Eliminated' : surfer.status}
         </p>
         {surfer.commentary && isInWater && (
           <p className="text-xs text-primary-dark mt-1 italic font-medium animate-in fade-in slide-in-from-left-2 duration-500">"{surfer.commentary}"</p>

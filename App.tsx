@@ -85,6 +85,7 @@ const App: React.FC = () => {
                   value: latest.value,
                   tier: latest.tier,
                   image: latest.image,
+                  status: latest.status || s.status,
                   points: points
                 } : { ...s, points };
               });

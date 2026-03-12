@@ -35,6 +35,49 @@ export const syncUserTeamToDB = async (userId: string, eventId: string, team: Su
 };
 
 /**
+ * Helper to identify eliminated surfers based on heat results (3rd or 4th place in any heat).
+ */
+export const getEliminatedSurferIds = async (eventId: string): Promise<Set<string>> => {
+    // 1. Fetch completed heats
+    const { data: heats } = await supabase
+        .from('heats')
+        .select('id')
+        .eq('event_id', eventId)
+        .eq('status', 'COMPLETED');
+
+    if (!heats || heats.length === 0) return new Set();
+
+    const heatIds = heats.map(h => h.id);
+
+    // 2. Fetch assignments
+    const { data: assignments } = await supabase
+        .from('heat_assignments')
+        .select('surfer_id, heat_id, heat_score')
+        .in('heat_id', heatIds);
+
+    if (!assignments) return new Set();
+
+    // 3. Calculate ranks
+    const heatGroups: Record<string, any[]> = {};
+    assignments.forEach(a => {
+        if (!heatGroups[a.heat_id]) heatGroups[a.heat_id] = [];
+        heatGroups[a.heat_id].push(a);
+    });
+
+    const eliminated = new Set<string>();
+    for (const hId in heatGroups) {
+        const sorted = heatGroups[hId].sort((a, b) => (b.heat_score || 0) - (a.heat_score || 0));
+        sorted.forEach((a, index) => {
+            if (index + 1 >= 3) {
+                eliminated.add(a.surfer_id);
+            }
+        });
+    }
+
+    return eliminated;
+};
+
+/**
  * Retrieves another user's drafted team for a specific event to display on leaderboards.
  */
 export const getUserTeamFromDB = async (userId: string, eventId: string): Promise<Surfer[]> => {
@@ -63,9 +106,14 @@ export const getUserTeamFromDB = async (userId: string, eventId: string): Promis
         return [];
     }
 
-    // 3. Format back into our standard Surfer array syntax, combining data
+    // 3. Get eliminated list to set status correctly
+    const eliminatedIds = await getEliminatedSurferIds(eventId);
+
+    // 4. Format back into our standard Surfer array syntax, combining data
     return teamRows.map((row: any) => {
         const surfer = surfers?.find(s => s.id === row.surfer_id);
+        const isEliminated = eliminatedIds.has(row.surfer_id);
+
         return {
             id: row.surfer_id,
             name: surfer?.name || 'Unknown Surfer',
@@ -73,7 +121,7 @@ export const getUserTeamFromDB = async (userId: string, eventId: string): Promis
             value: surfer?.value || 5,
             country: surfer?.country || '',
             points: row.points || 0,
-            status: 'Waiting', // Default status for viewing other teams
+            status: isEliminated ? 'Eliminated' : 'Waiting',
             image: surfer?.image || '',
         };
     }) as Surfer[];

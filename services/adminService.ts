@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { getEliminatedSurferIds } from './teamService';
 
 // Types
 export interface Event {
@@ -406,10 +407,16 @@ export const getEventSurfers = async (eventId: string) => {
 
     // Flatten and deduplicate
     const surfersMap = new Map();
+    const eliminatedIds = await getEliminatedSurferIds(eventId);
+
     data.forEach((heat: any) => {
         heat.heat_assignments?.forEach((ha: any) => {
             if (ha.surfers) {
-                surfersMap.set(ha.surfers.id, ha.surfers);
+                const s = { ...ha.surfers };
+                if (eliminatedIds.has(s.id)) {
+                    s.status = 'Eliminated';
+                }
+                surfersMap.set(s.id, s);
             }
         });
     });

@@ -226,6 +226,11 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
               }}
             />
           </div>
+          {isEliminated && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+              <span className="material-icons-round text-red-500 text-5xl font-black drop-shadow-lg">close</span>
+            </div>
+          )}
           {isSelected && (
             <div className={`absolute top-0 right-1 md:right-4 w-8 h-8 ${tierColorInfo.solid} rounded-full flex items-center justify-center text-white border-4 border-white shadow-md animate-in zoom-in`}>
               <span className="material-icons-round text-lg font-black">check</span>
@@ -487,6 +492,11 @@ const RosterSlot = ({
                   (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${surfer.name.split(' ').map(n => n[0]).join('')}&background=random&color=fff&size=128`;
                 }}
               />
+              {surfer.status?.toLowerCase() === 'eliminated' && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
+                  <span className="material-icons-round text-red-500 text-4xl font-black drop-shadow-md">close</span>
+                </div>
+              )}
               {!isLocked && (
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <button
