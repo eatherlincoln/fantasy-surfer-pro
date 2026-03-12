@@ -34,12 +34,6 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
     fetchUserLeagues();
     fetchGlobalLeaderboard();
 
-    // RLS Access Check for Debugging
-    supabase.from('profiles').select('id').limit(1).then(({ data, error }) => {
-      if (error) console.error('[RLS Check] Profiles error:', error);
-      else console.log('[RLS Check] Profiles accessible:', !!data);
-    });
-
     // Check for Deep Link on mount
     const params = new URLSearchParams(window.location.search);
     const joinCode = params.get('join');
@@ -53,7 +47,6 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
 
   useEffect(() => {
     if (selectedLeague) {
-      console.log(`[Leagues] Fetching leaderboard for league: ${selectedLeague.id}`);
       fetchLeagueLeaderboard(selectedLeague.id);
     } else {
       setLeagueMembers([]);
@@ -63,16 +56,10 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
   // Fetch Member Teams specifically when expanded
   useEffect(() => {
     if (expandedId && activeEvent) {
-      console.log(`[Leagues] Expansion Check: ${expandedId}. Event Status: ${activeEvent.status}`);
+      const isStarted = activeEvent.status === 'LIVE' || activeEvent.status === 'COMPLETED';
       
-      // TEMPORARY: Remove isStarted check to verify data fetching
-      if (!memberTeams[expandedId]) {
-        console.log(`[Leagues] Scouting roster for user: ${expandedId}, event: ${activeEvent.id}`);
+      if (isStarted && !memberTeams[expandedId]) {
         getUserTeamFromDB(expandedId, activeEvent.id).then(team => {
-          console.log(`[Leagues] Found ${team?.length || 0} surfers for ${expandedId}`);
-          if (!team || team.length === 0) {
-            console.warn(`[Leagues] No team data returned for ${expandedId}`);
-          }
           // Map surfer status to league UI status just like userStats lineup does
           const mappedLineup = team.map(s => ({
             name: s.name.split(' ').pop() || '',

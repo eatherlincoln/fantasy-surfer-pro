@@ -46,7 +46,6 @@ export const getUserTeamFromDB = async (userId: string, eventId: string): Promis
 
     if (teamError) {
         console.error("Error fetching user team rows:", teamError);
-        console.log("Error details:", JSON.stringify(teamError, null, 2));
         return [];
     }
 

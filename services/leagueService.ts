@@ -139,10 +139,7 @@ export const getLeagueLeaderboard = async (leagueId: string, eventId?: string) =
             .eq('event_id', eventId)
             .in('user_id', userIds);
 
-        if (tErr) {
-            console.error(`[getLeagueLeaderboard] Error fetching team counts:`, tErr);
-        } else if (teams) {
-            console.log(`[getLeagueLeaderboard] Fetched ${teams.length} user_teams rows for ${userIds.length} users.`);
+        if (teams) {
             const countsMap: Record<string, number> = {};
             (teams as any[]).forEach(t => {
                 const uid = String(t.user_id).toLowerCase();
@@ -188,17 +185,12 @@ export const getGlobalLeaderboard = async (eventId?: string) => {
             .eq('event_id', eventId)
             .in('user_id', userIds);
 
-        if (tErr) {
-            console.error(`[getGlobalLeaderboard] Error fetching team counts:`, tErr);
-        } else if (teams) {
-            console.log(`[getGlobalLeaderboard] Fetched ${teams.length} user_teams rows for ${userIds.length} profiles.`);
+        if (teams) {
             const countsMap: Record<string, number> = {};
             (teams as any[]).forEach(t => {
                 const uid = String(t.user_id).toLowerCase();
                 countsMap[uid] = (countsMap[uid] || 0) + 1;
             });
-            
-            console.log("[getGlobalLeaderboard] Sample countsMap keys:", Object.keys(countsMap).slice(0, 3));
             
             castProfiles.forEach((p: any) => {
                 const pid = String(p.id).toLowerCase();
