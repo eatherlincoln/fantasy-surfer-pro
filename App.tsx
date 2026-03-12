@@ -1,5 +1,5 @@
 
-// Final points and round advancement system - v2.0.1 (Vercel Build Trigger)
+// Final points and round advancement system - v2.0.2 (Deployment Trigger)
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Surfer, EventStatus, UserProfile } from './types';
 import { Event } from './services/adminService';
