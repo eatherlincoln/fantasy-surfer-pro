@@ -336,8 +336,8 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
                         <span className="material-icons-round text-gray-400 text-xl w-full h-full flex items-center justify-center">person</span>
                       )}
                       {(surfer.status === 'OUT' || surfer.status === 'Eliminated') && (
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 transition-all duration-700 animate-in zoom-in spin-in-12 bg-white/60">
-                          <img src="/out-stamp.png" alt="OUT" className="w-10 h-auto rotate-[-15deg] drop-shadow-xl border-2 border-white" />
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 transition-all duration-700 animate-in zoom-in spin-in-12">
+                          <img src="/out-stamp.png" alt="OUT" className="w-10 h-auto rotate-[-15deg] drop-shadow-xl" />
                         </div>
                       )}
                     </div>
