@@ -334,7 +334,7 @@ const App: React.FC = () => {
 
       <div className="fixed bottom-0 left-0 right-0 flex justify-center z-50 pointer-events-none">
         <div className="w-full max-w-screen-md pointer-events-auto px-4 md:px-0 mb-6">
-          <Navigation currentView={currentView} onViewChange={setCurrentView} />
+          <Navigation currentView={currentView} onViewChange={setCurrentView} isAdmin={userProfile?.is_admin} />
         </div>
       </div>
     </div>

@@ -5,15 +5,20 @@ import { View } from '../types';
 interface NavigationProps {
   currentView: View;
   onViewChange: (view: View) => void;
+  isAdmin?: boolean;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ currentView, onViewChange }) => {
+const Navigation: React.FC<NavigationProps> = ({ currentView, onViewChange, isAdmin }) => {
   const tabs = [
     { id: 'DASHBOARD' as View, label: 'Home', icon: 'home' },
     { id: 'TEAM_BUILDER' as View, label: 'My Team', icon: 'groups' },
     { id: 'LEAGUES' as View, label: 'Leagues', icon: 'emoji_events' },
     { id: 'PROFILE' as View, label: 'Profile', icon: 'person' },
   ];
+
+  if (isAdmin) {
+    tabs.push({ id: 'ADMIN' as View, label: 'Admin', icon: 'admin_panel_settings' });
+  }
 
   return (
     <nav className="glass border border-white/20 apple-shadow md:rounded-full h-20 px-8 pb-1 flex justify-around items-center transition-all">

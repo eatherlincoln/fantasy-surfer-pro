@@ -478,7 +478,21 @@ const AdminDashboard: React.FC = () => {
 
     const checkAdmin = async () => {
         const { data: { user } } = await supabase.auth.getUser();
-        if (user) setIsAdmin(true);
+        if (user) {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('is_admin')
+                .eq('id', user.id)
+                .single();
+            
+            if (profile?.is_admin) {
+                setIsAdmin(true);
+            } else {
+                setIsAdmin(false);
+            }
+        } else {
+            setIsAdmin(false);
+        }
         setLoading(false);
     };
 
