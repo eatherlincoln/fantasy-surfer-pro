@@ -67,9 +67,19 @@ export const getEliminatedSurferIds = async (eventId: string): Promise<Set<strin
     const eliminated = new Set<string>();
     for (const hId in heatGroups) {
         const sorted = heatGroups[hId].sort((a, b) => (b.heat_score || 0) - (a.heat_score || 0));
+        const numSurfers = sorted.length;
+        
         sorted.forEach((a, index) => {
-            if (index + 1 >= 3) {
-                eliminated.add(a.surfer_id);
+            const rank = index + 1;
+            // In 4-man heats (R1/R2), top 2 advance, bottom 2 eliminated (rank 3,4)
+            // In 2-man heats (R16 onwards), winner advances, loser eliminated (rank 2)
+            if (numSurfers === 4) {
+                if (rank >= 3) eliminated.add(a.surfer_id);
+            } else if (numSurfers === 2) {
+                if (rank >= 2) eliminated.add(a.surfer_id);
+            } else if (numSurfers === 3) {
+                 // Fallback for 3-man heats if they happen
+                if (rank >= 2) eliminated.add(a.surfer_id);
             }
         });
     }

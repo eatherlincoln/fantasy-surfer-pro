@@ -136,20 +136,18 @@ export const getLeagueLeaderboard = async (leagueId: string, eventId?: string) =
         const userIds = castMembers.map(m => m.user_id);
         const { data: teams, error: tErr } = await supabase
             .from('user_teams')
-            .select('user_id, surfer_id')
+            .select('user_id, surfer_id, surfers(status)')
             .eq('event_id', eventId)
             .in('user_id', userIds);
 
         if (teams) {
-            const eliminatedIds = await getEliminatedSurferIds(eventId);
             const countsMap: Record<string, number> = {};
             (teams as any[]).forEach(t => {
                 const uid = String(t.user_id).toLowerCase();
                 // Only count if NOT eliminated
-                if (!eliminatedIds.has(t.surfer_id)) {
+                if (t.surfers?.status !== 'Eliminated') {
                     countsMap[uid] = (countsMap[uid] || 0) + 1;
                 } else {
-                    // Initialize if not exists to ensure 0 is shown
                     if (!countsMap[uid]) countsMap[uid] = 0;
                 }
             });
@@ -189,17 +187,16 @@ export const getGlobalLeaderboard = async (eventId?: string) => {
         const userIds = castProfiles.map(p => p.id);
         const { data: teams, error: tErr } = await supabase
             .from('user_teams')
-            .select('user_id, surfer_id')
+            .select('user_id, surfer_id, surfers(status)')
             .eq('event_id', eventId)
             .in('user_id', userIds);
 
         if (teams) {
-            const eliminatedIds = await getEliminatedSurferIds(eventId);
             const countsMap: Record<string, number> = {};
             (teams as any[]).forEach(t => {
                 const uid = String(t.user_id).toLowerCase();
                 // Only count if NOT eliminated
-                if (!eliminatedIds.has(t.surfer_id)) {
+                if (t.surfers?.status !== 'Eliminated') {
                     countsMap[uid] = (countsMap[uid] || 0) + 1;
                 } else {
                     if (!countsMap[uid]) countsMap[uid] = 0;
