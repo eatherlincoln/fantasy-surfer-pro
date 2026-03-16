@@ -39,7 +39,7 @@ const masterData = [
   { name: 'Mateus Herdy', tier: 'C', country: 'Brazil', stance: 'Natural', url: 'https://www.dropbox.com/scl/fi/uih56i1lnspapje0gc4i5/Mateus-Herdy.png?rlkey=7tlaemyekxdjz8cq1xg3vhqaf&dl=1' },
   { name: 'Liam O\'Brien', tier: 'C', country: 'Australia', stance: 'Natural', url: 'https://www.dropbox.com/scl/fi/9a7q75u2k0lci7osnl9pn/Liam-Obrien.png?rlkey=ih9it9ptxjz69s6vz3tqgtn&dl=1' },
   { name: 'Gabriel Medina', tier: 'C', country: 'Brazil', stance: 'Goofy', url: 'https://www.dropbox.com/scl/fi/7egs1pjshfmquouw4i8w1/Gabby-Medina.png?rlkey=ma9zror27ckmil03psf8tkfxl&dl=1' },
-  { name: 'Ramzi Boukhaim', tier: 'C', country: 'Morroco', stance: 'Goofy', url: 'https://www.dropbox.com/scl/fi/54ai3a1886kbkkwg6b4au/Ramzi-Boukhaim.png?rlkey=yciwtot686jgf3ftzm97syylk&dl=1' }
+  { name: 'Ramzi Boukhaim', tier: 'C', country: 'Morocco', stance: 'Goofy', url: 'https://www.dropbox.com/scl/fi/54ai3a1886kbkkwg6b4au/Ramzi-Boukhaim.png?rlkey=yciwtot686jgf3ftzm97syylk&dl=1' }
 ];
 
 function slugify(name: string) {
@@ -47,20 +47,17 @@ function slugify(name: string) {
 }
 
 async function sync() {
-  console.log("--- Starting Master Data Sync ---");
+  console.log("--- Starting Master Data Sync (V2: Full Update) ---");
 
   for (const s of masterData) {
     console.log(`\nSyncing ${s.name}...`);
     
-    // 1. Download image
-    console.log(`Downloading image from Dropbox...`);
     try {
+      // 1. Download image (if needed or forced)
       const response = await fetch(s.url);
       if (!response.ok) throw new Error(`Download failed with status ${response.status}`);
-      
       const arrayBuffer = await response.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      
       const slug = slugify(s.name);
       const storagePath = `surfers/${slug}.png`;
 
@@ -70,12 +67,14 @@ async function sync() {
         contentType: 'image/png',
         upsert: true
       });
-
       if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
 
       const publicUrl = `${PROD_URL}/storage/v1/object/public/avatars/${storagePath}`;
 
-      // 3. Update Database (Upsert based on name)
+      // 3. Calculated fields
+      const value = s.tier === 'A' ? 10 : s.tier === 'B' ? 7.5 : 5;
+
+      // 4. Update Database
       let searchName = s.name;
       if (s.name === 'Cole Houshman') searchName = 'Cole Houshmand';
       if (s.name === 'Ramzi Boukhaim') searchName = 'Ramzi Boukhiam';
@@ -93,16 +92,18 @@ async function sync() {
           .update({
             name: s.name,
             tier: s.tier,
+            value: value,
             country: s.country,
             stance: s.stance,
             image: publicUrl,
             is_on_tour: true,
-            status: 'ACTIVE'
+            status: 'ACTIVE',
+            gender: 'Male'
           })
           .eq('id', existing.id);
         
         if (updateError) console.error("Update Error:", updateError.message);
-        else console.log("Success: Updated existing.");
+        else console.log(`Success: Updated ${s.name} (Value: ${value})`);
       } else {
         console.log(`No record found for ${searchName}. Inserting new...`);
         const { error: insertError } = await supabase
@@ -110,17 +111,17 @@ async function sync() {
           .insert({
             name: s.name,
             tier: s.tier,
+            value: value,
             country: s.country,
             stance: s.stance,
             image: publicUrl,
             is_on_tour: true,
             status: 'ACTIVE',
-            gender: 'Male',
-            value: s.tier === 'A' ? 10 : s.tier === 'B' ? 7.5 : 5
+            gender: 'Male'
           });
         
         if (insertError) console.error("Insert Error:", insertError.message);
-        else console.log("Success: Inserted new.");
+        else console.log(`Success: Inserted ${s.name} (Value: ${value})`);
       }
 
     } catch (err: any) {
@@ -128,7 +129,7 @@ async function sync() {
     }
   }
 
-  console.log("\n--- Master Sync Complete ---");
+  console.log("\n--- Master Sync V2 Complete ---");
 }
 
 sync().catch(console.error);

@@ -26,28 +26,33 @@ async function updateHeats() {
     return;
   }
 
-  const heatDraw = {
-    round1: [
-      { heat: 1, surfers: ['Mateus Herdy', 'Liam O\'Brien'] },
-      { heat: 2, surfers: ['Oscar Berry', 'Ramzi Boukhaim'] },
-      { heat: 3, surfers: ['Luke Thompson', 'Dane Henry'] },
-      { heat: 4, surfers: ['Callum Robson', 'Wildcard'] }
-    ],
-    round2: [
-      { heat: 1, surfers: ['Miguel Pupo', 'Joel Vaughan'] },
-      { heat: 2, surfers: ['Barron Mamiya', 'Seth Moniz'] },
-      { heat: 4, surfers: ['Ethan Ewing', 'George Pittar'] },
-      { heat: 5, surfers: ['Jake Marshall', 'Joao Chianca'] },
-      { heat: 7, surfers: ['Cole Houshman', 'Alejo Muniz'] },
-      { heat: 8, surfers: ['Kanoa Igarashi', 'Morgan Cibilic'] },
-      { heat: 10, surfers: ['Crosby Colapinto', 'Marco Mignot'] },
-      { heat: 11, surfers: ['Leonardo Fioravanti', 'Kauli Vaast'] },
-      { heat: 12, surfers: ['Filipe Toledo', 'Eli Hannerman'] },
-      { heat: 14, surfers: ['Gabriel Medina', 'Alan Cleland'] },
-      { heat: 15, surfers: ['Connor O\'Leary', 'Rio Waida'] },
-      { heat: 16, surfers: ['Jack Robinson', 'Samuel Pupo'] }
-    ]
-  };
+  
+const heatDraw = {
+  round1: [
+    { heat: 1, surfers: ['Mateus Herdy', 'Liam O\'Brien'] },
+    { heat: 2, surfers: ['Oscar Berry', 'Ramzi Boukhaim'] },
+    { heat: 3, surfers: ['Luke Thompson', 'Dane Henry'] },
+    { heat: 4, surfers: ['Callum Robson', 'Wildcard'] }
+  ],
+  round2: [
+    { heat: 1, surfers: ['Miguel Pupo', 'Joel Vaughan'] },
+    { heat: 2, surfers: ['Barron Mamiya', 'Seth Moniz'] },
+    { heat: 3, surfers: ['Jordy Smith'] },
+    { heat: 4, surfers: ['Ethan Ewing', 'George Pittar'] },
+    { heat: 5, surfers: ['Jake Marshall', 'Joao Chianca'] },
+    { heat: 6, surfers: ['Griffin Colapinto'] },
+    { heat: 7, surfers: ['Cole Houshman', 'Alejo Muniz'] },
+    { heat: 8, surfers: ['Kanoa Igarashi', 'Morgan Cibilic'] },
+    { heat: 9, surfers: ['Yago Dora'] },
+    { heat: 10, surfers: ['Crosby Colapinto', 'Marco Mignot'] },
+    { heat: 11, surfers: ['Leonardo Fioravanti', 'Kauli Vaast'] },
+    { heat: 12, surfers: ['Filipe Toledo', 'Eli Hannerman'] },
+    { heat: 13, surfers: ['Italo Ferreira'] },
+    { heat: 14, surfers: ['Gabriel Medina', 'Alan Cleland'] },
+    { heat: 15, surfers: ['Connor O\'Leary', 'Rio Waida'] },
+    { heat: 16, surfers: ['Jack Robinson', 'Samuel Pupo'] }
+  ]
+};
 
   for (const round of [1, 2]) {
     const roundHeats = round === 1 ? heatDraw.round1 : heatDraw.round2;
