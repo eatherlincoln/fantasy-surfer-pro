@@ -131,7 +131,10 @@ export const getUserTeamFromDB = async (userId: string, eventId: string): Promis
     // 4. Format back into our standard Surfer array syntax, combining data
     return teamRows.map((row: any) => {
         const surfer = surfers?.find(s => s.id === row.surfer_id);
-        const isEliminated = eliminatedIds.has(row.surfer_id);
+        const isCalculatedEliminated = eliminatedIds.has(row.surfer_id);
+        const isDbEliminated = surfer?.status?.toLowerCase() === 'eliminated' || surfer?.status === 'OUT';
+        
+        const isEliminated = isCalculatedEliminated || isDbEliminated;
 
         return {
             id: row.surfer_id,

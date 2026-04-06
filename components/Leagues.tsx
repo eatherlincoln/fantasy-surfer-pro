@@ -332,7 +332,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {lineupToRender.map((surfer: any, idx: number) => (
                   <div key={idx} className={`bg-white rounded-xl p-2 flex items-center gap-3 border shadow-sm ${getTierColor(surfer.tier)} border-l-4`}>
-                    <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
+                    <div className="relative w-10 h-10 rounded-full bg-gray-100 border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
                       {surfer.image ? (
                         <img src={surfer.image} alt={surfer.name} className="w-full h-full object-cover object-top" />
                       ) : (
