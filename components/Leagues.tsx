@@ -225,20 +225,26 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
 
   const userStats = useMemo(() => {
     const totalPoints = userTeam.reduce((acc, s) => acc + (s.points || 0), 0);
-    const activeSurfers = userTeam.filter(s => s.status !== 'Eliminated').length;
+    const surfersLeft = userTeam.filter(s => {
+      const status = s.status?.toUpperCase() || '';
+      return status !== 'ELIMINATED' && status !== 'OUT';
+    }).length;
 
     // Map surfer status to league UI status
-    const lineup = userTeam.map(s => ({
-      name: s.name.split(' ').pop() || '',
-      image: s.image,
-      status: s.status === 'In Water Now' ? 'IN HEAT' : s.status === 'Eliminated' ? 'OUT' : 'NEXT' as any,
-      value: s.value,
-      tier: s.tier
-    }));
+    const lineup = userTeam.map(s => {
+      const statusUpper = s.status?.toUpperCase();
+      return {
+        name: s.name.split(' ').pop() || '',
+        image: s.image,
+        status: s.status === 'In Water Now' ? 'IN HEAT' : (statusUpper === 'ELIMINATED' || statusUpper === 'OUT') ? 'OUT' : 'NEXT' as any,
+        value: s.value,
+        tier: s.tier
+      };
+    });
 
     return {
       points: totalPoints,
-      surfersLeft: activeSurfers,
+      surfersLeft: surfersLeft,
       lineup: userTeam.length > 0 ? lineup : undefined
     };
   }, [userTeam]);
@@ -332,15 +338,17 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {lineupToRender.map((surfer: any, idx: number) => (
                   <div key={idx} className={`bg-white rounded-xl p-2 flex items-center gap-3 border shadow-sm ${getTierColor(surfer.tier)} border-l-4`}>
-                    <div className="relative w-10 h-10 rounded-full bg-gray-100 border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
-                      {surfer.image ? (
-                        <img src={surfer.image} alt={surfer.name} className="w-full h-full object-cover object-top" />
-                      ) : (
-                        <span className="material-icons-round text-gray-400 text-xl w-full h-full flex items-center justify-center">person</span>
-                      )}
-                      {(surfer.status === 'OUT' || surfer.status === 'Eliminated') && (
+                    <div className="relative flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-white shadow-sm overflow-hidden">
+                        {surfer.image ? (
+                          <img src={surfer.image} alt={surfer.name} className="w-full h-full object-cover object-top" />
+                        ) : (
+                          <span className="material-icons-round text-gray-400 text-xl w-full h-full flex items-center justify-center">person</span>
+                        )}
+                      </div>
+                      {(surfer.status?.toUpperCase() === 'OUT' || surfer.status?.toUpperCase() === 'ELIMINATED') && (
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 transition-all duration-700 animate-in zoom-in spin-in-12">
-                          <img src="/out-stamp.png" alt="OUT" className="w-10 h-auto rotate-[-15deg] drop-shadow-xl" />
+                          <img src="/out-stamp.png" alt="OUT" className="w-10 h-auto rotate-[-15deg] drop-shadow-xl scale-125" />
                         </div>
                       )}
                     </div>
