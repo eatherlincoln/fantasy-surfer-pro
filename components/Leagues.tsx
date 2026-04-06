@@ -245,13 +245,16 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
 
   const allMembers = useMemo(() => {
     if (activeTab === 'GLOBAL') {
+      // Find the user's actual standing in the global list if they exist
+      const actualUser = globalMembers.find(m => m.id === userProfile?.id);
+
       const userMember = {
-        id: '1',
-        rank: 1,
+        id: userProfile?.id || '1',
+        rank: actualUser ? actualUser.rank : '-',
         name: teamName,
         initial: teamName.charAt(0).toUpperCase(),
-        points: userStats.points,
-        surfersLeft: userStats.surfersLeft,
+        points: actualUser ? actualUser.points : (userProfile?.total_fantasy_points || 0),
+        surfersLeft: actualUser ? actualUser.surfersLeft : userStats.surfersLeft,
         trend: 'up',
         trendValue: 3,
         isUser: true,

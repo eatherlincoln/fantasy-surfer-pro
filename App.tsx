@@ -73,6 +73,17 @@ const App: React.FC = () => {
 
           if (liveSurfers) {
             setUserTeam(prev => {
+              // Check if we need to start fresh for a new event
+              const savedEventId = localStorage.getItem('fantasy_event_id');
+              const isNewEvent = savedEventId !== ev.id;
+              
+              if (isNewEvent && (!dbPicks || dbPicks.length === 0)) {
+                  // Wait, we should do this effect in a cleaner way. 
+                  // If it's a new event and they have no DB picks for it, clear team.
+                  // For now, within setUserTeam we return []
+                  return [];
+              }
+
               const synced = prev.map(s => {
                 const latest = liveSurfers.find(a => a.id == s.id || a.name === s.name);
                 const dbPick = dbPicks.find(p => p.id == s.id || p.name === s.name);
@@ -85,12 +96,12 @@ const App: React.FC = () => {
                   value: latest.value,
                   tier: latest.tier,
                   image: latest.image,
-                  status: latest.status || s.status,
+                  // ensure status matches DB
+                  status: (latest.status === 'ELIMINATED' || latest.status?.toLowerCase() === 'eliminated') ? 'Eliminated' : (latest.status || s.status),
                   points: points
                 } : { ...s, points };
               });
 
-              // CRITICAL BUG FIX: Deduplicate and trim
               const uniqueSynced = synced.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
               const trimmedSynced = uniqueSynced.length > 10 ? uniqueSynced.slice(0, 10) : uniqueSynced;
 
@@ -176,6 +187,9 @@ const App: React.FC = () => {
   useEffect(() => {
     const hydrateTeamFromCloud = async () => {
       if (activeEvent && userProfile) {
+        // Save the active event ID so we know when it changes
+        localStorage.setItem('fantasy_event_id', activeEvent.id);
+
         const { getUserTeamFromDB } = await import('./services/teamService');
         const dbTeam = await getUserTeamFromDB(userProfile.id, activeEvent.id);
 
@@ -185,6 +199,9 @@ const App: React.FC = () => {
 
           setUserTeam(uniqueDbTeam);
           setCurrentView(prev => prev === 'TEAM_BUILDER' ? 'DASHBOARD' : prev);
+        } else {
+            // New logic: if no DB team for this active event, and localStorage event ID didn't match
+            // We already clear it above in fetchEvent. But just to be sure, we won't override here if it's empty.
         }
       }
     };

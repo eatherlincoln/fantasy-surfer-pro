@@ -41,11 +41,17 @@ export const getEliminatedSurferIds = async (eventId: string): Promise<Set<strin
     // 1. Fetch completed heats
     const { data: heats } = await supabase
         .from('heats')
-        .select('id')
+        .select('id, round_number')
         .eq('event_id', eventId)
         .eq('status', 'COMPLETED');
 
     if (!heats || heats.length === 0) return new Set();
+
+    // Mapping heat IDs to their round numbers
+    const heatRoundMap: Record<string, number> = {};
+    heats.forEach(h => {
+        heatRoundMap[h.id] = h.round_number;
+    });
 
     const heatIds = heats.map(h => h.id);
 
@@ -66,6 +72,9 @@ export const getEliminatedSurferIds = async (eventId: string): Promise<Set<strin
 
     const eliminated = new Set<string>();
     for (const hId in heatGroups) {
+        // Skip elimination logic for Round 1 entirely (no one is eliminated)
+        if (heatRoundMap[hId] === 1) continue;
+
         const sorted = heatGroups[hId].sort((a, b) => (b.heat_score || 0) - (a.heat_score || 0));
         const numSurfers = sorted.length;
         
@@ -78,8 +87,8 @@ export const getEliminatedSurferIds = async (eventId: string): Promise<Set<strin
             } else if (numSurfers === 2) {
                 if (rank >= 2) eliminated.add(a.surfer_id);
             } else if (numSurfers === 3) {
-                 // Fallback for 3-man heats if they happen
-                if (rank >= 2) eliminated.add(a.surfer_id);
+                 // 3-man elimination heat (e.g., elimination round occasionally)
+                if (rank >= 3) eliminated.add(a.surfer_id); 
             }
         });
     }
