@@ -195,8 +195,9 @@ export const getGlobalLeaderboard = async (eventId?: string) => {
             const countsMap: Record<string, number> = {};
             (teams as any[]).forEach(t => {
                 const uid = String(t.user_id).toLowerCase();
-                // Only count if NOT eliminated
-                if (t.surfers?.status !== 'Eliminated') {
+                // Only count if NOT eliminated or OUT
+                const status = t.surfers?.status?.toUpperCase();
+                if (status !== 'ELIMINATED' && status !== 'OUT') {
                     countsMap[uid] = (countsMap[uid] || 0) + 1;
                 } else {
                     if (!countsMap[uid]) countsMap[uid] = 0;
