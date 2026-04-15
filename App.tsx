@@ -26,6 +26,7 @@ const App: React.FC = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
+  const [teamHydrated, setTeamHydrated] = useState(false);
 
   /* New Hook to fetch Active Event */
   const [activeEvent, setActiveEvent] = useState<Event | null>(null);
@@ -202,7 +203,9 @@ const App: React.FC = () => {
         } else {
             // No DB team for this event — clear any stale localStorage team
             setUserTeam([]);
+            localStorage.removeItem('fantasy_surfer_team');
         }
+        setTeamHydrated(true);
       }
     };
     hydrateTeamFromCloud();
@@ -211,9 +214,9 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('fantasy_surfer_team', JSON.stringify(userTeam));
 
-    // Auto-Save Partial Drafts to DB (Debounced)
+    // Auto-Save Partial Drafts to DB (Debounced) — only after hydration to avoid re-persisting stale teams
     const timeoutId = setTimeout(async () => {
-      if (userProfile && activeEvent && currentView === 'TEAM_BUILDER' && userTeam.length > 0) {
+      if (teamHydrated && userProfile && activeEvent && currentView === 'TEAM_BUILDER' && userTeam.length > 0) {
         try {
           // Sync current snapshot silently in background
           const { syncUserTeamToDB } = await import('./services/teamService');
@@ -225,7 +228,7 @@ const App: React.FC = () => {
     }, 1500); // 1.5s debounce
 
     return () => clearTimeout(timeoutId);
-  }, [userTeam, userProfile, activeEvent, currentView]);
+  }, [userTeam, userProfile, activeEvent, currentView, teamHydrated]);
 
   const handleLogin = () => {
     if (userProfile && (userProfile.username?.startsWith('Surfer_') || userProfile.team_name === 'My Team')) {
