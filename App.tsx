@@ -19,10 +19,7 @@ import { supabase } from './services/supabase';
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('LOGIN');
   const [eventStatus, setEventStatus] = useState<EventStatus>('DRAFTING');
-  const [userTeam, setUserTeam] = useState<Surfer[]>(() => {
-    const saved = localStorage.getItem('fantasy_surfer_team');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [userTeam, setUserTeam] = useState<Surfer[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
@@ -60,56 +57,6 @@ const App: React.FC = () => {
           }
         }
 
-        // Auto-sync stale localStorage teams with DB
-        if (ev && userTeam.length > 0) {
-          const { getEventSurfers } = await import('./services/adminService');
-          const { getUserTeamFromDB } = await import('./services/teamService');
-          const liveSurfers = await getEventSurfers(ev.id);
-
-          let dbPicks: Surfer[] = [];
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session) {
-            dbPicks = await getUserTeamFromDB(session.user.id, ev.id);
-          }
-
-          if (liveSurfers) {
-            setUserTeam(prev => {
-              // Check if we need to start fresh for a new event
-              const savedEventId = localStorage.getItem('fantasy_event_id');
-              const isNewEvent = savedEventId !== ev.id;
-              
-              if (isNewEvent && (!dbPicks || dbPicks.length === 0)) {
-                  // Wait, we should do this effect in a cleaner way. 
-                  // If it's a new event and they have no DB picks for it, clear team.
-                  // For now, within setUserTeam we return []
-                  return [];
-              }
-
-              const synced = prev.map(s => {
-                const latest = liveSurfers.find(a => a.id == s.id || a.name === s.name);
-                const dbPick = dbPicks.find(p => p.id == s.id || p.name === s.name);
-
-                // Priority: 1. Points from this event in DB, 2. Global points, 3. Previous points
-                const points = dbPick ? dbPick.points : (latest?.current_season_points || latest?.points || s.points || 0);
-
-                return latest ? {
-                  ...s,
-                  value: latest.value,
-                  tier: latest.tier,
-                  image: latest.image,
-                  // ensure status matches DB
-                  status: (latest.status === 'ELIMINATED' || latest.status?.toLowerCase() === 'eliminated') ? 'Eliminated' : (latest.status || s.status),
-                  points: points
-                } : { ...s, points };
-              });
-
-              const uniqueSynced = synced.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
-              const trimmedSynced = uniqueSynced.length > 10 ? uniqueSynced.slice(0, 10) : uniqueSynced;
-
-              return JSON.stringify(trimmedSynced) !== JSON.stringify(prev) ? trimmedSynced : prev;
-            });
-          }
-        }
       } catch (e) { console.error(e); }
     };
     fetchEvent();
