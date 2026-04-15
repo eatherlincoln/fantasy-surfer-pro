@@ -200,8 +200,8 @@ const App: React.FC = () => {
           setUserTeam(uniqueDbTeam);
           setCurrentView(prev => prev === 'TEAM_BUILDER' ? 'DASHBOARD' : prev);
         } else {
-            // New logic: if no DB team for this active event, and localStorage event ID didn't match
-            // We already clear it above in fetchEvent. But just to be sure, we won't override here if it's empty.
+            // No DB team for this event — clear any stale localStorage team
+            setUserTeam([]);
         }
       }
     };

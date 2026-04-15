@@ -106,7 +106,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
       Current Event: ${activeEvent?.name || 'Upcoming Event'}.
       Context: ${activeEvent?.ai_context || 'Standard conditions expected.'}.
       Available Surfers (Top 5 Value): ${allSurfers.slice(0, 5).map(s => s.name).join(', ')}.
-      Suggest a strategy for selecting a team for this event given a $60M budget.
+      Suggest a strategy for selecting a team for this event given a $${TOTAL_BUDGET}M budget.
       Rules: Keep the response concise (max 3 sentences). Do NOT use markdown symbols (no asterisks or bolding). Write in a tight, analytical tone.`;
 
       const response = await ai.models.generateContent({
@@ -363,7 +363,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ initialTeam, isLocked, onSave
                 <span className={`text-5xl md:text-6xl font-black tracking-tighter ${totalSpent > TOTAL_BUDGET ? 'text-red-500' : 'text-primary'}`}>
                   ${(TOTAL_BUDGET - totalSpent).toFixed(1)}<span className="text-2xl font-bold ml-1">M</span>
                 </span>
-                <span className="text-xs text-gray-400 font-bold mt-1">Remaining / $60.0M Cap</span>
+                <span className="text-xs text-gray-400 font-bold mt-1">Remaining / ${TOTAL_BUDGET.toFixed(1)}M Cap</span>
               </div>
 
               <div className="flex gap-12 md:text-right">
