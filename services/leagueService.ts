@@ -214,6 +214,45 @@ export const getGlobalLeaderboard = async (eventId?: string) => {
     return profiles;
 };
 
+export const getEventLeaderboard = async (eventId: string) => {
+    // Fetch all user_teams for this event, grouped by user
+    const { data: teams, error: tErr } = await supabase
+        .from('user_teams')
+        .select('user_id, points, surfer_id, surfers(status)')
+        .eq('event_id', eventId);
+
+    if (tErr) throw tErr;
+    if (!teams || teams.length === 0) return [];
+
+    // Aggregate per user: total event points + surfers left count
+    const userMap: Record<string, { points: number; surfersLeft: number }> = {};
+    (teams as any[]).forEach(t => {
+        const uid = t.user_id;
+        if (!userMap[uid]) userMap[uid] = { points: 0, surfersLeft: 0 };
+        userMap[uid].points += (t.points || 0);
+        const status = t.surfers?.status?.toUpperCase();
+        if (status !== 'ELIMINATED' && status !== 'OUT') {
+            userMap[uid].surfersLeft += 1;
+        }
+    });
+
+    // Fetch profiles for these users
+    const userIds = Object.keys(userMap);
+    const { data: profiles, error: pErr } = await supabase
+        .from('profiles')
+        .select('id, username, full_name, team_name, avatar_url')
+        .in('id', userIds);
+
+    if (pErr) throw pErr;
+
+    // Merge and return
+    return (profiles || []).map((p: any) => ({
+        ...p,
+        event_points: userMap[p.id]?.points || 0,
+        user_team_count: userMap[p.id]?.surfersLeft || 0,
+    })).sort((a: any, b: any) => b.event_points - a.event_points);
+};
+
 export const leaveLeague = async (leagueId: string, userId: string) => {
     // 1. Delete the membership
     const { error } = await supabase

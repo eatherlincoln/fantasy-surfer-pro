@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Surfer, Tier, UserProfile } from '../types';
-import { createLeague, joinLeague, getUserLeagues, getLeagueLeaderboard, getGlobalLeaderboard, leaveLeague, League, LeagueMember } from '../services/leagueService';
+import { createLeague, joinLeague, getUserLeagues, getLeagueLeaderboard, getGlobalLeaderboard, getEventLeaderboard, leaveLeague, League, LeagueMember } from '../services/leagueService';
 import { supabase } from '../services/supabase';
 import { Event } from '../services/adminService';
 import { getUserTeamFromDB } from '../services/teamService';
@@ -18,10 +18,12 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
 
   // League State
   const [activeTab, setActiveTab] = useState<'GLOBAL' | 'LEAGUES'>('GLOBAL');
+  const [standingsView, setStandingsView] = useState<'EVENT' | 'SEASON'>('EVENT');
   const [userLeagues, setUserLeagues] = useState<League[]>([]);
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null);
   const [leagueMembers, setLeagueMembers] = useState<any[]>([]);
   const [globalMembers, setGlobalMembers] = useState<any[]>([]);
+  const [eventMembers, setEventMembers] = useState<any[]>([]);
   const [memberTeams, setMemberTeams] = useState<Record<string, any>>({});
   const [showLeagueModal, setShowLeagueModal] = useState<'CREATE' | 'JOIN' | null>(null);
   const [leagueInput, setLeagueInput] = useState('');
@@ -33,6 +35,7 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
     if (userProfile?.team_name) setTeamName(userProfile.team_name);
     fetchUserLeagues();
     fetchGlobalLeaderboard();
+    fetchEventLeaderboard();
 
     // Check for Deep Link on mount
     const params = new URLSearchParams(window.location.search);
@@ -108,6 +111,31 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
       setGlobalMembers(finalGlobal);
     } catch (error) {
       console.error('Error fetching global leaderboard:', error);
+    }
+  };
+
+  const fetchEventLeaderboard = async () => {
+    if (!activeEvent?.id) return;
+    try {
+      const data = await getEventLeaderboard(activeEvent.id);
+      const transformed = data.map((profile: any, idx: number) => {
+        const name = profile.team_name || profile.username || profile.full_name || 'New Team';
+        const initial = (profile.team_name || profile.username || profile.full_name || 'N')[0].toUpperCase();
+        return {
+          id: profile.id,
+          rank: idx + 1,
+          name,
+          initial,
+          points: profile.event_points || 0,
+          surfersLeft: profile.user_team_count || 0,
+          trend: 'neutral',
+          isUser: profile.id === userProfile?.id,
+          avatar: profile.avatar_url
+        };
+      });
+      setEventMembers(transformed);
+    } catch (error) {
+      console.error('Error fetching event leaderboard:', error);
     }
   };
 
@@ -251,15 +279,17 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
 
   const allMembers = useMemo(() => {
     if (activeTab === 'GLOBAL') {
-      // Find the user's actual standing in the global list if they exist
-      const actualUser = globalMembers.find(m => m.id === userProfile?.id);
+      const sourceList = standingsView === 'EVENT' ? eventMembers : globalMembers;
+
+      // Find the user's actual standing in the source list
+      const actualUser = sourceList.find(m => m.id === userProfile?.id);
 
       const userMember = {
         id: userProfile?.id || '1',
         rank: actualUser ? actualUser.rank : '-',
         name: teamName,
         initial: teamName.charAt(0).toUpperCase(),
-        points: actualUser ? actualUser.points : (userProfile?.total_fantasy_points || 0),
+        points: actualUser ? actualUser.points : (standingsView === 'EVENT' ? userStats.points : (userProfile?.total_fantasy_points || 0)),
         surfersLeft: actualUser ? actualUser.surfersLeft : userStats.surfersLeft,
         trend: 'up',
         trendValue: 3,
@@ -268,15 +298,15 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
         avatar: userProfile?.avatar_url || undefined,
       };
 
-      // Remove double counting the user from the global list, handle it here
-      const filteredGlobal = globalMembers.filter(m => m.id !== userProfile?.id)
+      // Remove double counting the user from the list
+      const filteredList = sourceList.filter(m => m.id !== userProfile?.id);
 
-      return [userMember, ...filteredGlobal];
+      return [userMember, ...filteredList];
     } else {
       // If viewing a custom league
       return leagueMembers.length > 0 ? leagueMembers : [];
     }
-  }, [userStats, teamName, userProfile, activeTab, leagueMembers, globalMembers, activeEvent]);
+  }, [userStats, teamName, userProfile, activeTab, standingsView, leagueMembers, globalMembers, eventMembers, activeEvent]);
 
   const renderMemberRow = (member: any, isPinned = false) => (
     <div key={member.id} className={`flex flex-col ${isPinned ? 'bg-primary/5 border-b-2 border-primary/10' : ''}`}>
@@ -438,8 +468,8 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
 
       {activeTab === 'GLOBAL' && (
         <>
-          <div className="mb-8">
-            <h2 className="text-xl font-bold tracking-tight text-gray-900">Global Standings</h2>
+          <div className="mb-6">
+            <h2 className="text-xl font-bold tracking-tight text-gray-900">Standings</h2>
             <div className="flex items-center text-sm text-gray-400 mt-1 font-medium">
               <span>Top 100</span>
               <span className="mx-2 w-1 h-1 rounded-full bg-gray-300"></span>
@@ -447,9 +477,30 @@ const Leagues: React.FC<LeaguesProps> = ({ userTeam, userProfile, activeEvent })
             </div>
           </div>
 
+          {/* Event / Season Sub-tabs */}
+          <div className="flex p-1 bg-gray-100 rounded-xl mb-6">
+            <button
+              onClick={() => setStandingsView('EVENT')}
+              className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${standingsView === 'EVENT' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+              <span className="material-icons-round text-sm">surfing</span>
+              {activeEvent?.name ? activeEvent.name.split(' ').slice(-2).join(' ') : 'This Event'}
+            </button>
+            <button
+              onClick={() => setStandingsView('SEASON')}
+              className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${standingsView === 'SEASON' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+              <span className="material-icons-round text-sm">emoji_events</span>
+              Season
+            </button>
+          </div>
+
           <div className="bg-white rounded-2xl apple-shadow border border-accent/50 overflow-hidden divide-y divide-gray-50">
-            {renderMemberRow(allMembers[0], true)}
+            {allMembers.length > 0 && renderMemberRow(allMembers[0], true)}
             {allMembers.slice(1).map((member) => renderMemberRow(member))}
+            {allMembers.length === 0 && (
+              <div className="p-8 text-center text-gray-400 text-sm">No teams drafted for this event yet.</div>
+            )}
           </div>
         </>
       )}
