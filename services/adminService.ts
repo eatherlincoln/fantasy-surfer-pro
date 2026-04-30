@@ -121,6 +121,17 @@ export const updateEvent = async (eventId: string, updates: Partial<Event>) => {
 
 // --- User Management ---
 
+export const inviteUserByEmail = async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+            shouldCreateUser: true,
+        },
+    });
+    if (error) throw error;
+    return true;
+};
+
 export const getUsers = async () => {
     const { data, error } = await supabase
         .from('profiles')

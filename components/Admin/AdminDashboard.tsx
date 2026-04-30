@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     createEvent, getEvents, createHeat, getHeats, startHeat, endHeat, updateEventStatus, deleteEvent, deleteHeat, createHeatAssignment, deleteHeatAssignment, submitWaveScore,
     eliminateSurfer, advanceSurfer, getOrCreateSurfer,
-    finalizeHeat, updateEvent, getUsers, toggleUserBan, deleteUser,
+    finalizeHeat, updateEvent, getUsers, toggleUserBan, deleteUser, inviteUserByEmail,
     uploadEventImage, setEventAsCurrent,
     type Event, type Heat
 } from '../../services/adminService';
@@ -469,6 +469,10 @@ const AdminDashboard: React.FC = () => {
     // Users Data
     const [users, setUsers] = useState<any[]>([]);
 
+    // Invite form
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [inviting, setInviting] = useState(false);
+
     // State for CSV Import
     const [targetRound, setTargetRound] = useState<number>(0);
 
@@ -683,6 +687,20 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
+    const handleInviteUser = async () => {
+        if (!inviteEmail.trim()) return;
+        setInviting(true);
+        try {
+            await inviteUserByEmail(inviteEmail.trim());
+            alert(`✅ Invite sent to ${inviteEmail}!\n\nThey'll receive a magic link to sign up.`);
+            setInviteEmail('');
+        } catch (e: any) {
+            alert(`Error sending invite: ${e.message}`);
+        } finally {
+            setInviting(false);
+        }
+    };
+
     const handleDeleteUser = async (userId: string, username: string) => {
         if (!confirm(`Are you absolutely sure you want to PERMANENTLY delete user ${username || userId}? This action cannot be undone and will wipe their drafted teams and authentication record.`)) return;
         try {
@@ -750,6 +768,38 @@ const AdminDashboard: React.FC = () => {
             {activeTab === 'USERS' && (
                 <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200">
                     <h2 className="text-2xl font-bold mb-6">User Management</h2>
+
+                    {/* INVITE USER */}
+                    <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 mb-8">
+                        <h3 className="text-sm font-black text-blue-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <span className="material-icons-round text-base">person_add</span>
+                            Invite User by Email
+                        </h3>
+                        <div className="flex gap-3">
+                            <input
+                                type="email"
+                                placeholder="email@example.com"
+                                value={inviteEmail}
+                                onChange={e => setInviteEmail(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && handleInviteUser()}
+                                disabled={inviting}
+                                className="flex-1 border border-blue-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50"
+                            />
+                            <button
+                                onClick={handleInviteUser}
+                                disabled={inviting || !inviteEmail.trim()}
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                                {inviting ? (
+                                    <><div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent" /> Sending...</>
+                                ) : (
+                                    <><span className="material-icons-round text-sm">send</span> Send Invite</>
+                                )}
+                            </button>
+                        </div>
+                        <p className="text-xs text-blue-400 mt-2">Sends a magic sign-in link — user clicks it to create their account.</p>
+                    </div>
+
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
