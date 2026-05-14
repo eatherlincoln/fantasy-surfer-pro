@@ -64,10 +64,17 @@ const App: React.FC = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      // Handle password recovery link — route to reset screen before doing anything else
+      if (_event === 'PASSWORD_RECOVERY') {
+        setSession(session);
+        setCurrentView('RESET_PASSWORD');
+        return;
+      }
+
       setSession(session);
       if (session) {
         setCurrentView(prev => {
-          if (prev === 'LOGIN') {
+          if (prev === 'LOGIN' || prev === 'RESET_PASSWORD') {
             const params = new URLSearchParams(window.location.search);
             if (params.get('join')) return 'LEAGUES';
 
@@ -246,8 +253,8 @@ const App: React.FC = () => {
     );
   }
 
-  if (currentView === 'LOGIN') {
-    return <Login onLogin={handleLogin} />;
+  if (currentView === 'LOGIN' || currentView === 'RESET_PASSWORD') {
+    return <Login onLogin={handleLogin} initialMode={currentView === 'RESET_PASSWORD' ? 'RESET_PASSWORD' : 'LOGIN'} />;
   }
 
   const handleBackFromTeamBuilder = () => {
